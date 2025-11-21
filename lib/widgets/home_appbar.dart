@@ -5,8 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../app_styles/app_colors.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final double appBarSize;
-  const HomeAppBar({super.key, required this.appBarSize});
+  const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -95,5 +94,5 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(appBarSize.h);
+  Size get preferredSize => Size.fromHeight(70.h);
 }

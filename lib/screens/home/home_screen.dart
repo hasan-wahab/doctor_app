@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/heding_text.dart';
@@ -25,10 +26,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController1 = PageController();
   late PageController _pageController2 = PageController();
-  late ScrollController _scrollController = ScrollController();
   int currentValue1 = 0;
   int currentValue2 = 0;
-  double appBarSize = 70;
+
   late Timer _timer;
 
   List<String> therapyName = [
@@ -52,22 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _pageController1 = PageController(initialPage: currentValue1);
     _pageController2 = PageController(initialPage: currentValue1);
-    _scrollController = ScrollController();
 
     sliderController(_pageController1, currentValue1);
     sliderController(_pageController2, currentValue2);
-
-    // _scrollController.addListener(() {
-    //   if (_scrollController.position.pixels > 20) {
-    //     setState(() {
-    //       appBarSize = 50;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       appBarSize = 70;
-    //     });
-    //   }
-    // });
 
     super.initState();
   }
@@ -75,9 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HomeAppBar(appBarSize: appBarSize),
+      appBar: HomeAppBar(),
       body: ListView(
-        controller: _scrollController,
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         children: [
           SizedBox(height: 15.h),
@@ -91,7 +77,15 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               HeadingText(text: 'Therapy Session Packages'),
-              CustomText(text: 'View all', color: AppColors.secondaryTextColor),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.allPackagesScreen);
+                },
+                child: CustomText(
+                  text: 'View all',
+                  color: AppColors.secondaryTextColor,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 9.h),
@@ -100,14 +94,14 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(height: 12.h),
           Container(
             height: 210.h,
-           width: 350.w,
+            width: 350.w,
             decoration: BoxDecoration(
-              borderRadius:BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(12.r),
               image: DecorationImage(
                 image: AssetImage(
                   'assets/images/WhatsApp Image 2025-11-19 at 5.05.31 PM (1) 1.png',
                 ),
-                fit: BoxFit.cover
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -170,28 +164,12 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
-}
 
-void checkWhatsAppPackages() async {
-  List<String> packages = [
-    "com.whatsapp", // normal WhatsApp
-    "com.whatsapp.w4b", // WhatsApp Business
-    "com.whatsapp.w4b2", // Some phones me business v2 hota hai
-    "com.gbwhatsapp", // GB WhatsApp
-    "com.whatsapp.gb", // Another clone
-    "com.fmwhatsapp", // FM WhatsApp
-  ];
-
-  for (var p in packages) {
-    final Uri url = Uri.parse(
-      "intent://send/#Intent;scheme=whatsapp;package=$p;end",
-    );
-
-    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      print("FOUND AND OPENED PACKAGE: $p");
-      return;
-    }
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController2.dispose();
+    _pageController1.dispose();
+    super.dispose();
   }
-
-  print("NO WHATSAPP PACKAGE FOUND");
 }

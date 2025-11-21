@@ -19,6 +19,8 @@ class AppColors{
   static Color textWhiteColor=Colors.white;
   /// Black Icon Color
   static Color blackIconColor=Colors.black;
+  // White Icon Color
+  static Color whiteIconColor=Colors.white;
   /// Link Text Color
   static Color linkTextColor=Color.fromRGBO(16, 70, 188, 1);
 }

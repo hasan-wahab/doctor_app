@@ -37,36 +37,38 @@ class _NaveBarState extends State<NaveBar> {
         padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
         height: 71.h,
         color: AppColors.secondaryColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: List.generate((iconText.length), (index) {
-            return InkWell(
-              onTap: () {
-                setState(() {
-                  currentIndex = index;
-                });
-              },
-              child: Column(
-                children: [
-                  Icon(
-                    icons[index],
-                    color: currentIndex == index
-                        ? AppColors.primaryColor
-                        : AppColors.blackIconColor,
-                  ),
-                  CustomText(
-                    text: iconText[index],
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: currentIndex == index
-                        ? AppColors.primaryColor
-                        : AppColors.blackIconColor,
-                  ),
-                ],
-              ),
-            );
-          }),
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate((iconText.length), (index) {
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
+                child: Column(
+                  children: [
+                    Icon(
+                      icons[index],
+                      color: currentIndex == index
+                          ? AppColors.primaryColor
+                          : AppColors.blackIconColor,
+                    ),
+                    CustomText(
+                      text: iconText[index],
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: currentIndex == index
+                          ? AppColors.primaryColor
+                          : AppColors.blackIconColor,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
         ),
       ),
     );
