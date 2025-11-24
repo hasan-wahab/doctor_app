@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
 import 'package:doctor_app/screens/info_screen.dart';
@@ -35,7 +37,7 @@ class _NaveBarState extends State<NaveBar> {
       body: screenList.elementAt(currentIndex),
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
-        height: 71.h,
+        height: Platform.isIOS ? 701.h : 100.h,
         color: AppColors.secondaryColor,
         child: SafeArea(
           child: Row(

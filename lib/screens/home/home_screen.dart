@@ -8,7 +8,6 @@ import 'package:doctor_app/widgets/heding_text.dart';
 import 'package:doctor_app/widgets/outline_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../widgets/home_appbar.dart';
@@ -24,8 +23,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late PageController _pageController1 = PageController();
-  late PageController _pageController2 = PageController();
+  late PageController _pageController1;
+  late PageController _pageController2;
   int currentValue1 = 0;
   int currentValue2 = 0;
 
@@ -50,13 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    super.initState();
     _pageController1 = PageController(initialPage: currentValue1);
-    _pageController2 = PageController(initialPage: currentValue1);
+    _pageController2 = PageController(initialPage: currentValue2);
 
     sliderController(_pageController1, currentValue1);
     sliderController(_pageController2, currentValue2);
-
-    super.initState();
   }
 
   @override
@@ -67,11 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         children: [
           SizedBox(height: 15.h),
-          // Slider
-          FirstSlider(
-            currentValue: currentValue1,
-            controller: _pageController1,
-          ),
+          FirstSlider(currentValue: currentValue1, controller: _pageController1)
+        ,
           SizedBox(height: 15.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           SizedBox(height: 9.h),
-          // Packages
           PackagesWidget(imageList: therapyImages, textList: therapyName),
           SizedBox(height: 12.h),
           Container(
@@ -105,12 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SizedBox(height: 9.h),
-          // Slider
-          SecondSlider(
-            controller: _pageController2,
-            currentValue: currentValue2,
-          ),
+          SizedBox(height: 20.h,),
+          SecondSlider(controller: _pageController2, currentValue: currentValue2)
         ],
       ),
       floatingActionButton: InkWell(
@@ -122,8 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               String androidUrl = 'whatsapp://send?phone=$number&text=$message';
               await launchUrl(Uri.parse(androidUrl));
             } else if (Platform.isIOS) {
-              String iosUrl =
-                  'https://wa.me/"$number"?text=${Uri.parse('I need help')}';
+              String iosUrl = 'https://wa.me/$number?text=$message';
               await launchUrl(Uri.parse(iosUrl));
             }
           } on Exception catch (e) {
@@ -145,20 +134,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  sliderController(PageController controller, int currentValue) {
+  void sliderController(PageController controller, int currentValue) {
     _timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       if (controller.hasClients) {
-        if (currentValue < 4) {
-          setState(() {
+        setState(() {
+          if (currentValue < 4) {
             currentValue++;
-          });
-        } else {
-          currentValue = 0;
-          setState(() {});
-        }
+          } else {
+            currentValue = 0;
+          }
+        });
         controller.animateToPage(
           currentValue,
-          duration: Duration(milliseconds: 600),
+          duration: Duration(milliseconds: 1000),
           curve: Curves.easeIn,
         );
       }
@@ -168,8 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _timer.cancel();
-    _pageController2.dispose();
     _pageController1.dispose();
+    _pageController2.dispose();
     super.dispose();
   }
 }

@@ -12,4 +12,6 @@ class AppRoutes {
   static const String infoScreen = 'infoScreen';
   // View All Packages Screen
   static const String allPackagesScreen = 'allPackagesScreen';
+  // Video Player Screen
+  static const String videoPlayerScreen = 'videoPlayerScreen';
 }
