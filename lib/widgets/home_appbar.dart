@@ -1,3 +1,4 @@
+import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -66,23 +67,28 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
 
-              SizedBox(
-                height: 22.h,
-                width: 64.w,
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.loginScreen);
+                },
+                child: SizedBox(
+                  height: 22.h,
+                  width: 64.w,
 
-                child: Row(
-                  children: [
-                    Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: AppColors.primaryColor,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: GoogleFonts.poppins.toString(),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: GoogleFonts.poppins.toString(),
+                        ),
                       ),
-                    ),
-                    Icon(Icons.login, size: 20.h),
-                  ],
+                      Icon(Icons.login, size: 20.h),
+                    ],
+                  ),
                 ),
               ),
             ],

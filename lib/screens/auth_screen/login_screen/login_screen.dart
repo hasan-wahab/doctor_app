@@ -1,0 +1,101 @@
+import 'package:doctor_app/app_routes/routes_name.dart';
+import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/widgets/app_button.dart';
+import 'package:doctor_app/widgets/app_t_field.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  String? email;
+  String? password;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          children: [
+            SizedBox(height: 96.h),
+            Container(
+              height: 70.h,
+              width: 70.w,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/main_logo.png'),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 50.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [Text('Login', style: TextStyle(fontSize: 40))],
+            ),
+            SizedBox(height: 50.h),
+            AppTField(
+              validator: (value) {
+                if (value == '') {
+                  return 'Please enter your email';
+                } else if (value!.contains('@gmail.com') == false) {
+                  return 'Your email format is incorrect (@gmail.com)';
+                }
+                email = value;
+                return null;
+              },
+              hintText: 'Enter your email',
+              lableText: 'Email',
+            ),
+            SizedBox(height: 20.h),
+            AppTField(
+              validator: (value) {
+                if (value == '') {
+                  return 'Please enter your password';
+                }
+                password = value;
+                return null;
+              },
+              hintText: 'Enter your password',
+              lableText: 'Password',
+            ),
+            SizedBox(height: 10.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.restPassword);
+                  },
+                  child: Text(
+                    'Forget password?',
+                    style: TextStyle(color: AppColors.primaryColor),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 30.h),
+            AppButton(
+              text: 'Login',
+              onTap: () {
+                final form = _formKey.currentState;
+                if (form!.validate()) {
+                  Navigator.pushNamed(context, AppRoutes.naveBar);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

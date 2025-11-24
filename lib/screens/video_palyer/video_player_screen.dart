@@ -17,7 +17,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late List<String> _videoIds;
   int _currentIndex = 0;
   bool _isInit = true;
-
+  final List<String> videoImageId = [
+    'HhjHYkPQ8F0',
+    'nRhYQ3l2Ask',
+    'mRD0-GxqHVo',
+    'k4y_91Q6d5I',
+    '5qap5aO4i9A',
+  ];
   final List<String> videoUrl = [
     "https://www.youtube.com/watch?v=HhjHYkPQ8F0",
     "https://www.youtube.com/watch?v=nRhYQ3l2Ask",
@@ -91,6 +97,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       },
       player: YoutubePlayer(
+        aspectRatio: 16 / 9,
         controller: _yControllers[_currentIndex],
         showVideoProgressIndicator: true,
         progressIndicatorColor: AppColors.primaryColor,
@@ -99,83 +106,131 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           handleColor: AppColors.primaryColor,
         ),
         key: ValueKey(_videoIds[_currentIndex]),
+        topActions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: AppColors.whiteIconColor,
+              size: 30,
+            ),
+          ),
+        ],
       ),
       builder: (context, player) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Video Playlist'), elevation: 1),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              player,
-              SizedBox(height: 16.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: CustomText(
-                 text:  'Playlist',
-                  fontSize: 18,
-                  color: AppColors.primaryColor,
-                  fontWeight: FontWeight.bold,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                player,
+                SizedBox(height: 16.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: CustomText(text: 'Alone', fontSize: 16, maxLines: 1),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _videoIds.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = _currentIndex == index;
-                    return GestureDetector(
-                      onTap: () => _switchVideo(index),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primaryColor.withOpacity(0.1)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primaryColor
-                                : Colors.grey.shade300,
-                            width: 1.5,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: SizedBox(
+                    width: MediaQuery.sizeOf(context).width - 140.w,
+                    child: CustomText(
+                      fontSize: 13,
+                      color: AppColors.secondaryTextColor,
+                      maxLines: 2,
+                      text:
+                          'Lorem ipsum adipiscing elit.Quisque vel lacus sit amet mauris convallis volutpat.Suspendisse potenti. Curabitur nec urna vitae ipsum aliquettempor. Integer aliquam nulla nec odio accumsan, vitaevulputate ipsum facilisis. ',
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: CustomText(
+                    text: 'Playlist',
+                    fontSize: 18,
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _videoIds.length,
+                    itemBuilder: (context, index) {
+                      final isSelected = _currentIndex == index;
+                      return GestureDetector(
+                        onTap: () => _switchVideo(index),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              isSelected
-                                  ? Icons.play_circle_filled
-                                  : Icons.play_circle_outline,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
+                          ),
+                          height: 100.h,
+                          width: MediaQuery.sizeOf(context).width.w,
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.secondaryColor : null,
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
                               color: isSelected
                                   ? AppColors.primaryColor
-                                  : Colors.grey.shade600,
+                                  : Colors.grey,
                             ),
-                            SizedBox(width: 12.w),
-                            Text(
-                              'Video ${index + 1}',
-                              style: TextStyle(
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isSelected
-                                    ? AppColors.primaryColor
-                                    : Colors.black87,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 80.h,
+                                width: 80.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      'https://img.youtube.com/vi/${videoImageId[index]}/0.jpg',
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 10.w),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'Alone',
+                                    fontSize: 16,
+                                    maxLines: 1,
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.sizeOf(context).width -
+                                        140.w,
+                                    child: CustomText(
+                                      fontSize: 13,
+                                      color: AppColors.secondaryTextColor,
+                                      maxLines: 2,
+                                      text:
+                                          'Lorem ipsum adipiscing elit.Quisque vel lacus sit amet mauris convallis volutpat.Suspendisse potenti. Curabitur nec urna vitae ipsum aliquettempor. Integer aliquam nulla nec odio accumsan, vitaevulputate ipsum facilisis. ',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

@@ -103,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SecondSlider(controller: _pageController2, currentValue: currentValue2)
         ],
       ),
+      backgroundColor: AppColors.bgColor,
       floatingActionButton: InkWell(
         onTap: () async {
           String number = '+923489446989';

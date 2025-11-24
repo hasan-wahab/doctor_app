@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
-import 'package:doctor_app/screens/info_screen.dart';
+import 'package:doctor_app/screens/info_screen/info_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
-import 'package:doctor_app/screens/profile_screen.dart';
+import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
