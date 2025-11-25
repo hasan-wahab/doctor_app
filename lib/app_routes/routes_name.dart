@@ -24,4 +24,16 @@ class AppRoutes {
   static const String signUpScreen = 'signUpScreen';
   // Reset Password Screen
   static const String restPassword = 'restPassword';
+  // Wallet Screen
+  static const String walletScreen = 'walletScreen';
+  // Transaction History Screen
+  static const String transactionHistoryScreen = 'transactionHistoryScreen';
+  // Recharge Wallet Screen
+  static const String rechargeScreen = 'rechargeScreen';
+  // Payment Methode Screen
+  static const String paymentMethodeScreen = 'paymentMethodeScreen';
+  // Appointment Detail Screen
+  static const String appointmentDetailScreen = 'appointmentDetailScreen';
+  // Book Appointment Screen
+  static const String bookAppointmentScreen = 'bookAppointmentScreen';
 }

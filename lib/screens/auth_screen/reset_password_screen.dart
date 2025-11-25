@@ -50,7 +50,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             children: [Text('Enter your email address to reset your password')],
           ),
           SizedBox(height: 25.h),
-          AppTField(hintText: 'Enter your email', lableText: 'Email'),
+          AppTField(hintText: 'Enter your email', ),
           SizedBox(height: 60.h),
 
           AppButton(text: 'Submit'),

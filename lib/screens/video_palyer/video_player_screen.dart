@@ -18,18 +18,28 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   int _currentIndex = 0;
   bool _isInit = true;
   final List<String> videoImageId = [
-    'HhjHYkPQ8F0',
-    'nRhYQ3l2Ask',
-    'mRD0-GxqHVo',
-    'k4y_91Q6d5I',
-    '5qap5aO4i9A',
+    'x3sKVlYFj5w',
+    'ho3Wpg1gPAQ',
+    'NuAFBlMGTwI',
+    '1Z6Iu0JcIhI',
   ];
   final List<String> videoUrl = [
-    "https://www.youtube.com/watch?v=HhjHYkPQ8F0",
-    "https://www.youtube.com/watch?v=nRhYQ3l2Ask",
-    "https://www.youtube.com/watch?v=mRD0-GxqHVo",
-    "https://www.youtube.com/watch?v=k4y_91Q6d5I",
-    "https://www.youtube.com/watch?v=5qap5aO4i9A",
+    "https://youtu.be/x3sKVlYFj5w",
+    "https://youtu.be/ho3Wpg1gPAQ",
+    "https://youtu.be/NuAFBlMGTwI",
+    "https://youtu.be/1Z6Iu0JcIhI",
+  ];
+  List<String> videoTitle = [
+    'Back pain',
+    'Neck Pain',
+    'Sciatica Pain',
+    'Physical Therapy',
+  ];
+  List<String> videoDescription = [
+    'Back pain treatment and cervical pain treatment At F-8 Islamabad 03082033 332 ',
+    'Neck Pain Treatment| Back pain Treatment| Treatment of Morning stiffness',
+    'Sciatica Pain Treatment|Treatment of Pain Radiating to legs | Disc Bulge Treatment',
+    'Dr Kainat and her Mother Got sessions from Dr Ali Therapy and recommend Physical Therapy',
   ];
 
   @override
@@ -129,7 +139,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 SizedBox(height: 16.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: CustomText(text: 'Alone', fontSize: 16, maxLines: 1),
+                  child: CustomText(
+                    text: videoTitle[_currentIndex],
+                    fontSize: 16,
+                    maxLines: 1,
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -139,8 +153,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       fontSize: 13,
                       color: AppColors.secondaryTextColor,
                       maxLines: 2,
-                      text:
-                          'Lorem ipsum adipiscing elit.Quisque vel lacus sit amet mauris convallis volutpat.Suspendisse potenti. Curabitur nec urna vitae ipsum aliquettempor. Integer aliquam nulla nec odio accumsan, vitaevulputate ipsum facilisis. ',
+                      text: videoDescription[_currentIndex],
                     ),
                   ),
                 ),
@@ -204,7 +217,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CustomText(
-                                    text: 'Alone',
+                                    text: videoTitle[index],
                                     fontSize: 16,
                                     maxLines: 1,
                                   ),
@@ -216,8 +229,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       fontSize: 13,
                                       color: AppColors.secondaryTextColor,
                                       maxLines: 2,
-                                      text:
-                                          'Lorem ipsum adipiscing elit.Quisque vel lacus sit amet mauris convallis volutpat.Suspendisse potenti. Curabitur nec urna vitae ipsum aliquettempor. Integer aliquam nulla nec odio accumsan, vitaevulputate ipsum facilisis. ',
+                                      text: videoDescription[index],
                                     ),
                                   ),
                                 ],

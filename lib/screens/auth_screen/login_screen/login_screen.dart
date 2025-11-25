@@ -53,7 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
               hintText: 'Enter your email',
-              lableText: 'Email',
             ),
             SizedBox(height: 20.h),
             AppTField(
@@ -65,7 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
               hintText: 'Enter your password',
-              lableText: 'Password',
             ),
             SizedBox(height: 10.h),
             Row(

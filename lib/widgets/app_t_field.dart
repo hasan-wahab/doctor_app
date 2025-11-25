@@ -3,23 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppTField extends StatelessWidget {
-  final String hintText;
-  final String lableText;
+  final String? hintText;
   final TextEditingController? controller;
   final Function(String? value)? validator;
+  final double? width;
   const AppTField({
     super.key,
-    required this.hintText,
-    required this.lableText,
+    this.hintText,
     this.controller,
     this.validator,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 62.h,
-      width: MediaQuery.sizeOf(context).width,
+      width: width ?? MediaQuery.sizeOf(context).width,
       decoration: BoxDecoration(
         color: Color.fromRGBO(217, 217, 217, 0.35),
         borderRadius: BorderRadius.circular(12.r),
@@ -31,7 +31,7 @@ class AppTField extends StatelessWidget {
           //  suffix: Icon(Icons.add),
           contentPadding: EdgeInsets.only(top: 20, left: 20, right: 20),
           border: InputBorder.none,
-          hintText: hintText,
+          hintText: hintText ?? "",
 
           // label: Text(lableText),
         ),

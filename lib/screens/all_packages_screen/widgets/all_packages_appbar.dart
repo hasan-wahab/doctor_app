@@ -3,9 +3,21 @@ import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AllPackagesAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const AllPackagesAppbar({super.key});
+class AllPackagesAppbar extends StatefulWidget implements PreferredSizeWidget {
 
+  final Function(String? value) onChanged;
+  const AllPackagesAppbar({super.key, required this.onChanged});
+
+  @override
+  State<AllPackagesAppbar> createState() => _AllPackagesAppbarState();
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size.fromHeight(110.h);
+}
+
+class _AllPackagesAppbarState extends State<AllPackagesAppbar> {
+  var searchResult = [];
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -32,6 +44,7 @@ class AllPackagesAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 CustomText(
                   text: 'Therapy Search & Booking In',
+
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: AppColors.firstTextBlackColor,
@@ -58,26 +71,25 @@ class AllPackagesAppbar extends StatelessWidget implements PreferredSizeWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(30.r),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 5.w,
-              children: [
-                SizedBox(width: 15.w),
-                Icon(Icons.search, size: 30.sp, color: AppColors.primaryColor),
-                CustomText(
-                  text: 'Search here',
-                  color: AppColors.secondaryTextColor,
-                  fontSize: 16,
+            child: TextFormField(
+              onChanged: (value) =>widget.onChanged(value),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                prefixIcon: Padding(
+                  padding: EdgeInsets.only(top: 10.h),
+                  child: Icon(Icons.search, color: AppColors.primaryColor),
                 ),
-              ],
+
+                hint: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Text('Search here')],
+                ),
+                contentPadding: EdgeInsets.only(top: 15.h, right: 20.w),
+              ),
             ),
           ),
         ),
       ],
     );
   }
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(110.h);
 }

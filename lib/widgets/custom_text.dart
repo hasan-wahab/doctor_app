@@ -8,6 +8,7 @@ class CustomText extends StatelessWidget {
   final FontWeight fontWeight;
   final Color color;
   final int? maxLines;
+  final TextAlign? align;
 
   const CustomText({
     super.key,
@@ -16,6 +17,7 @@ class CustomText extends StatelessWidget {
     this.fontWeight = FontWeight.w500,
     this.color = Colors.black,
     this.maxLines,
+    this.align,
   });
 
   @override
@@ -23,6 +25,7 @@ class CustomText extends StatelessWidget {
     return Text(
       overflow: TextOverflow.ellipsis,
       maxLines: maxLines,
+      textAlign: align,
       text,
       style: TextStyle(
         fontSize: fontSize.sp,

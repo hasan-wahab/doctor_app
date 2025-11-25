@@ -19,6 +19,8 @@ class SecondSlider extends StatefulWidget {
 }
 
 class _SecondSliderState extends State<SecondSlider> {
+  final List<String> videoImageId = ['x3sKVlYFj5w','ho3Wpg1gPAQ','NuAFBlMGTwI','1Z6Iu0JcIhI'];
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -38,7 +40,7 @@ class _SecondSliderState extends State<SecondSlider> {
           },
           controller: widget.controller,
           scrollDirection: Axis.horizontal,
-          children: List.generate((5), (index) {
+          children: List.generate((4), (index) {
             return Stack(
               children: [
                 Container(
@@ -56,8 +58,8 @@ class _SecondSliderState extends State<SecondSlider> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.r),
                       image: DecorationImage(
-                        image: AssetImage(
-                          'assets/images/istockphoto-2171324541-612x612 1.png',
+                        image: NetworkImage(
+                          'https://img.youtube.com/vi/${videoImageId[index]}/0.jpg',
                         ),
                         fit: BoxFit.cover,
                       ),

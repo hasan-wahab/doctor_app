@@ -5,7 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,60 +48,6 @@ class MapScreen extends StatelessWidget {
                   ),
                   Icon(Icons.arrow_drop_down, color: AppColors.primaryColor),
                 ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: 51.h,
-                      width: 162.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.linkTextColor,
-                        borderRadius: BorderRadius.circular(25.r),
-                      ),
-                      child: Row(
-                        spacing: 5.w,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Transform.rotate(
-                            angle: 106,
-                            child: Padding(
-                              padding: EdgeInsets.only(bottom: 4.0.h),
-                              child: Icon(
-                                Icons.send,
-                                color: AppColors.whiteIconColor,
-                              ),
-                            ),
-                          ),
-                          CustomText(
-                            text: 'Nearby Labs',
-                            color: AppColors.textWhiteColor,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      height: 70.h,
-                      width: 70.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.linkTextColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.arrow_turn_up_right,
-                        size: 30.sp,
-                        color: AppColors.whiteIconColor,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
+import 'package:doctor_app/screens/home/home_screen_2.dart';
 import 'package:doctor_app/screens/info_screen/info_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
@@ -26,7 +27,7 @@ class _NaveBarState extends State<NaveBar> {
     Icons.person_2_outlined,
   ];
   List<Widget> screenList = [
-    HomeScreen(),
+    HomeScreen2(),
     MapScreen(),
     InfoScreen(),
     ProfileScreen(),

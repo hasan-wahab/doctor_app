@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
       if (controller.hasClients) {
         setState(() {
-          if (currentValue < 4) {
+          if (currentValue < 3) {
             currentValue++;
           } else {
             currentValue = 0;
