@@ -28,25 +28,20 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         height: MediaQuery.sizeOf(context).height.h,
-        width: MediaQuery.sizeOf(context).width.w,
+        width: double.infinity,
         color: AppColors.primaryColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             firstText == true
-                ? Image.asset('assets/images/splash_icon.png')
-                : Container(),
-            SizedBox(height: 20),
-            secondText == true
-                ? Text(
-                    'Y P A R Y A L I T A',
-                    style: TextStyle(
-                      color: AppColors.textWhiteColor,
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ? Container(
+                    //  height: 100.h,
+                    width: 300.w,
+                    child: Image.asset('assets/images/main_logo.png'),
                   )
                 : Container(),
+            SizedBox(height: 20),
+
             thirdText == true
                 ? Text(
                     'A L I T H E R A P Y',
@@ -76,15 +71,8 @@ class _SplashScreenState extends State<SplashScreen> {
           setState(() {});
         })
         .then((_) async {
-          await Future.delayed(Duration(seconds: 2)).then((_) {
-            secondText = true;
-            setState(() {});
-          });
-        })
-        .then((_) async {
           await Future.delayed(Duration(seconds: 2))
               .then((_) {
-                secondText = false;
                 thirdText = true;
                 setState(() {});
               })

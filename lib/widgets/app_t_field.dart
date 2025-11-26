@@ -23,6 +23,9 @@ class AppTField extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.fromRGBO(217, 217, 217, 0.35),
         borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.primaryColor
+        )
       ),
       child: TextFormField(
         controller: controller,

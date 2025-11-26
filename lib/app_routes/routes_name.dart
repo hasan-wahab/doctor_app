@@ -36,4 +36,24 @@ class AppRoutes {
   static const String appointmentDetailScreen = 'appointmentDetailScreen';
   // Book Appointment Screen
   static const String bookAppointmentScreen = 'bookAppointmentScreen';
+  // Select Date Screen
+  static const String selectDateScreen = 'selectDateScreen';
+  // Confirm Appointment Screen
+  static const String confirmAppointment = 'confirmAppointment';
+  // Payment option screen
+  static const String paymentOptionScreen = 'paymentOptionScreen';
+  // Wallet payment Screen
+  static const String walletPaymentScreen = 'walletPaymentScreen';
+  // Bank Payment Screen
+  static const String bankPaymentScreen = 'bankPaymentScreen';
+  // Easy Paisa Payment Screen
+  static const String easyPaisaPaymentScreen = 'easyPaisaPaymentScreen';
+  // Credit Card or Debit payment Screen
+  static const String creditCardPaymentScreen = 'creditCardPaymentScreen';
+  // Payment Success Screen
+  static const String successPaymentScreen = 'successPaymentScreen';
+  // Session Notes Screen
+  static const String notesScreen = 'notesScreen';
+  // Session Record Screen
+  static const String sessionRecordScreen = 'sessionRecordScreen';
 }

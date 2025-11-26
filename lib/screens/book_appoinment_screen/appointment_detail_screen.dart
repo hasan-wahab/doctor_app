@@ -195,12 +195,12 @@ class AppointmentDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AppButton(text: 'Reschedule', isColor: false, width: 170.w),
+                AppButton(text: 'Reschedule', isColor: false, width: 150.w),
                 AppButton(
                   textColor: Colors.red,
                   text: 'Cancel',
                   isColor: false,
-                  width: 170.w,
+                  width: 150.w,
                   borderColor: Colors.red,
                 ),
               ],

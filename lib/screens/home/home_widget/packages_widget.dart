@@ -7,11 +7,7 @@ import '../../../widgets/outline_button.dart';
 class PackagesWidget extends StatefulWidget {
   List<String> imageList;
   List<String> textList;
-   PackagesWidget({
-    super.key,
-    required this.imageList,
-    required this.textList,
-  });
+  PackagesWidget({super.key, required this.imageList, required this.textList});
 
   @override
   State<PackagesWidget> createState() => _PackagesWidgetState();
@@ -41,7 +37,7 @@ class _PackagesWidgetState extends State<PackagesWidget> {
                     ),
                   ),
                 ),
-                CustomText(text:widget.textList[index], fontSize: 12),
+                CustomText(text: widget.textList[index], fontSize: 12),
                 AppOutlineButton(onTap: () {}, text: 'Book'),
               ],
             );

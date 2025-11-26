@@ -6,6 +6,7 @@ import 'package:doctor_app/screens/home/home_screen_2.dart';
 import 'package:doctor_app/screens/info_screen/info_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
+import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,21 +20,22 @@ class NaveBar extends StatefulWidget {
 
 class _NaveBarState extends State<NaveBar> {
   int currentIndex = 0;
-  final List<String> iconText = ['Home', 'Location', 'About', 'Account'];
+  final List<String> iconText = ['Home', 'Location', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
     Icons.location_on_outlined,
-    Icons.info_outline,
+    Icons.list_alt_rounded,
     Icons.person_2_outlined,
   ];
   List<Widget> screenList = [
     HomeScreen2(),
     MapScreen(),
-    InfoScreen(),
+    SessionRecord(),
     ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
+    // screenList.insert(0, currentIndex == 1 ? HomeScreen() : HomeScreen2());
     return Scaffold(
       body: screenList.elementAt(currentIndex),
       bottomNavigationBar: Container(

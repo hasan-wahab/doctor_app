@@ -1,3 +1,4 @@
+import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
@@ -30,9 +31,9 @@ class BookAppointmentScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 30.h),
-              AppTField(hintText: 'Search here'),
+              AppTField(hintText: 'Search doctor or speciality'),
               SizedBox(height: 16.h),
-              CustomText(text: 'Doctor Select', fontSize: 20),
+              CustomText(text: 'Doctor Selection', fontSize: 20),
               SizedBox(height: 16.h),
 
               Column(
@@ -123,6 +124,10 @@ class BookAppointmentScreen extends StatelessWidget {
                             ),
                             CustomText(text: '2000 PKR'),
                             AppButton(
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                AppRoutes.selectDateScreen,
+                              ),
                               height: 40,
                               text: 'Book Appointment',
                               width: 153,
