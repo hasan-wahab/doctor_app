@@ -1,5 +1,7 @@
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +16,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   String? email;
   String? password;
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 50.h),
             AppTField(
+              controller: emailController,
               validator: (value) {
                 if (value == '') {
                   return 'Please enter your email';
@@ -56,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 20.h),
             AppTField(
+              controller: passwordController,
               validator: (value) {
                 if (value == '') {
                   return 'Please enter your password';
@@ -82,15 +90,28 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             SizedBox(height: 30.h),
-            AppButton(
-              text: 'Login',
-              onTap: () {
-                final form = _formKey.currentState;
-                if (form!.validate()) {
-                  Navigator.pushNamed(context, AppRoutes.naveBar);
-                }
-              },
-            ),
+            isLoading
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [CircularProgressIndicator()],
+                  )
+                : AppButton(
+                    text: 'Login',
+                    onTap: () async {
+                      final form = _formKey.currentState;
+                      if (form!.validate()) {
+                        isLoading = true;
+                        setState(() {});
+                        await AuthApiServices.loginApi(
+                          context,
+                          email: email.toString(),
+                          password: password.toString(),
+                        );
+                        isLoading = false;
+                        setState(() {});
+                      }
+                    },
+                  ),
           ],
         ),
       ),

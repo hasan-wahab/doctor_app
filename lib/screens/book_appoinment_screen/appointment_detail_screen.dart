@@ -197,6 +197,9 @@ class AppointmentDetailScreen extends StatelessWidget {
               children: [
                 AppButton(text: 'Reschedule', isColor: false, width: 150.w),
                 AppButton(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
                   textColor: Colors.red,
                   text: 'Cancel',
                   isColor: false,

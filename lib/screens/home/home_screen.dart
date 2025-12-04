@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/heding_text.dart';
 import 'package:doctor_app/widgets/outline_button.dart';
@@ -27,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late PageController _pageController2;
   int currentValue1 = 0;
   int currentValue2 = 0;
-
   late Timer _timer;
 
   List<String> therapyName = [
@@ -161,4 +161,5 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController2.dispose();
     super.dispose();
   }
+
 }

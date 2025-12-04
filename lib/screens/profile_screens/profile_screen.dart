@@ -1,18 +1,27 @@
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final prefs = SharedPreferences.getInstance();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      appBar: ProfileAppbar(title: 'Profile',),
+      appBar: ProfileAppbar(title: 'Profile'),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 20.h),
         child: Column(
@@ -37,87 +46,161 @@ class ProfileScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.updateProfile,
-                              arguments: <String,List<String>>{
-                                'data': [
-                                  'Hamza',
-                                  '+92348560920',
-                                  'Male',
-                                  '12/02/2023',
-                                  'abcd@gmail.com',
-                                ],
-                              },
-                            );
-                          },
-                          child: Container(
-                            height: 32.h,
-                            width: 32.w,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.edit,
-                              color: AppColors.whiteIconColor,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                CustomText(text: 'Name', fontSize: 20),
+                CustomText(text: 'Hasan', fontSize: 20),
                 CustomText(
                   text: 'Patient ID: #MC-2025',
                   color: AppColors.secondaryTextColor,
                 ),
               ],
             ),
-            SizedBox(height: 80),
+            SizedBox(height: 40.h),
             Column(
               spacing: 20.h,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(text: 'Name', fontSize: 20),
-                    CustomText(text: 'Hamza', fontSize: 20),
-                  ],
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.myProfileScreen);
+                  },
+                  child: Card(
+                    color: AppColors.secondaryColor,
+
+                    child: Padding(
+                      padding: EdgeInsets.all(10.r),
+                      child: SizedBox(
+                        height: 50.h,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              spacing: 10.w,
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  color: AppColors.primaryColor,
+                                ),
+                                CustomText(text: 'My Profile'),
+                              ],
+                            ),
+                            Icon(Icons.arrow_forward_ios_outlined, size: 18.r),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(text: 'Phone', fontSize: 20),
-                    CustomText(text: '+92345678909', fontSize: 20),
-                  ],
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.myNFCCardScreen);
+                  },
+                  child: Card(
+                    color: AppColors.secondaryColor,
+                    child: Padding(
+                      padding: EdgeInsets.all(10.r),
+                      child: SizedBox(
+                        height: 50.h,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              spacing: 10.w,
+                              children: [
+                                Icon(
+                                  Icons.credit_card,
+                                  color: AppColors.primaryColor,
+                                ),
+                                CustomText(text: 'My Card'),
+                              ],
+                            ),
+                            Icon(Icons.arrow_forward_ios_outlined, size: 18.r),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(text: 'Gender', fontSize: 20),
-                    CustomText(text: 'Male', fontSize: 20),
-                  ],
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.mapScreen);
+                  },
+                  child: Card(
+                    color: AppColors.secondaryColor,
+
+                    child: Padding(
+                      padding: EdgeInsets.all(10.r),
+                      child: SizedBox(
+                        height: 50.h,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              spacing: 10.w,
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: AppColors.primaryColor,
+                                ),
+                                CustomText(text: 'Location'),
+                              ],
+                            ),
+                            Icon(Icons.arrow_forward_ios_outlined, size: 18.r),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(text: 'DOB', fontSize: 20),
-                    CustomText(text: 'DD/MM/YY', fontSize: 20),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(text: 'Email', fontSize: 20),
-                    CustomText(text: 'abc@gmail.com', fontSize: 20),
-                  ],
+                InkWell(
+                  onTap: () async {
+                    AppMsg.showErrorMsg(
+                      context,
+                      msgTitle: 'Confirmation!',
+                      msg: 'Are your sure you want to log out',
+                     actionText: 'No',
+                     actionText2: 'Yes',
+                     action2: () async {
+                       await LocalStorage.userLogOut().then((onValue) {
+                         Navigator.pushNamedAndRemoveUntil(
+                           context,
+                           AppRoutes.naveBar,
+                               (Route<dynamic> route) => false,
+                         );
+                       });
+                     },
+                    );
+                  },
+                  child: Card(
+                    color: AppColors.secondaryColor,
+                    child: Padding(
+                      padding: EdgeInsets.all(10.r),
+                      child: SizedBox(
+                        height: 50.h,
+
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              spacing: 10.w,
+                              children: [
+                                Icon(
+                                  Icons.logout,
+                                  color: AppColors.primaryColor,
+                                ),
+                                CustomText(text: 'Log Out'),
+                              ],
+                            ),
+                            Icon(Icons.arrow_forward_ios_outlined, size: 18.r),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

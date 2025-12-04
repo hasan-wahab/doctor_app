@@ -1,15 +1,17 @@
 import 'dart:io';
 
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
 import 'package:doctor_app/screens/home/home_screen_2.dart';
-import 'package:doctor_app/screens/info_screen/info_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../local_storage/local_storage.dart';
 
 class NaveBar extends StatefulWidget {
   const NaveBar({super.key});
@@ -20,6 +22,7 @@ class NaveBar extends StatefulWidget {
 
 class _NaveBarState extends State<NaveBar> {
   int currentIndex = 0;
+  String? token;
   final List<String> iconText = ['Home', 'Location', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
@@ -28,16 +31,30 @@ class _NaveBarState extends State<NaveBar> {
     Icons.person_2_outlined,
   ];
   List<Widget> screenList = [
+    HomeScreen(),
+    MapScreen(),
+    SessionRecord(),
+    LoginScreen(),
+  ];
+  List<Widget> screenList2 = [
     HomeScreen2(),
     MapScreen(),
     SessionRecord(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    getToken();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // screenList.insert(0, currentIndex == 1 ? HomeScreen() : HomeScreen2());
     return Scaffold(
-      body: screenList.elementAt(currentIndex),
+      body: token == null
+          ? screenList.elementAt(currentIndex != 0 ? 3 : currentIndex)
+          : screenList2.elementAt(currentIndex),
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
         height: Platform.isIOS ? 701.h : 100.h,
@@ -50,7 +67,19 @@ class _NaveBarState extends State<NaveBar> {
               return InkWell(
                 onTap: () {
                   setState(() {
-                    currentIndex = index;
+                    if (token == null) {
+                      if (index == 1) {
+                        currentIndex = 3;
+                      } else if (index == 2) {
+                        currentIndex = 3;
+                      } else if (index == 3) {
+                        currentIndex = 3;
+                      } else {
+                        currentIndex = index;
+                      }
+                    } else {
+                      currentIndex = index;
+                    }
                   });
                 },
                 child: Column(
@@ -77,5 +106,10 @@ class _NaveBarState extends State<NaveBar> {
         ),
       ),
     );
+  }
+
+  void getToken() async {
+    token = await LocalStorage.getUserToken();
+    setState(() {});
   }
 }

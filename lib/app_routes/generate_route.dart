@@ -14,10 +14,10 @@ import 'package:doctor_app/screens/pament_method_screen/cridit_card_payment_scre
 import 'package:doctor_app/screens/pament_method_screen/easypaisa_pament_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/pament_succes_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/wallet_payment_screen.dart';
+import 'package:doctor_app/screens/profile_screens/my_profile.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/profile_screens/update_profile.dart';
 import 'package:doctor_app/screens/session_record/session_notes.dart';
-import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/screens/splash_scree/splash_screen.dart';
 import 'package:doctor_app/screens/video_palyer/video_player_screen.dart';
 import 'package:doctor_app/screens/wallet_screen/payment_method_screen.dart';
@@ -26,6 +26,8 @@ import 'package:doctor_app/screens/wallet_screen/transaction_history.dart';
 import 'package:doctor_app/screens/wallet_screen/wallet_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../screens/nfc_card/nfc_card.dart';
 
 class AppGenerateRoute {
   String routeName;
@@ -110,8 +112,12 @@ class AppGenerateRoute {
       screen: PaymentSuccessScreen(),
     ),
     AppGenerateRoute(
-      routeName: AppRoutes.sessionRecordScreen,
-      screen: SessionRecord(),
+      routeName: AppRoutes.myNFCCardScreen,
+      screen: NfcCard(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.myProfileScreen,
+      screen: MyProfileScreen(),
     ),
     AppGenerateRoute(routeName: AppRoutes.notesScreen, screen: SessionNotes()),
   ];
@@ -132,6 +138,7 @@ class AppGenerateRoute {
       return CupertinoPageRoute(
         builder: (context) => MapScreen(),
         settings: settings,
+
       );
     }
   }

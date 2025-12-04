@@ -1,3 +1,5 @@
+import 'package:doctor_app/app_routes/routes_name.dart';
+import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/screens/all_packages_screen/package_model.dart';
 import 'package:doctor_app/screens/all_packages_screen/widgets/all_packages_appbar.dart';
 import 'package:doctor_app/widgets/home_appbar.dart';
@@ -125,7 +127,18 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                       : result[index].name,
                   fontSize: 12,
                 ),
-                AppOutlineButton(onTap: () {}, text: 'Book'),
+                AppOutlineButton(
+                  onTap: () async {
+                    final user = await LocalStorage.getUserToken();
+                    if (user == null) {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.loginScreen,
+                      );
+                    }
+                  },
+                  text: 'Book',
+                ),
               ],
             );
           },

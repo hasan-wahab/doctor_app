@@ -56,4 +56,9 @@ class AppRoutes {
   static const String notesScreen = 'notesScreen';
   // Session Record Screen
   static const String sessionRecordScreen = 'sessionRecordScreen';
+  // My NFC Card Screemn
+  static const String myNFCCardScreen = 'myNFCCardScreen';
+  // My Profile Screen
+
+  static const String myProfileScreen = 'myProfileScreen';
 }

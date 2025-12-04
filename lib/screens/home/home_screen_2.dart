@@ -1,5 +1,6 @@
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,17 +21,22 @@ class HomeScreen2 extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    height: 58.h,
-                    width: 58.w,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/profile_image.png'),
-                      ),
-                      border: Border.all(
-                        color: AppColors.primaryColor,
-                        width: 2.w,
+                  InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context,AppRoutes.myProfileScreen);
+                    },
+                    child: Container(
+                      height: 58.h,
+                      width: 58.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/profile_image.png'),
+                        ),
+                        border: Border.all(
+                          color: AppColors.primaryColor,
+                          width: 2.w,
+                        ),
                       ),
                     ),
                   ),
@@ -179,28 +185,33 @@ class HomeScreen2 extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                height: 96.h,
-                width: 110.w,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: AppColors.secondaryColor,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      CupertinoIcons.person_alt_circle_fill,
-                      size: 36.sp,
-                      color: AppColors.primaryColor,
-                    ),
-                    CustomText(
-                      text: 'Update\nProfile',
-                      maxLines: 2,
-                      align: TextAlign.center,
-                      color: AppColors.secondaryTextColor,
-                    ),
-                  ],
+              InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, AppRoutes.myProfileScreen);
+                },
+                child: Container(
+                  height: 96.h,
+                  width: 110.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: AppColors.secondaryColor,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.person_alt_circle_fill,
+                        size: 36.sp,
+                        color: AppColors.primaryColor,
+                      ),
+                      CustomText(
+                        text: 'Update\nProfile',
+                        maxLines: 2,
+                        align: TextAlign.center,
+                        color: AppColors.secondaryTextColor,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -255,26 +266,25 @@ class HomeScreen2 extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        AppRoutes.appointmentDetailScreen,
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 28.h,
-                        width: 90.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.r),
-                          color: AppColors.secondaryColor,
+                   InkWell(
+                     onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AppointmentDetailScreen()));
+                     },
+                     child: Container(
+                          alignment: Alignment.center,
+                          height: 28.h,
+                          width: 90.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.r),
+                            color: AppColors.secondaryColor,
+                          ),
+                          child: CustomText(
+                            text: 'View Detail',
+                            fontSize: 12,
+                            color: AppColors.secondaryTextColor,
+                          ),
                         ),
-                        child: CustomText(
-                          text: 'View Detail',
-                          fontSize: 12,
-                          color: AppColors.secondaryTextColor,
-                        ),
-                      ),
-                    ),
+                   ),
                   ],
                 ),
               ],

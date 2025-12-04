@@ -1,6 +1,8 @@
+import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../local_storage/local_storage.dart';
 import '../../../widgets/custom_text.dart';
 import '../../../widgets/outline_button.dart';
 
@@ -14,6 +16,14 @@ class PackagesWidget extends StatefulWidget {
 }
 
 class _PackagesWidgetState extends State<PackagesWidget> {
+  String? token;
+
+  @override
+  void initState() {
+    getTokenValue();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -38,12 +48,23 @@ class _PackagesWidgetState extends State<PackagesWidget> {
                   ),
                 ),
                 CustomText(text: widget.textList[index], fontSize: 12),
-                AppOutlineButton(onTap: () {}, text: 'Book'),
+                AppOutlineButton(
+                  onTap: () {
+                    if (token == null) {
+                      Navigator.pushNamed(context, AppRoutes.loginScreen);
+                    }
+                  },
+                  text: 'Book',
+                ),
               ],
             );
           }),
         ),
       ),
     );
+  }
+
+  void getTokenValue() async {
+    token = await LocalStorage.getUserToken();
   }
 }
