@@ -45,13 +45,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: AssetImage('assets/images/profile_image.png'),
+                          image: NetworkImage(data['data']?[0]??''),
                         ),
                         shape: BoxShape.circle,
                       ),
                     ),
                   ),
-                  CustomText(text: data['data']?[0] ?? "Name", fontSize: 20),
+                  CustomText(text: data['data']?[1] ?? "Name", fontSize: 20),
                   CustomText(
                     text: 'Patient ID: #MC-2025',
                     color: AppColors.secondaryTextColor,
@@ -70,7 +70,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       border: Border.all(color: AppColors.secondaryTextColor),
                     ),
                     child: TextFormField(
-                      initialValue: data['data']?[0],
+                      initialValue: data['data']?[1],
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
@@ -97,7 +97,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       border: Border.all(color: AppColors.secondaryTextColor),
                     ),
                     child: TextFormField(
-                      initialValue: data['data']?[1],
+                      initialValue: data['data']?[2],
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
@@ -125,7 +125,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       border: Border.all(color: AppColors.secondaryTextColor),
                     ),
                     child: DropdownButton<String>(
-                      value: data['data']?[2],
+                      value: data['data']?[3],
                       menuMaxHeight: 100,
                       isExpanded: true,
                       items: [
@@ -166,7 +166,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
                         border: Border.all(color: AppColors.secondaryTextColor),
                       ),
-                      child: Text(data['data']![3]),
+                      child: Text(data['data']![4]),
                     ),
                   ),
                 ],
@@ -183,7 +183,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       border: Border.all(color: AppColors.secondaryTextColor),
                     ),
                     child: TextFormField(
-                      initialValue: data['data']![4],
+                      initialValue: data['data']![5],
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),

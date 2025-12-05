@@ -16,7 +16,7 @@ class LocalStorage {
     return prefs;
   }
 
-  static Future<bool> userLogOut() async {
+  static Future<bool> userLogOutToken() async {
     final preferences = await SharedPreferences.getInstance();
     final result = await preferences.remove('token');
     await preferences.reload();
@@ -28,5 +28,17 @@ class LocalStorage {
     final result = await preferences.clear();
     await preferences.reload();
     return result;
+  }
+
+  static Future<bool> saveProfileData(String dataKey, data) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return await prefs.setString(dataKey, data);
+  }
+
+  static Future<String?> getProfileData(String dataKey) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString(dataKey);
   }
 }

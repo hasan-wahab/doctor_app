@@ -1,52 +1,4 @@
 class LoginModel {
-  bool? success;
-  int? statusCode;
-  String? message;
-  Data? data;
-
-  LoginModel({this.success, this.statusCode, this.message, this.data});
-
-  LoginModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    statusCode = json['status_code'];
-    message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['status_code'] = this.statusCode;
-    data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
-    return data;
-  }
-}
-
-class Data {
-  String? accessToken;
-  User? user;
-
-  Data({this.accessToken, this.user});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    accessToken = json['access_token'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['access_token'] = this.accessToken;
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
-    }
-    return data;
-  }
-}
-
-class User {
   int? id;
   String? name;
   String? username;
@@ -68,30 +20,29 @@ class User {
   String? phone;
   String? cnic;
 
-  User({
-    this.id,
-    this.name,
-    this.username,
-    this.email,
-    this.emailVerifiedAt,
-    this.profilePicture,
-    this.isLogin,
-    this.userType,
-    this.createdBy,
-    this.updatedBy,
-    this.deletedAt,
-    this.createdAt,
-    this.updatedAt,
-    this.clinicId,
-    this.roomId,
-    this.departmentId,
-    this.designationId,
-    this.shiftId,
-    this.phone,
-    this.cnic,
-  });
+  LoginModel(
+      {this.id,
+        this.name,
+        this.username,
+        this.email,
+        this.emailVerifiedAt,
+        this.profilePicture,
+        this.isLogin,
+        this.userType,
+        this.createdBy,
+        this.updatedBy,
+        this.deletedAt,
+        this.createdAt,
+        this.updatedAt,
+        this.clinicId,
+        this.roomId,
+        this.departmentId,
+        this.designationId,
+        this.shiftId,
+        this.phone,
+        this.cnic});
 
-  User.fromJson(Map<String, dynamic> json) {
+  LoginModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     username = json['username'];

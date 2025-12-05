@@ -1,19 +1,38 @@
+import 'dart:convert';
+
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class MyProfileScreen extends StatelessWidget {
+import '../../local_storage/local_storage.dart';
+
+class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
+
+  @override
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
+}
+
+class _MyProfileScreenState extends State<MyProfileScreen> {
+  String? userToken;
+   LoginModel? profileData;
+
+  @override
+  void initState() {
+    getUserToken();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      appBar: ProfileAppbar(title: 'Profile',isLeading: true,),
-      body: Padding(
+      appBar: ProfileAppbar(title: 'Profile', isLeading: true),
+      body:profileData!=null? Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0.w, vertical: 20.h),
         child: Column(
           children: [
@@ -30,8 +49,8 @@ class MyProfileScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            image: AssetImage(
-                              'assets/images/profile_image.png',
+                            image: NetworkImage(
+                              profileData?.profilePicture??'',
                             ),
                           ),
                           shape: BoxShape.circle,
@@ -44,13 +63,14 @@ class MyProfileScreen extends StatelessWidget {
                             Navigator.pushNamed(
                               context,
                               AppRoutes.updateProfile,
-                              arguments: <String,List<String>>{
+                              arguments: <String, List<String>>{
                                 'data': [
-                                  'Hamza',
-                                  '+92348560920',
+                                  profileData!.profilePicture.toString(),
+                                  profileData!.name.toString(),
+                                  profileData!.phone.toString(),
                                   'Male',
                                   '12/02/2023',
-                                  'abcd@gmail.com',
+                                  profileData!.email.toString(),
                                 ],
                               },
                             );
@@ -72,7 +92,7 @@ class MyProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                CustomText(text: 'Name', fontSize: 20),
+                CustomText(text: profileData!.name.toString(), fontSize: 20),
                 CustomText(
                   text: 'Patient ID: #MC-2025',
                   color: AppColors.secondaryTextColor,
@@ -88,14 +108,17 @@ class MyProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(text: 'Name', fontSize: 20),
-                    CustomText(text: 'Hamza', fontSize: 20),
+                    CustomText(text: profileData!.name.toString(), fontSize: 20),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(text: 'Phone', fontSize: 20),
-                    CustomText(text: '+92345678909', fontSize: 20),
+                    CustomText(
+                      text: profileData!.phone.toString(),
+                      fontSize: 20,
+                    ),
                   ],
                 ),
                 Row(
@@ -116,14 +139,37 @@ class MyProfileScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(text: 'Email', fontSize: 20),
-                    CustomText(text: 'abc@gmail.com', fontSize: 20),
+                    CustomText(
+                      text: profileData!.email.toString(),
+                      fontSize: 20,
+                    ),
                   ],
                 ),
               ],
             ),
           ],
         ),
+      ):Center(
+        child: CircularProgressIndicator(),
       ),
     );
+  }
+
+  void getUserToken() async {
+    userToken = await LocalStorage.getUserToken();
+    if (userToken != null) {
+      getCurrentUserData(userToken!);
+    }
+  }
+
+  void getCurrentUserData(String token) async {
+    String? data = await LocalStorage.getProfileData(userToken!);
+
+    if (data != null) {
+      Map<String, dynamic> jsonData = jsonDecode(data);
+
+      profileData = LoginModel.fromJson(jsonData);
+      setState(() {});
+    }
   }
 }

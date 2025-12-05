@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NfcCard extends StatefulWidget {
@@ -12,6 +17,30 @@ class NfcCard extends StatefulWidget {
 }
 
 class _NfcCardState extends State<NfcCard> {
+  LoginModel? profileData;
+  static const platform = MethodChannel('hce.channel');
+
+  void _sendIdToHce(String id) async {
+    try {
+      final result = await platform.invokeMethod("setData", {"data": id});
+      if (result == true) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("ID sent to HCE!")));
+      }
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: ${e.message}")));
+    }
+  }
+
+  @override
+  void initState() {
+    getCurrentUserData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,8 +56,8 @@ class _NfcCardState extends State<NfcCard> {
           child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
         ),
       ),
-      body:SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 15.w,vertical: 15.h),
+      body:profileData!=null? SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -37,7 +66,7 @@ class _NfcCardState extends State<NfcCard> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15.0),
                 gradient: const LinearGradient(
-                  colors: [Colors.red, Colors.amber,],
+                  colors: [Colors.red, Colors.amber],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -46,11 +75,11 @@ class _NfcCardState extends State<NfcCard> {
                     color: Colors.black26,
                     blurRadius: 10,
                     offset: Offset(0, 5),
-                  )
+                  ),
                 ],
               ),
               child: Padding(
-                padding:  EdgeInsets.symmetric(horizontal: 15.w,vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,8 +91,12 @@ class _NfcCardState extends State<NfcCard> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const CustomText(text: "ALI THERAPY",fontSize: 18,color: Colors.yellow,),
-                            SizedBox(height: 15.h,),
+                            const CustomText(
+                              text: "ALI THERAPY",
+                              fontSize: 18,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(height: 15.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               spacing: 10.w,
@@ -72,23 +105,32 @@ class _NfcCardState extends State<NfcCard> {
                                   height: 50.h,
                                   width: 50.w,
                                   decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: AssetImage('assets/images/profile_image.png'))
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                        profileData!.profilePicture.toString(),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Column(
-
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    CustomText(text: 'Hasan wahab',fontSize: 18,color: AppColors.secondaryColor,fontWeight: FontWeight.bold,),
-                                    CustomText(text: '1234567',fontSize: 15,color: AppColors.textWhiteColor,),
-
+                                    CustomText(
+                                      text: profileData!.name.toString(),
+                                      fontSize: 18,
+                                      color: AppColors.secondaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    CustomText(
+                                      text:  profileData!.id.toString(),
+                                      fontSize: 15,
+                                      color: AppColors.textWhiteColor,
+                                    ),
                                   ],
                                 ),
-
                               ],
                             ),
                           ],
@@ -98,100 +140,168 @@ class _NfcCardState extends State<NfcCard> {
                           height: 70.h,
                           width: 80,
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black12,
                                 blurRadius: 10,
                                 spreadRadius: 1,
-                                offset: Offset(0, 4)
-                              )
-                            ]
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child:Image.asset('assets/images/main_logo.png'),
+                          child: Image.asset('assets/images/main_logo.png'),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     SizedBox(
-                      width: MediaQuery.sizeOf(context).width/2,
+                      width: MediaQuery.sizeOf(context).width / 2,
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(text: 'Phone',color: AppColors.textWhiteColor,fontSize: 13,fontWeight: FontWeight.bold,),
-                              CustomText(text: '0987654321',color: AppColors.textWhiteColor,fontSize: 13,),
+                              CustomText(
+                                text: 'Phone',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              CustomText(
+                                text:  profileData!.phone.toString(),
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                              ),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(text: 'CNIC',color: AppColors.textWhiteColor,fontSize: 13,fontWeight: FontWeight.bold,),
-                              CustomText(text: '0987654321',color: AppColors.textWhiteColor,fontSize: 13,),
+                              CustomText(
+                                text: 'CNIC',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              CustomText(
+                                text: profileData!.cnic.toString(),
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                              ),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(text: 'Blood',color: AppColors.textWhiteColor,fontSize: 13,fontWeight: FontWeight.bold,),
-                              CustomText(text: 'O+',color: AppColors.textWhiteColor,fontSize: 13,),
+                              CustomText(
+                                text: 'Blood',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              CustomText(
+                                text: 'O+',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                              ),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(text: 'Gender',color: AppColors.textWhiteColor,fontSize: 13,fontWeight: FontWeight.bold,),
-                              CustomText(text: 'Male',color: AppColors.textWhiteColor,fontSize: 13,),
+                              CustomText(
+                                text: 'Gender',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              CustomText(
+                                text: 'Male',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                              ),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(text: 'Issued',color: AppColors.textWhiteColor,fontSize: 13,fontWeight: FontWeight.bold,),
-                              CustomText(text: ' 03-Dec-25',color: AppColors.textWhiteColor,fontSize: 13,),
+                              CustomText(
+                                text:  profileData!.name.toString(),
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              CustomText(
+                                text: ' 03-Dec-25',
+                                color: AppColors.textWhiteColor,
+                                fontSize: 13,
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 8.h,),
+                    SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomText(text: 'Main Boulevard, Gulberg III, Lahore',fontSize: 12,color: AppColors.secondaryTextColor,),
-                            CustomText(text: '+92 42 3578 5555 | +92 300 1234567',fontSize: 12,color: AppColors.secondaryTextColor,),
+                            CustomText(
+                              text: 'Main Boulevard, Gulberg III, Lahore',
+                              fontSize: 12,
+                              color: AppColors.secondaryTextColor,
+                            ),
+                            CustomText(
+                              text: '+92 42 3578 5555 | +92 300 1234567',
+                              fontSize: 12,
+                              color: AppColors.secondaryTextColor,
+                            ),
                           ],
                         ),
-                        Icon(Icons.wifi,color: AppColors.whiteIconColor,size: 40.r,),
+                        Icon(
+                          Icons.wifi,
+                          color: AppColors.whiteIconColor,
+                          size: 40.r,
+                        ),
                       ],
-                    )
-
-
-
-
+                    ),
                   ],
                 ),
               ),
             ),
 
-
             const SizedBox(height: 30),
-
 
             const Center(
               child: Text(
                 "Hold phone close to the NFC reader",
                 style: TextStyle(color: Colors.black87),
               ),
-            )
+            ),
           ],
         ),
-      ),
+      ):Center(child: CircularProgressIndicator()),
     );
+  }
+
+  void getCurrentUserData() async {
+    String? token = await LocalStorage.getUserToken();
+    if (token != null) {
+      String? data = await LocalStorage.getProfileData(token);
+
+      Map<String, dynamic> jsonData = jsonDecode(data!);
+      profileData = LoginModel.fromJson(jsonData);
+
+      if (profileData?.id != null) {
+        _sendIdToHce(profileData!.id.toString());
+      }else{
+        _sendIdToHce('');
+      }
+      setState(() {});
+    }
   }
 }

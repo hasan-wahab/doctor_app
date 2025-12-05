@@ -7,6 +7,7 @@ import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_mod
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthApiServices {
   AuthApiServices._();
@@ -18,9 +19,6 @@ class AuthApiServices {
     required String password,
   }) async {
     try {
-      // LoginModel loginModel=LoginModel(
-      //   data:
-      // );
       final jsonData = {"email": email, "password": password};
       final url = Uri.parse(ApiKeys.loginKey);
 
@@ -31,7 +29,11 @@ class AuthApiServices {
       );
 
       if (response.statusCode == 200) {
-        String token = jsonDecode(response.body)['data']['access_token'];
+        final data = jsonDecode(response.body);
+        String token = data['data']['access_token'];
+        Map<String, dynamic> profileData = data['data']['user'];
+        await LocalStorage.saveProfileData(token, jsonEncode(profileData));
+
         await LocalStorage.saveUserToken(token).then((onValue) {
           Navigator.pushNamedAndRemoveUntil(
             context,
