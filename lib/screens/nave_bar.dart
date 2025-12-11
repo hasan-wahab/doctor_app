@@ -14,7 +14,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../local_storage/local_storage.dart';
 
 class NaveBar extends StatefulWidget {
-  const NaveBar({super.key});
+  int? currentIndex;
+  NaveBar({super.key, this.currentIndex = 0});
 
   @override
   State<NaveBar> createState() => _NaveBarState();
@@ -46,6 +47,11 @@ class _NaveBarState extends State<NaveBar> {
   @override
   void initState() {
     getToken();
+    if (widget.currentIndex == null) {
+      currentIndex = 0;
+    } else {
+      currentIndex = widget.currentIndex!;
+    }
     super.initState();
   }
 
@@ -109,7 +115,7 @@ class _NaveBarState extends State<NaveBar> {
   }
 
   void getToken() async {
-    token = await LocalStorage.getUserToken();
+    token = await LocalStorage.getUserToken('token');
     setState(() {});
   }
 }

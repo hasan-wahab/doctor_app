@@ -3,16 +3,15 @@ import 'dart:convert';
 import 'package:doctor_app/app_keys/api_keys.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthApiServices {
   AuthApiServices._();
 
-  /// Post Login Api
+  /// Post Login Api Call
   static loginApi(
     BuildContext context, {
     required String email,
@@ -30,10 +29,12 @@ class AuthApiServices {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        String token = data['data']['access_token'];
-        Map<String, dynamic> profileData = data['data']['user'];
-        await LocalStorage.saveProfileData(token, jsonEncode(profileData));
 
+        String token = data['data']['access_token'];
+        print(token);
+        Map<String, dynamic> profileData = data['data'];
+        print(profileData);
+        await LocalStorage.saveProfileData(token, jsonEncode(profileData));
         await LocalStorage.saveUserToken(token).then((onValue) {
           Navigator.pushNamedAndRemoveUntil(
             context,
@@ -57,6 +58,72 @@ class AuthApiServices {
     } on Exception catch (err) {
       print(err);
       return AppMsg.showErrorMsg(context, msg: 'Error : ${err.toString()}');
+    }
+  }
+
+  /// Update current user
+
+  static Future<void>updateApiCall({
+    required String name,
+    required String email,
+    required String cnic,
+    required String phone,
+    required String currentUserToken,
+  }) async {
+    final updateUrl = Uri.parse(
+      "${ApiKeys.updateProfileKey}?t=${DateTime.now().millisecondsSinceEpoch}",
+    );
+
+    http.Response response = await http.post(
+      updateUrl,
+      body: jsonEncode({
+        "name": name,
+        "email": email,
+        "cnic": cnic,
+        "phone": phone,
+      }),
+      headers: {
+        "Authorization": "Bearer $currentUserToken",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final currentUserToken = await LocalStorage.getUserToken('token');
+      final getOldUserData = await LocalStorage.getProfileData(
+        currentUserToken!,
+      );
+
+      /// Convert to json
+      final updatedData = jsonDecode(response.body);
+
+      /// Convert string to json
+      final data = jsonDecode(getOldUserData!);
+
+      data['user']['name'] = updatedData['data']['name'];
+      data['user']['email'] = updatedData['data']['email'];
+      data['user']['cnic'] = updatedData['data']['cnic'];
+      data['patient_data']['patient_info']['cnic'] =
+          updatedData['data']['cnic'];
+      data['patient_data']['patient_info']['email'] =
+          updatedData['data']['email'];
+      data['patient_data']['patient_info']['phone'] =
+          updatedData['data']['phone'];
+
+      final updateData = data;
+      await LocalStorage.saveProfileData(
+        currentUserToken,
+        jsonEncode(updateData),
+      );
+
+      print(updateData);
+    } else {
+      print("Status: ${response.statusCode}");
+      print("Response: ${response.body}");
     }
   }
 }

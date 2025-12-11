@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,7 +18,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  LoginModel? profileData;
+  LoginModel1? profileData;
 
   @override
   void initState() {
@@ -49,7 +50,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: NetworkImage(
-                                    profileData!.profilePicture.toString(),
+                                    profileData!.user!.profilePicture
+                                        .toString(),
                                   ),
                                 ),
                                 shape: BoxShape.circle,
@@ -58,9 +60,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                       ),
-                      CustomText(text: 'Hasan', fontSize: 20),
                       CustomText(
-                        text: 'Patient ID: ${profileData!.id.toString()}',
+                        text: profileData!.user!.name.toString(),
+                        fontSize: 20,
+                      ),
+                      CustomText(
+                        text: 'Patient ID: ${profileData!.user!.id.toString()}',
                         color: AppColors.secondaryTextColor,
                       ),
                     ],
@@ -193,12 +198,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             actionText2: 'Yes',
                             action2: () async {
                               await LocalStorage.userLogOutToken().then((
-                                onValue,
-                              ) {
+                                  onValue,
+                                  ) {
                                 Navigator.pushNamedAndRemoveUntil(
                                   context,
                                   AppRoutes.naveBar,
-                                  (Route<dynamic> route) => false,
+                                      (Route<dynamic> route) => true,
                                 );
                               });
                             },
@@ -245,11 +250,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void getCurrentUserData() async {
-    String? token = await LocalStorage.getUserToken();
+    String? token = await LocalStorage.getUserToken('token');
     String? data = await LocalStorage.getProfileData(token!);
     if (data != null) {
       Map<String, dynamic> jsonData = jsonDecode(data);
-      profileData = LoginModel.fromJson(jsonData);
+      profileData = LoginModel1.fromJson(jsonData);
       setState(() {});
     }
   }

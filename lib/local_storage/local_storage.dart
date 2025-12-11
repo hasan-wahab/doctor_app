@@ -9,10 +9,10 @@ class LocalStorage {
     return prefs;
   }
 
-  static Future<String?> getUserToken() async {
+  static Future<String?> getUserToken(String key) async {
     final preferences = await SharedPreferences.getInstance();
 
-    final prefs = await preferences.getString('token');
+    final prefs = await preferences.getString(key);
     return prefs;
   }
 

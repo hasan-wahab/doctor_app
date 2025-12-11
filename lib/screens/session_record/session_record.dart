@@ -16,12 +16,6 @@ class SessionRecord extends StatelessWidget {
         centerTitle: true,
         title: Text('Session Records'),
         automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -81,6 +75,7 @@ class SessionRecord extends StatelessWidget {
                             ),
                           ],
                         ),
+
                       ],
                     ),
                     SizedBox(height: 5.h),
@@ -209,7 +204,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -298,7 +294,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -387,7 +384,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -476,7 +474,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -565,7 +564,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -654,7 +654,8 @@ class SessionRecord extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),Container(
+              ),
+              Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.only(
                   top: 11.h,
@@ -745,13 +746,7 @@ class SessionRecord extends StatelessWidget {
                 ),
               ),
 
-
-
-
-
-
               SizedBox(height: 23.h),
-
             ],
           ),
         ),

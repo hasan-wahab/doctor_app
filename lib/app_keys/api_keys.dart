@@ -1,10 +1,10 @@
-class ApiKeys{
-
+class ApiKeys {
   ApiKeys._();
-  static String baseUrl='https://dralitherapy.neonweb.tech/api';
+  static String baseUrl = 'https://dralitherapy.neonweb.tech/api';
+
   /// Login Api Key
-  static String loginKey='$baseUrl/patient/login';
+  static String loginKey = '$baseUrl/patient/login';
 
   /// Sign Up Api Key
-  static String signUpKey='';
+  static String updateProfileKey = '$baseUrl/patient/update-profile';
 }

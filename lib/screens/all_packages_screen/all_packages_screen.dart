@@ -129,7 +129,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                 ),
                 AppOutlineButton(
                   onTap: () async {
-                    final user = await LocalStorage.getUserToken();
+                    final user = await LocalStorage.getUserToken('token');
                     if (user == null) {
                       Navigator.pushReplacementNamed(
                         context,

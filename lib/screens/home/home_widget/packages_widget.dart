@@ -65,6 +65,6 @@ class _PackagesWidgetState extends State<PackagesWidget> {
   }
 
   void getTokenValue() async {
-    token = await LocalStorage.getUserToken();
+    token = await LocalStorage.getUserToken('token');
   }
 }

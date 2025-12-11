@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../local_storage/local_storage.dart';
-import '../auth_screen/login_screen/auth_model/login_model.dart';
 
 class HomeScreen2 extends StatefulWidget {
   const HomeScreen2({super.key});
@@ -19,7 +19,7 @@ class HomeScreen2 extends StatefulWidget {
 }
 
 class _HomeScreen2State extends State<HomeScreen2> {
-  LoginModel? profileData;
+  LoginModel1? profileData;
 
   @override
   void initState() {
@@ -54,7 +54,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                 image: NetworkImage(
-                                  profileData!.profilePicture.toString(),
+                                  profileData!.user!.profilePicture.toString(),
                                 ),
                               ),
                               border: Border.all(
@@ -71,7 +71,7 @@ class _HomeScreen2State extends State<HomeScreen2> {
                             SizedBox(
                               width: 200.w,
                               child: CustomText(
-                                text: 'Hi, ${profileData!.name.toString()}',
+                                text: 'Hi, ${profileData!.user!.name.toString()}',
                                 fontSize: 20,
                               ),
                             ),
@@ -345,11 +345,11 @@ class _HomeScreen2State extends State<HomeScreen2> {
   }
 
   void getCurrentUserData() async {
-    String? token = await LocalStorage.getUserToken();
+    String? token = await LocalStorage.getUserToken('token');
     String? data = await LocalStorage.getProfileData(token!);
     if (data != null) {
       Map<String, dynamic> jsonData = jsonDecode(data);
-      profileData = LoginModel.fromJson(jsonData);
+      profileData = LoginModel1.fromJson(jsonData);
       setState(() {});
     }
   }
