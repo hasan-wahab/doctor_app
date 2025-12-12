@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
+import 'package:doctor_app/screens/dashboard_screen/dashbord_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
 import 'package:doctor_app/screens/home/home_screen_2.dart';
 import 'package:doctor_app/screens/map_screen.dart';
@@ -24,10 +25,10 @@ class NaveBar extends StatefulWidget {
 class _NaveBarState extends State<NaveBar> {
   int currentIndex = 0;
   String? token;
-  final List<String> iconText = ['Home', 'Location', 'Records', 'Account'];
+  final List<String> iconText = ['Home', 'Dashboard', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
-    Icons.location_on_outlined,
+    Icons.dashboard,
     Icons.list_alt_rounded,
     Icons.person_2_outlined,
   ];
@@ -39,7 +40,7 @@ class _NaveBarState extends State<NaveBar> {
   ];
   List<Widget> screenList2 = [
     HomeScreen2(),
-    MapScreen(),
+    DashbordScreen(),
     SessionRecord(),
     ProfileScreen(),
   ];

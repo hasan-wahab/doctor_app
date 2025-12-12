@@ -24,6 +24,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   @override
   void initState() {
     getUserToken();
+
     super.initState();
   }
 
@@ -73,6 +74,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                         'Male',
                                         '12/02/2023',
                                         profileData!.user!.email.toString(),
+                                        profileData!.user!.cnic.toString(),
                                       ],
                                     },
                                   );
@@ -136,7 +138,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           CustomText(text: 'Gender', fontSize: 20),
 
                           CustomText(
-                            text: profileData!.patientData!.patientInfo!.gender.toString(),
+                            text: profileData!.patientData!.patientInfo!.gender
+                                .toString(),
 
                             fontSize: 20,
                           ),
@@ -149,7 +152,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           CustomText(text: 'DOB', fontSize: 20),
 
                           CustomText(
-                            text: profileData!.patientData!.patientInfo!.birthDate.toString()
+                            text: profileData!
+                                .patientData!
+                                .patientInfo!
+                                .birthDate
+                                .toString()
                                 .toString(),
 
                             fontSize: 20,

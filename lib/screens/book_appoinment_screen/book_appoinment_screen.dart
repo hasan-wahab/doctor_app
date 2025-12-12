@@ -31,7 +31,10 @@ class BookAppointmentScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 30.h),
-              AppTField(hintText: 'Search doctor or speciality'),
+              AppTField(
+                hintText: 'Search doctor or speciality',
+                icon: Icon(Icons.search),
+              ),
               SizedBox(height: 16.h),
               CustomText(text: 'Doctor Selection', fontSize: 20),
               SizedBox(height: 16.h),

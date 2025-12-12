@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:doctor_app/app_keys/api_keys.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
@@ -16,6 +17,7 @@ class AuthApiServices {
     BuildContext context, {
     required String email,
     required String password,
+    bool isLoginCall = true,
   }) async {
     try {
       final jsonData = {"email": email, "password": password};
@@ -35,14 +37,16 @@ class AuthApiServices {
         Map<String, dynamic> profileData = data['data'];
         print(profileData);
         await LocalStorage.saveProfileData(token, jsonEncode(profileData));
-        await LocalStorage.saveUserToken(token).then((onValue) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.naveBar,
-            (Route<dynamic> route) => false,
-          );
+        await LocalStorage.saveUserToken(token).then((onValue) async {
+          await LocalStorage.saveProfileData('password', password.toString());
+          if (isLoginCall == true) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.naveBar,
+              (Route<dynamic> route) => false,
+            );
+          } else {}
         });
-
         return response;
       } else if (response.statusCode == 401) {
         return AppMsg.showErrorMsg(
@@ -63,13 +67,14 @@ class AuthApiServices {
 
   /// Update current user
 
-  static Future<void>updateApiCall({
+  static Future<void> updateApiCall({
     required String name,
     required String email,
     required String cnic,
     required String phone,
     required String currentUserToken,
-  }) async {
+  })
+  async {
     final updateUrl = Uri.parse(
       "${ApiKeys.updateProfileKey}?t=${DateTime.now().millisecondsSinceEpoch}",
     );
@@ -104,7 +109,10 @@ class AuthApiServices {
       /// Convert string to json
       final data = jsonDecode(getOldUserData!);
 
+      /// Update data in our Local Storage
+      ///
       data['user']['name'] = updatedData['data']['name'];
+      data['user']['profile_picture'] = updatedData['data']['profile_picture'];
       data['user']['email'] = updatedData['data']['email'];
       data['user']['cnic'] = updatedData['data']['cnic'];
       data['patient_data']['patient_info']['cnic'] =
@@ -113,7 +121,8 @@ class AuthApiServices {
           updatedData['data']['email'];
       data['patient_data']['patient_info']['phone'] =
           updatedData['data']['phone'];
-
+      data['patient_data']['patient_info']['image'] =
+          updatedData['data']['profile_picture'];
       final updateData = data;
       await LocalStorage.saveProfileData(
         currentUserToken,
@@ -123,7 +132,29 @@ class AuthApiServices {
       print(updateData);
     } else {
       print("Status: ${response.statusCode}");
-      print("Response: ${response.body}");
+    }
+  }
+
+  /// Update current user profile image
+
+  static Future<bool> updateProfileImage(File path, currentUserToken) async {
+    final url = Uri.parse('${ApiKeys.baseUrl}/patient/profile-picture');
+    final request = await http.MultipartRequest('Post', url);
+
+    request.headers["Authorization"] = "Bearer $currentUserToken";
+    request.headers["Accept"] = "application/json";
+    request.files.add(
+      await http.MultipartFile.fromPath('profile_picture', path.path),
+    );
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("Image updated!");
+      return true;
+    } else {
+      print("Failed: ${response.statusCode}");
+      return false;
     }
   }
 }

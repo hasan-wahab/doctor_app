@@ -7,39 +7,61 @@ class AppTField extends StatelessWidget {
   final TextEditingController? controller;
   final Function(String? value)? validator;
   final double? width;
+  final Widget? icon;
+  final bool isIconsLeft;
+  final bool obscureText;
   const AppTField({
     super.key,
     this.hintText,
     this.controller,
     this.validator,
     this.width,
+    this.icon,
+    this.isIconsLeft = true,
+    this.obscureText=false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 62.h,
-      width: width ?? MediaQuery.sizeOf(context).width,
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(217, 217, 217, 0.35),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: AppColors.primaryColor
-        )
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          // icon: Icon(Icons.add),
-          //  suffix: Icon(Icons.add),
-          contentPadding: EdgeInsets.only(top: 20, left: 20, right: 20),
-          border: InputBorder.none,
-          hintText: hintText ?? "",
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          height: 62.h,
+          width: width ?? MediaQuery.sizeOf(context).width,
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(217, 217, 217, 0.35),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.primaryColor),
+          ),
+          child: TextFormField(
+            obscureText: obscureText,
+            controller: controller,
+            decoration: InputDecoration(
+              // icon: Icon(Icons.add),
+              //  suffix: Icon(Icons.add),
+              contentPadding: EdgeInsets.only(top: 20, left:isIconsLeft==false?20: 40, right: 20),
+              border: InputBorder.none,
+              hintText: '${hintText ?? ''}',
 
-          // label: Text(lableText),
+              // label: Text(lableText),
+            ),
+            validator: (value) => validator!(value) ?? null,
+          ),
         ),
-        validator: (value) => validator!(value) ?? null,
-      ),
+        Padding(
+          padding: EdgeInsets.only(
+            right: isIconsLeft == false ? 10.w : 0,
+            left: isIconsLeft == true ? 10.w : 0,
+          ),
+          child: Align(
+            alignment: isIconsLeft == true
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child:  icon,
+          ),
+        ),
+      ],
     );
   }
 }

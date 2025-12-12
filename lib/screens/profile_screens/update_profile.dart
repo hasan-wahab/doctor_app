@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
@@ -7,6 +10,7 @@ import 'package:doctor_app/widgets/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../app_styles/app_colors.dart';
 import '../../widgets/custom_text.dart';
@@ -40,8 +44,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
     text: data['data']?[5],
   );
   late TextEditingController cnicController = TextEditingController(
-    text: '123456789092345',
+    text: data['data']?[6],
   );
+
+  File? pickImage;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,16 +65,42 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         SizedBox(
                           height: 120.h,
                           width: 120.w,
-                          child: Container(
-                            height: 118.h,
-                            width: 118.w,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(data['data']?[0] ?? ''),
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: 118.h,
+                                width: 118.w,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: pickImage == null
+                                        ? NetworkImage(data['data']?[0] ?? '')
+                                        : FileImage(pickImage!),
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                              shape: BoxShape.circle,
-                            ),
+                              InkWell(
+                                onTap: () {
+                                  pickImageFromUser();
+                                },
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    height: 32.h,
+                                    width: 32.w,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      color: AppColors.whiteIconColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         CustomText(
@@ -260,29 +292,55 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         String? email = emailController.text.toString();
                         String? cnic = cnicController.text.toString();
                         String? phone = phoneController.text.toString();
+                        print(cnic);
                         if (name != '' &&
                             email != '' &&
                             cnic != '' &&
                             phone != '') {
                           if (token != null) {
-                            await AuthApiServices.updateApiCall(
-                              name: name,
-                              email: email,
-                              cnic: cnic,
-                              phone: phone,
-                              currentUserToken: token.toString(),
-                            ).then((onValue) {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) =>
-                                      NaveBar(currentIndex: 3),
-                                ),
-                                (Route<dynamic> route) => false,
-                              );
-                              isLoading = false;
-                              setState(() {});
-                            });
+                            if (pickImage != null) {
+                              await AuthApiServices.updateProfileImage(
+                                pickImage!,
+                                token,
+                              ).then((onValue) async {
+                                await AuthApiServices.updateApiCall(
+                                  name: name,
+                                  email: email,
+                                  cnic: cnic,
+                                  phone: phone,
+                                  currentUserToken: token.toString(),
+                                ).then((onValue) async {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) =>
+                                          NaveBar(currentIndex: 3),
+                                    ),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                });
+                              });
+                            } else {
+                              await AuthApiServices.updateApiCall(
+                                name: name,
+                                email: email,
+                                cnic: cnic,
+                                phone: phone,
+                                currentUserToken: token.toString(),
+                              ).then((onValue) async {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) =>
+                                        NaveBar(currentIndex: 3),
+                                  ),
+                                  (Route<dynamic> route) => false,
+                                );
+                              });
+                            }
+
+                            isLoading = false;
+                            setState(() {});
                           } else {
                             print('Token Has Been null');
                           }
@@ -297,5 +355,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
             )
           : Center(child: CircularProgressIndicator()),
     );
+  }
+
+  void pickImageFromUser() async {
+    final picker = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    final pickedImage = File(picker!.path);
+
+    pickImage = pickedImage;
+    setState(() {});
   }
 }

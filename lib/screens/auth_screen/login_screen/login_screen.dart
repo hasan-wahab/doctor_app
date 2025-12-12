@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? email;
   String? password;
   bool isLoading = false;
+  bool obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 50.h),
             AppTField(
+              icon: Icon(Icons.email_outlined, color: AppColors.primaryColor),
+              isIconsLeft: false,
               controller: emailController,
               validator: (value) {
                 if (value == '') {
@@ -63,6 +66,19 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 20.h),
             AppTField(
+              obscureText: obscureText,
+              icon: InkWell(
+                onTap: () {
+                  setState(() {
+                    obscureText = !obscureText;
+                  });
+                },
+                child: Icon(
+                  obscureText != true ? Icons.visibility : Icons.visibility_off,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+              isIconsLeft: false,
               controller: passwordController,
               validator: (value) {
                 if (value == '') {

@@ -198,12 +198,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             actionText2: 'Yes',
                             action2: () async {
                               await LocalStorage.userLogOutToken().then((
-                                  onValue,
-                                  ) {
+                                onValue,
+                              ) {
                                 Navigator.pushNamedAndRemoveUntil(
                                   context,
                                   AppRoutes.naveBar,
-                                      (Route<dynamic> route) => true,
+                                  (Route<dynamic> route) => true,
                                 );
                               });
                             },
