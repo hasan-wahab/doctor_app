@@ -13,6 +13,7 @@ class AuthApiServices {
   AuthApiServices._();
 
   /// Post Login Api Call
+
   static loginApi(
     BuildContext context, {
     required String email,
@@ -73,8 +74,7 @@ class AuthApiServices {
     required String cnic,
     required String phone,
     required String currentUserToken,
-  })
-  async {
+  }) async {
     final updateUrl = Uri.parse(
       "${ApiKeys.updateProfileKey}?t=${DateTime.now().millisecondsSinceEpoch}",
     );
@@ -107,10 +107,11 @@ class AuthApiServices {
       final updatedData = jsonDecode(response.body);
 
       /// Convert string to json
+
       final data = jsonDecode(getOldUserData!);
 
       /// Update data in our Local Storage
-      ///
+
       data['user']['name'] = updatedData['data']['name'];
       data['user']['profile_picture'] = updatedData['data']['profile_picture'];
       data['user']['email'] = updatedData['data']['email'];
@@ -137,7 +138,11 @@ class AuthApiServices {
 
   /// Update current user profile image
 
-  static Future<bool> updateProfileImage(File path, currentUserToken) async {
+  static Future<bool> updateProfileImage(
+    File path,
+    currentUserToken,
+    BuildContext context,
+  ) async {
     final url = Uri.parse('${ApiKeys.baseUrl}/patient/profile-picture');
     final request = await http.MultipartRequest('Post', url);
 
@@ -153,8 +158,23 @@ class AuthApiServices {
       print("Image updated!");
       return true;
     } else {
-      print("Failed: ${response.statusCode}");
+      AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
       return false;
     }
+  }
+
+  /// Logout Api Call
+
+  static Future<void> logoutUser(currentUserToken) async {
+    final url = Uri.parse('${ApiKeys.baseUrl}/patient/logout');
+    final http.Response response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $currentUserToken",
+        "Accept": "application/json",
+      },
+    );
+
+    print(response.body);
   }
 }

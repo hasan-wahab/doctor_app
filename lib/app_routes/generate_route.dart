@@ -9,6 +9,7 @@ import 'package:doctor_app/screens/book_appoinment_screen/payment_option_screen.
 import 'package:doctor_app/screens/book_appoinment_screen/select_date_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
 import 'package:doctor_app/screens/nave_bar.dart';
+import 'package:doctor_app/screens/packages/packages_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/bank_transfer_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/cridit_card_payment_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/easypaisa_pament_screen.dart';
@@ -20,6 +21,7 @@ import 'package:doctor_app/screens/profile_screens/update_profile.dart';
 import 'package:doctor_app/screens/session_record/session_notes.dart';
 import 'package:doctor_app/screens/splash_scree/splash_screen.dart';
 import 'package:doctor_app/screens/video_palyer/video_player_screen.dart';
+import 'package:doctor_app/screens/visits_detail/visits_detail_screen.dart';
 import 'package:doctor_app/screens/wallet_screen/payment_method_screen.dart';
 import 'package:doctor_app/screens/wallet_screen/recharge_wallet_screen.dart';
 import 'package:doctor_app/screens/wallet_screen/transaction_history.dart';
@@ -111,15 +113,20 @@ class AppGenerateRoute {
       routeName: AppRoutes.successPaymentScreen,
       screen: PaymentSuccessScreen(),
     ),
-    AppGenerateRoute(
-      routeName: AppRoutes.myNFCCardScreen,
-      screen: NfcCard(),
-    ),
+    AppGenerateRoute(routeName: AppRoutes.myNFCCardScreen, screen: NfcCard()),
     AppGenerateRoute(
       routeName: AppRoutes.myProfileScreen,
       screen: MyProfileScreen(),
     ),
     AppGenerateRoute(routeName: AppRoutes.notesScreen, screen: SessionNotes()),
+    AppGenerateRoute(
+      routeName: AppRoutes.visitsDetailScreen,
+      screen: VisitsDetailScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.packagesDetailScreen,
+      screen: PackagesScreen(),
+    ),
   ];
 
   static CupertinoPageRoute onGenerateRoute(
@@ -138,7 +145,6 @@ class AppGenerateRoute {
       return CupertinoPageRoute(
         builder: (context) => MapScreen(),
         settings: settings,
-
       );
     }
   }

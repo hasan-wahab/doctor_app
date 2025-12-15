@@ -49,7 +49,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
     'Therapy Seesions',
     'Last appointment',
   ];
-
+  List<String> screenNameList = [
+    AppRoutes.visitsDetailScreen,
+    AppRoutes.packagesDetailScreen,
+    AppRoutes.visitsDetailScreen,
+    AppRoutes.visitsDetailScreen,
+    AppRoutes.visitsDetailScreen,
+    AppRoutes.visitsDetailScreen,
+  ];
   LoginModel1? profileData;
 
   @override
@@ -153,44 +160,47 @@ class _DashbordScreenState extends State<DashbordScreen> {
                               .toString(),
                         ];
 
-                        return Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: AppColors.primaryColor,
-                              width: 1,
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, screenNameList[index]);
+
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 5.h,
                             ),
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: 100.w,
-                                    child: CustomText(text: cardText[index]),
-                                  ),
-                                  SizedBox(
-                                    width: 100.w,
-                                    child: CustomText(
-                                      text: cardSecondText[index],
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: AppColors.primaryColor,
+                                width: 1,
+                              ),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 100.w,
+                                      child: CustomText(text: cardText[index]),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(icons[index]),
-                              ),
-                            ],
+                                    SizedBox(
+                                      width: 100.w,
+                                      child: CustomText(
+                                        text: cardSecondText[index],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Icon(icons[index])
+                              ],
+                            ),
                           ),
                         );
                       },

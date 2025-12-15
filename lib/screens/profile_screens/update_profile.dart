@@ -7,6 +7,7 @@ import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/aut
 import 'package:doctor_app/screens/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
+import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -128,7 +129,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           ),
                           child: TextFormField(
                             controller: nameController,
-
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.r),
@@ -299,10 +299,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             phone != '') {
                           if (token != null) {
                             if (pickImage != null) {
-                              await AuthApiServices.updateProfileImage(
-                                pickImage!,
-                                token,
-                              ).then((onValue) async {
+                              bool iaUpdated =
+                                  await AuthApiServices.updateProfileImage(
+                                    pickImage!,
+                                    token,
+                                    context,
+                                  );
+
+                              if (iaUpdated == true) {
                                 await AuthApiServices.updateApiCall(
                                   name: name,
                                   email: email,
@@ -319,7 +323,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     (Route<dynamic> route) => false,
                                   );
                                 });
-                              });
+                              }
                             } else {
                               await AuthApiServices.updateApiCall(
                                 name: name,

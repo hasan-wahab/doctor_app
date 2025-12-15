@@ -61,4 +61,9 @@ class AppRoutes {
   // My Profile Screen
 
   static const String myProfileScreen = 'myProfileScreen';
+
+  // Visit Details Screen
+  static const String visitsDetailScreen = 'visitsDetailScreen';
+  // Packages Detail Screen
+  static const String packagesDetailScreen = 'packagesDetailScreen';
 }

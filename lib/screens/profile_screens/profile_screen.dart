@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
@@ -19,6 +20,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   LoginModel1? profileData;
+  String? currentUserToken;
 
   @override
   void initState() {
@@ -197,14 +199,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             actionText: 'No',
                             actionText2: 'Yes',
                             action2: () async {
-                              await LocalStorage.userLogOutToken().then((
-                                onValue,
-                              ) {
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  AppRoutes.naveBar,
-                                  (Route<dynamic> route) => true,
-                                );
+                              await AuthApiServices.logoutUser(
+                                currentUserToken,
+                              ).then((value) async {
+                                await LocalStorage.userLogOutToken().then((
+                                  onValue,
+                                ) {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    AppRoutes.naveBar,
+                                    (Route<dynamic> route) => true,
+                                  );
+                                });
                               });
                             },
                           );
@@ -251,10 +257,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void getCurrentUserData() async {
     String? token = await LocalStorage.getUserToken('token');
+
     String? data = await LocalStorage.getProfileData(token!);
     if (data != null) {
       Map<String, dynamic> jsonData = jsonDecode(data);
       profileData = LoginModel1.fromJson(jsonData);
+      currentUserToken = token;
       setState(() {});
     }
   }
