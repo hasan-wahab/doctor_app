@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
@@ -44,21 +45,21 @@ class _DashbordScreenState extends State<DashbordScreen> {
   List<String> cardText = [
     'Visits',
     'Active packages',
-    'Total Spent',
-    'Next appointment',
-    'Therapy Seesions',
-    'Last appointment',
+    'Assessments',
+    'Invoice',
+    'Sessions',
+    'Assistant Manager',
   ];
   List<String> screenNameList = [
     AppRoutes.visitsDetailScreen,
     AppRoutes.packagesDetailScreen,
-    AppRoutes.visitsDetailScreen,
-    AppRoutes.visitsDetailScreen,
-    AppRoutes.visitsDetailScreen,
-    AppRoutes.visitsDetailScreen,
+    AppRoutes.assessmentScreen,
+    AppRoutes.invoiceDetailScreen,
+    AppRoutes.sessionsDetailScreen,
+    AppRoutes.assistantManagerScreen,
   ];
   LoginModel1? profileData;
-
+  CurrentPatientModel? currentPatientData;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +75,13 @@ class _DashbordScreenState extends State<DashbordScreen> {
                   children: [
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.myProfileScreen);
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.myProfileScreen,
+                          arguments: <String, dynamic>{
+                            "data": currentPatientData,
+                          },
+                        );
                       },
                       child: Container(
                         height: 39.h,
@@ -140,30 +147,26 @@ class _DashbordScreenState extends State<DashbordScreen> {
                       itemCount: 6,
                       itemBuilder: (context, index) {
                         List cardSecondText = [
-                          profileData!.patientData!.statistics!.totalVisits
+                          currentPatientData!.patient!.visits!.length
                               .toString(),
-                          profileData!.patientData!.statistics!.activePackages
+                          currentPatientData!.patient!.packages!.length
                               .toString(),
-                          profileData!.patientData!.statistics!.totalSpent
+                          '',
+                          currentPatientData!.recentInvoices!.length.toString(),
+                          currentPatientData!.therapySessions!.length
                               .toString(),
-                          profileData!
-                              .patientData!
-                              .statistics!
-                              .nextAppointmentDate
-                              .toString(),
-                          profileData!
-                              .patientData!
-                              .statistics!
-                              .totalTherapySessions
-                              .toString(),
-                          profileData!.patientData!.statistics!.lastVisitDate
-                              .toString(),
+                          '',
                         ];
 
                         return InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(context, screenNameList[index]);
-
+                          onTap: () async {
+                            Navigator.pushNamed(
+                              context,
+                              screenNameList[index],
+                              arguments: <String, CurrentPatientModel>{
+                                "data": currentPatientData!,
+                              },
+                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -183,22 +186,25 @@ class _DashbordScreenState extends State<DashbordScreen> {
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: cardSecondText[index] != ''
+                                      ? MainAxisAlignment.spaceBetween
+                                      : MainAxisAlignment.center,
                                   children: [
                                     SizedBox(
                                       width: 100.w,
                                       child: CustomText(text: cardText[index]),
                                     ),
-                                    SizedBox(
-                                      width: 100.w,
-                                      child: CustomText(
-                                        text: cardSecondText[index],
-                                      ),
-                                    ),
+                                    cardSecondText[index] != ''
+                                        ? SizedBox(
+                                            width: 100.w,
+                                            child: CustomText(
+                                              text: cardSecondText[index],
+                                            ),
+                                          )
+                                        : Container(),
                                   ],
                                 ),
-                                Icon(icons[index])
+                                Icon(icons[index]),
                               ],
                             ),
                           ),
@@ -324,23 +330,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
     });
     final token = await LocalStorage.getUserToken('token');
     final currentUserData = await LocalStorage.getProfileData(token!);
-    final currentUserPassword = await LocalStorage.getProfileData('password');
 
     final jsonData = jsonDecode(currentUserData!);
 
-    String email = jsonData['user']['email'];
+    profileData = LoginModel1.fromJson(jsonData);
 
-    await AuthApiServices.loginApi(
-      context,
-      email: email,
-      password: currentUserPassword.toString(),
-      isLoginCall: false,
+    currentPatientData = await AuthApiServices.getPatientData(
+      patientId: profileData!.patientData!.patientInfo!.id.toString(),
+      currentUserToken: profileData!.accessToken.toString(),
+      context: context,
     );
-    final currentUpdateData = await LocalStorage.getProfileData(token);
 
-    final jsonData2 = jsonDecode(currentUpdateData!);
-
-    profileData = LoginModel1.fromJson(jsonData2);
     setState(() {
       isLoading = false;
     });

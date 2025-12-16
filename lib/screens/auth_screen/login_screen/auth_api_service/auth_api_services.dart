@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:doctor_app/app_keys/api_keys.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,7 +67,7 @@ class AuthApiServices {
     }
   }
 
-  /// Update current user
+  /// Update current user profile
 
   static Future<void> updateApiCall({
     required String name,
@@ -176,5 +177,41 @@ class AuthApiServices {
     );
 
     print(response.body);
+  }
+
+  /// Get api | Current patient appointment data
+
+  static Future getPatientData({
+    required String patientId,
+    required String currentUserToken,
+    required BuildContext context,
+  }) async {
+    try {
+      final url = Uri.parse(
+        '${ApiKeys.baseUrl}/patient/apipatients/$patientId',
+      );
+
+      http.Response response = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $currentUserToken",
+          "Accept": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+
+        CurrentPatientModel currentPatientData = CurrentPatientModel.fromJson(
+          jsonData['data'],
+        );
+
+        return currentPatientData;
+      } else {
+        AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+    }
   }
 }

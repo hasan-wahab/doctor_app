@@ -1,5 +1,7 @@
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/screens/all_packages_screen/all_packages_screen.dart';
+import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
+import 'package:doctor_app/screens/assestent_manager/assistent_manager.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/auth_screen/reset_password_screen.dart';
 import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
@@ -29,7 +31,9 @@ import 'package:doctor_app/screens/wallet_screen/wallet_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/invioce/invoice_detail_screen.dart';
 import '../screens/nfc_card/nfc_card.dart';
+import '../screens/seesion/sessiom_detail_screen.dart';
 
 class AppGenerateRoute {
   String routeName;
@@ -126,6 +130,22 @@ class AppGenerateRoute {
     AppGenerateRoute(
       routeName: AppRoutes.packagesDetailScreen,
       screen: PackagesScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.invoiceDetailScreen,
+      screen: InvoiceDetailScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.assessmentScreen,
+      screen: AssessmentDetailScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.assistantManagerScreen,
+      screen: AssistantManagerScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.sessionsDetailScreen,
+      screen: SessionDetailScreen(),
     ),
   ];
 

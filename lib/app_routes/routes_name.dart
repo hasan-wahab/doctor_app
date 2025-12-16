@@ -66,4 +66,12 @@ class AppRoutes {
   static const String visitsDetailScreen = 'visitsDetailScreen';
   // Packages Detail Screen
   static const String packagesDetailScreen = 'packagesDetailScreen';
+  // Assessments Detail Screen
+  static const String assessmentScreen = 'assessmentScreen';
+  // Invoice Detail Screen
+  static const String invoiceDetailScreen = 'invoiceDetailScreen';
+  // Sessions Detail Screen
+  static const String sessionsDetailScreen = 'sessionsDetailScreen';
+  // Assistant Manager Screen
+  static const String assistantManagerScreen = 'assistantManagerScreen';
 }
