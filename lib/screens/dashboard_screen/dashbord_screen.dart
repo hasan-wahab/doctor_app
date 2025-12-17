@@ -69,39 +69,57 @@ class _DashbordScreenState extends State<DashbordScreen> {
           : ListView(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
               children: [
-                SizedBox(height: 66.h),
+                SizedBox(height: 56.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.myProfileScreen,
-                          arguments: <String, dynamic>{
-                            "data": currentPatientData,
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.myProfileScreen,
+                            );
                           },
-                        );
-                      },
-                      child: Container(
-                        height: 39.h,
-                        width: 39.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              profileData!.user!.profilePicture.toString(),
+                          child: Container(
+                            height: 58.h,
+                            width: 58.w,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  profileData!.user!.profilePicture.toString(),
+                                ),
+                              ),
+                              border: Border.all(
+                                color: AppColors.primaryColor,
+                                width: 2.w,
+                              ),
                             ),
                           ),
-                          border: Border.all(
-                            color: AppColors.primaryColor,
-                            width: 2.w,
-                          ),
                         ),
-                      ),
+                        SizedBox(width: 10.w),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 200.w,
+                              child: CustomText(
+                                text: 'Hi, ${profileData!.user!.name.toString()}',
+                                fontSize: 20,
+                              ),
+                            ),
+                            CustomText(
+                              text:
+                              '0${DateTime.now().day.toString()}/${DateTime.now().month.toString()}/${DateTime.now().year.toString()}',
+                              fontSize: 12,
+                              color: AppColors.secondaryTextColor,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-
-                    CustomText(text: 'Dashboard', fontSize: 24),
 
                     Stack(
                       alignment: Alignment.topRight,

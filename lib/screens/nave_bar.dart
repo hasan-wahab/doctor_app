@@ -39,8 +39,8 @@ class _NaveBarState extends State<NaveBar> {
     LoginScreen(),
   ];
   List<Widget> screenList2 = [
-    HomeScreen2(),
     DashbordScreen(),
+    HomeScreen2(),
     SessionRecord(),
     ProfileScreen(),
   ];

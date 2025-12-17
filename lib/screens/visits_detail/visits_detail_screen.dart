@@ -39,65 +39,78 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         centerTitle: true,
         title: Text('My visits'),
       ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        children: [
-          CustomText(
-            text: 'Visit History',
-            fontSize: 20,
-            color: AppColors.primaryColor,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(
-              currentPatientData!.patient!.visits.length,
-              (index) {
-                final currentPatient = currentPatientData!.patient!.visits;
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 12.h,
-                  ),
-                  margin: EdgeInsets.only(top: 10.h),
-                  height: 178.h,
-                  width: 360.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: AppColors.primaryColor, width: 2),
-                  ),
+      body: currentPatientData != null
+          ? ListView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              children: [
+                CustomText(
+                  text: 'Visit History',
+                  fontSize: 20,
+                  color: AppColors.primaryColor,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: List.generate(
+                    currentPatientData!.patient!.visits.length,
+                    (index) {
+                      final currentPatient =
+                          currentPatientData!.patient!.visits;
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 12.h,
+                        ),
+                        margin: EdgeInsets.only(top: 10.h),
+                        height: 178.h,
+                        width: 360.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: AppColors.primaryColor,
+                            width: 2,
+                          ),
+                        ),
 
-                  child: Column(
-                    children: [
-                      _text(
-                        firstText: 'Date',
-                        secondText: currentPatient[index].visitAt.toString(),
-                      ),
-                      _text(
-                        firstText: 'Type',
-                        buttonText: currentPatient[index].type.toString(),
-                      ),
-                      _text(firstText: 'Doctor', secondText: 'Dr'),
-                      _text(
-                        firstText: 'Stage',
-                        secondText: currentPatient[index].currentStage,
-                      ),
-                      _text(
-                        firstText: 'Amount',
-                        secondText: currentPatient[index].consultationFee
-                            .toString(),
-                      ),
-                      _text(
-                        firstText: 'Status',
-                        buttonText: currentPatient[index].status ?? 'Pending',
-                      ),
-                    ],
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _text(
+                              firstText: 'Date',
+                              secondText: currentPatient[index].visitAt
+                                  .toString(),
+                            ),
+                            _text(
+                              firstText: 'Type',
+                              buttonText: currentPatient[index].type.toString(),
+                            ),
+                            _text(
+                              firstText: 'Doctor',
+                              secondText: currentPatient[index].consultant!.name
+                                  .toString(),
+                            ),
+                            _text(
+                              firstText: 'Stage',
+                              secondText: currentPatient[index].currentStage,
+                            ),
+                            _text(
+                              firstText: 'Amount',
+                              secondText: currentPatient[index].consultationFee
+                                  .toString(),
+                            ),
+                            _text(
+                              firstText: 'Status',
+                              buttonText:
+                                  currentPatient[index].status ?? 'Pending',
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                ),
+              ],
+            )
+          : Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -110,8 +123,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: CustomText(text: firstText)),
+        Expanded(flex: 1, child: CustomText(text: firstText)),
         Expanded(
+          flex: 2,
           child: secondText != null
               ? CustomText(text: secondText, align: TextAlign.start)
               : Row(

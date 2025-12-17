@@ -3,10 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../app_styles/app_colors.dart';
+import '../../models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
 
-class InvoiceDetailScreen extends StatelessWidget {
+class InvoiceDetailScreen extends StatefulWidget {
   const InvoiceDetailScreen({super.key});
+
+  @override
+  State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
+}
+
+class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
+  CurrentPatientModel? currentPatientData;
+  @override
+  void didChangeDependencies() {
+    Map<String, CurrentPatientModel> data =
+        ModalRoute.of(context)?.settings.arguments
+            as Map<String, CurrentPatientModel>;
+    if (data != null) {
+      currentPatientData = data['data'];
+    }
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +56,10 @@ class InvoiceDetailScreen extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(6, (index) {
+            children: List.generate(currentPatientData!.recentInvoices.length, (
+              index,
+            ) {
+              var invoice = currentPatientData!.recentInvoices[index];
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
                 margin: EdgeInsets.only(top: 10.h),
@@ -52,12 +73,18 @@ class InvoiceDetailScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _text(firstText: 'Invoice #', secondText: '#0000002'),
-                    _text(firstText: 'Date', secondText: 'Nov 29, 2025'),
-                    _text(firstText: 'Type', buttonText: 'Consultation'),
+                    _text(
+                      firstText: 'Invoice #',
+                      secondText: invoice.id.toString(),
+                    ),
+                    _text(
+                      firstText: 'Date',
+                      secondText: invoice.createdAt.toString(),
+                    ),
+                    _text(firstText: 'Type', buttonText: invoice.type),
 
-                    _text(firstText: 'Amount', secondText: 'Rs 3,000.00'),
-                    _text(firstText: 'Status', buttonText: 'Pending'),
+                    _text(firstText: 'Amount', secondText: invoice.amount),
+                    _text(firstText: 'Status', buttonText: invoice.status),
                   ],
                 ),
               );

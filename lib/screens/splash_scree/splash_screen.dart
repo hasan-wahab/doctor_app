@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.sizeOf(context).height.h,
+        height: MediaQuery.sizeOf(context).height,
         width: double.infinity,
         color: AppColors.primaryColor,
         child: Column(
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ? Container(
                     //  height: 100.h,
                     width: 300.w,
-                    child: Image.asset('assets/images/main_logo.png'),
+                    child: Image.asset("assets/images/main_logo.png"),
                   )
                 : Container(),
             SizedBox(height: 20),
@@ -85,7 +85,6 @@ class _SplashScreenState extends State<SplashScreen> {
                       setState(() {});
                     })
                     .then((_) async {
-
                       await Future.delayed(Duration(seconds: 2)).then((_) {
                         Navigator.pushReplacementNamed(
                           context,

@@ -51,6 +51,29 @@ class _PackagesScreenState extends State<PackagesScreen> {
             children: List.generate(
               (currentPatientData!.patient!.packages.length),
               (index) {
+                final totalSession =
+                    currentPatientData!
+                        .patient!
+                        .packages[index]
+                        .pivot!
+                        .sessionsTotal ??
+                    7;
+                final usedSession = currentPatientData!
+                    .patient!
+                    .packages[index]
+                    .pivot!
+                    .sessionsUsed;
+                List colorsList = List.generate(
+                  (usedSession == 0 ? 1 : usedSession!),
+                  (index) {
+                    return usedSession != 0
+                        ? AppColors.primaryColor
+                        : AppColors.secondaryColor;
+                  },
+                );
+                List colorsList2 = List.generate((7 - usedSession!), (index) {
+                  return AppColors.secondaryColor;
+                });
                 return Container(
                   margin: EdgeInsets.only(top: 20.h),
                   padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 20),
@@ -80,9 +103,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                             color: AppColors.secondaryTextColor,
                           ),
                           CustomText(
-                            text:
-                                '${currentPatientData!.patient!.packages[index].pivot!.sessionsUsed}/${currentPatientData!.patient!.packages[index].pivot!.sessionsTotal}',
-                            //    text: '0/7',
+                            text: '$usedSession/$totalSession',
                             fontSize: 12,
                           ),
                         ],
@@ -92,7 +113,10 @@ class _PackagesScreenState extends State<PackagesScreen> {
                         height: 10.h,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: AppColors.secondaryTextColor,
+                          gradient: LinearGradient(
+                            colors: [...colorsList, ...colorsList2],
+                          ),
+
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                       ),
