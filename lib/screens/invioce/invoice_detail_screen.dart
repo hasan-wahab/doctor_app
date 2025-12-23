@@ -1,3 +1,4 @@
+import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +16,8 @@ class InvoiceDetailScreen extends StatefulWidget {
 
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   CurrentPatientModel? currentPatientData;
+  var isExpanded;
+
   @override
   void didChangeDependencies() {
     Map<String, CurrentPatientModel> data =
@@ -23,6 +26,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     if (data != null) {
       currentPatientData = data['data'];
     }
+    isExpanded = List.generate(currentPatientData!.recentInvoices.length, (
+      index,
+    ) {
+      return false;
+    });
     super.didChangeDependencies();
   }
 
@@ -61,9 +69,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ) {
               var invoice = currentPatientData!.recentInvoices[index];
               return Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
+                padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 20.h),
                 margin: EdgeInsets.only(top: 10.h),
-                height: 178.h,
                 width: 360.w,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
@@ -71,20 +78,70 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 ),
 
                 child: Column(
+                  spacing: 10.h,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _text(
                       firstText: 'Invoice #',
                       secondText: invoice.id.toString(),
                     ),
+
                     _text(
                       firstText: 'Date',
                       secondText: invoice.createdAt.toString(),
                     ),
                     _text(firstText: 'Type', buttonText: invoice.type),
-
-                    _text(firstText: 'Amount', secondText: invoice.amount),
+                    _text(
+                      firstText: 'Total amount',
+                      secondText: invoice.amount,
+                    ),
                     _text(firstText: 'Status', buttonText: invoice.status),
+
+                    isExpanded[index] == true
+                        ? Column(
+                            children: [
+                              Divider(color: AppColors.primaryColor),
+                              _text(
+                                firstText: 'Partial payments',
+                                secondText: '',
+                              ),
+                              ...List.generate(invoice.payments.length, (
+                                index,
+                              ) {
+                                return _text(
+                                  firstText: '${index + 1}',
+                                  secondText: invoice.payments[index].amount,
+                                );
+                              }),
+                              Divider(color: AppColors.primaryColor),
+                            ],
+                          )
+                        : Container(),
+
+                    SizedBox(height: 5.h),
+                    invoice.status != 'paid'
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AppButton(
+                                onTap: () {
+                                  setState(() {
+                                    isExpanded[index] = !isExpanded[index];
+                                  });
+                                },
+                                text: isExpanded[index] == true
+                                    ? 'see less'
+                                    : 'see more',
+                                width: 100,
+                                height: 20,
+                                isColor: false,
+                                textSize: 12,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ],
+                          )
+                        : Container(),
+                    SizedBox(height: 2.h),
                   ],
                 ),
               );

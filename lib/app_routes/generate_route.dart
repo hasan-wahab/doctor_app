@@ -31,6 +31,7 @@ import 'package:doctor_app/screens/wallet_screen/wallet_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/home/search_screen.dart';
 import '../screens/invioce/invoice_detail_screen.dart';
 import '../screens/nfc_card/nfc_card.dart';
 import '../screens/seesion/sessiom_detail_screen.dart';
@@ -138,6 +139,10 @@ class AppGenerateRoute {
     AppGenerateRoute(
       routeName: AppRoutes.assessmentScreen,
       screen: AssessmentDetailScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.searchScreen,
+      screen: SearchScreen(),
     ),
     AppGenerateRoute(
       routeName: AppRoutes.assistantManagerScreen,

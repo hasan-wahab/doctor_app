@@ -185,7 +185,8 @@ class AuthApiServices {
     required String patientId,
     required String currentUserToken,
     required BuildContext context,
-  }) async {
+  })
+  async {
     try {
       final url = Uri.parse(
         '${ApiKeys.baseUrl}/patient/apipatients/$patientId',
@@ -201,11 +202,11 @@ class AuthApiServices {
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
+        print(jsonData['data']);
 
         CurrentPatientModel currentPatientData = CurrentPatientModel.fromJson(
           jsonData['data'],
         );
-
         return currentPatientData;
       } else {
         AppMsg.showErrorMsg(context, msg: response.statusCode.toString());

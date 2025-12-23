@@ -12,6 +12,7 @@ class AppButton extends StatelessWidget {
   final Color? textColor;
   final double? textSize;
   final double? height;
+  final BorderRadius? borderRadius;
 
   AppButton({
     super.key,
@@ -23,6 +24,7 @@ class AppButton extends StatelessWidget {
     this.textColor,
     this.textSize,
     this.height,
+    this.borderRadius
   });
 
   @override
@@ -35,7 +37,7 @@ class AppButton extends StatelessWidget {
         width: width?.w ?? MediaQuery.sizeOf(context).width.w,
         decoration: BoxDecoration(
           color: isColor ? AppColors.primaryColor : AppColors.whiteIconColor,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius:borderRadius?? BorderRadius.circular(12.r),
           border: isColor == false
               ? Border.all(color: borderColor ?? AppColors.primaryColor)
               : null,

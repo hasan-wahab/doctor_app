@@ -7,7 +7,6 @@ class AppMsg {
 
   static showErrorMsg(
     BuildContext context, {
-
     required String msg,
     String? msgTitle,
     VoidCallback? action,
@@ -16,6 +15,7 @@ class AppMsg {
     String? actionText2,
   }) {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
@@ -60,8 +60,8 @@ class AppMsg {
                     actionText2,
                     style: TextStyle(color: AppColors.linkTextColor),
                   ),
-                )
-              : Container(),
+                )              : Container(),
+
         ],
       ),
     );

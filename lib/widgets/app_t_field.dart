@@ -10,6 +10,7 @@ class AppTField extends StatelessWidget {
   final Widget? icon;
   final bool isIconsLeft;
   final bool obscureText;
+  final bool autoFucus;
   const AppTField({
     super.key,
     this.hintText,
@@ -19,6 +20,7 @@ class AppTField extends StatelessWidget {
     this.icon,
     this.isIconsLeft = true,
     this.obscureText=false,
+    this.autoFucus=false,
   });
 
   @override
@@ -35,6 +37,7 @@ class AppTField extends StatelessWidget {
             border: Border.all(color: AppColors.primaryColor),
           ),
           child: TextFormField(
+            autofocus: autoFucus,
             obscureText: obscureText,
             controller: controller,
             decoration: InputDecoration(

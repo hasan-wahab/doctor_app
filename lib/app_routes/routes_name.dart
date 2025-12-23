@@ -74,4 +74,6 @@ class AppRoutes {
   static const String sessionsDetailScreen = 'sessionsDetailScreen';
   // Assistant Manager Screen
   static const String assistantManagerScreen = 'assistantManagerScreen';
+  // Search Screen
+  static const String searchScreen = 'searchScreen';
 }

@@ -25,10 +25,10 @@ class NaveBar extends StatefulWidget {
 class _NaveBarState extends State<NaveBar> {
   int currentIndex = 0;
   String? token;
-  final List<String> iconText = ['Home', 'Dashboard', 'Records', 'Account'];
+  final List<String> iconText = ['Home', 'Location', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
-    Icons.dashboard,
+    Icons.location_on_outlined,
     Icons.list_alt_rounded,
     Icons.person_2_outlined,
   ];
@@ -40,7 +40,7 @@ class _NaveBarState extends State<NaveBar> {
   ];
   List<Widget> screenList2 = [
     DashbordScreen(),
-    HomeScreen2(),
+    MapScreen(),
     SessionRecord(),
     ProfileScreen(),
   ];

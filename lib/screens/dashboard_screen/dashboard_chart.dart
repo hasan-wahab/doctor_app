@@ -12,48 +12,56 @@ class DashboardChartsCustom extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Bar Chart
-        Container(
-          width: 165.w,
-          height: 121.h,
-          padding: EdgeInsets.all(10.r,),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                  color: AppColors.primaryColor
-              )
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Monthly Payments', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 8.h),
-              Expanded(child: CustomBarChart(data: [4, 7, 5, 6, 7, 3])),
-            ],
+        Expanded(
+          child: Container(
+            width: 165.w,
+            height: 121.h,
+            padding: EdgeInsets.all(10.r),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: AppColors.primaryColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Monthly Payments',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8.h),
+                Expanded(child: CustomBarChart(data: [10, 7, 5, 6, 7, 3,10,9,3,2,9])),
+              ],
+            ),
           ),
         ),
-
+        SizedBox(width: 10.w),
         // Line Chart
-        Container(
-          width: 165.w,
-          height: 121.h,
-          padding: EdgeInsets.all(10.r),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: AppColors.primaryColor
-            )
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Sessions Consuming', style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 8.h),
-              Expanded(child: CustomLineChart(data: [3, 4.5, 3.5, 5, 4.2, 4.8])),
-            ],
-          ),
-        ),
+        // Expanded(
+        //   child: Container(
+        //     width: 165.w,
+        //     height: 121.h,
+        //     padding: EdgeInsets.all(10.r),
+        //     decoration: BoxDecoration(
+        //       color: Colors.white,
+        //       borderRadius: BorderRadius.circular(12.r),
+        //       border: Border.all(color: AppColors.primaryColor),
+        //     ),
+        //     child: Column(
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         Text(
+        //           'Sessions Consuming',
+        //           style: TextStyle(fontWeight: FontWeight.bold),
+        //         ),
+        //         SizedBox(height: 8.h),
+        //         Expanded(
+        //           child: CustomLineChart(data: [3, 4.5, 3.5, 5, 4.2, 4.8]),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
@@ -66,26 +74,28 @@ class CustomBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      double maxData = data.reduce((a, b) => a > b ? a : b);
-      double barWidth = constraints.maxWidth / (data.length * 2);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double maxData = data.reduce((a, b) => a > b ? a : b);
+        double barWidth = constraints.maxWidth / (data.length * 2);
 
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: data.map((value) {
-          double barHeight = (value / maxData) * constraints.maxHeight;
-          return Container(
-            width: barWidth,
-            height: barHeight,
-            decoration: BoxDecoration(
-              color: Colors.teal,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          );
-        }).toList(),
-      );
-    });
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: data.map((value) {
+            double barHeight = (value / maxData) * constraints.maxHeight;
+            return Container(
+              width: barWidth,
+              height: barHeight,
+              decoration: BoxDecoration(
+                color: Colors.teal,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 }
 
@@ -98,7 +108,7 @@ class CustomLineChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: _LineChartPainter(data: data),
-      child: Container()
+      child: Container(),
     );
   }
 }

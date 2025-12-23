@@ -74,15 +74,17 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                     children: [
                       _text(
                         firstText: 'Sessions#',
-                        secondText: therapySessions.sessionNumber ?? 'no data',
+                        secondText: therapySessions.sessionNumber == null
+                            ? 'No data'
+                            : therapySessions.sessionNumber.toString(),
                       ),
                       _text(
-                        firstText: 'Date',
-                        secondText: therapySessions.createdAt.toString(),
+                        firstText: 'Next session date',
+                        secondText: therapySessions.nextSessionDate.toString(),
                       ),
                       _text(
                         firstText: 'Therapist',
-                        secondText: therapySessions.therapist!.name.toString(),
+                        secondText: therapySessions.therapist.name.toString(),
                       ),
 
                       _text(

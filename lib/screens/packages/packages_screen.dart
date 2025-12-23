@@ -49,18 +49,18 @@ class _PackagesScreenState extends State<PackagesScreen> {
           ),
           Column(
             children: List.generate(
-              (currentPatientData!.patient!.packages.length),
+              (currentPatientData!.patient!.packages!.length),
               (index) {
                 final totalSession =
                     currentPatientData!
                         .patient!
-                        .packages[index]
+                        .packages![index]
                         .pivot!
                         .sessionsTotal ??
                     7;
                 final usedSession = currentPatientData!
                     .patient!
-                    .packages[index]
+                    .packages![index]
                     .pivot!
                     .sessionsUsed;
                 List colorsList = List.generate(
@@ -89,7 +89,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                     children: [
                       CustomText(
                         text:
-                            '${currentPatientData!.patient!.packages[index].name.toString()} ',
+                            '${currentPatientData!.patient!.packages![index].name.toString()} ',
 
                         fontSize: 12,
                       ),
@@ -130,7 +130,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                             firstText: 'Price',
                             secondText: currentPatientData!
                                 .patient!
-                                .packages[index]
+                                .packages![index]
                                 .pivot!
                                 .price
                                 .toString(),
@@ -139,7 +139,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                             firstText: 'Status',
                             buttonText: currentPatientData!
                                 .patient!
-                                .packages[index]
+                                .packages![index]
                                 .pivot!
                                 .status,
                           ),

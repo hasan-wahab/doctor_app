@@ -14,6 +14,7 @@ class AssessmentDetailScreen extends StatefulWidget {
 
 class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
   CurrentPatientModel? currentPatientData;
+  var consultantAssessments;
   @override
   void didChangeDependencies() {
     Map<String, CurrentPatientModel> data =
@@ -37,7 +38,9 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
           child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
         ),
         centerTitle: true,
-        title: Text('Assessments'),
+        title: consultantAssessments == null
+            ? Text('Consultant Assessments')
+            : Text('Assessments'),
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -48,294 +51,187 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
             color: AppColors.primaryColor,
           ),
           SizedBox(height: 30.h),
-          ...List.generate((currentPatientData!.patient!.visits.length), (
+          ...List.generate((currentPatientData!.patient.visits.length), (
             index,
           ) {
-            var consultantAssessments = currentPatientData!
-                .patient!
-                .visits[index]
-                .consultantAssessment!;
-            return Container(
-              margin: EdgeInsets.only(bottom: 20),
-              height: 404.h,
-              width: 350.w,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(width: 2, color: AppColors.primaryColor),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    height: 40.h,
-                    width: 350.w,
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide()),
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 1.3 - 15,
-                          child: Stack(
-                            alignment: Alignment.centerLeft,
-                            children: [
-                              CustomText(
-                                text: currentPatientData!
-                                    .patient!
-                                    .visits[index]
-                                    .consultant!
-                                    .name
-                                    .toString(),
-                              ),
-                              Align(
-                                alignment: Alignment.topRight,
+            consultantAssessments =
+                currentPatientData!.patient.visits[index].consultantAssessment;
+            if (consultantAssessments != null) {
+              return Container(
+                margin: EdgeInsets.only(bottom: 20),
+                height: 404.h,
+                width: 350.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(width: 2, color: AppColors.primaryColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      height: 40.h,
+                      width: 350.w,
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide()),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.sizeOf(context).width / 1.3 - 15,
+                            child: Stack(
+                              alignment: Alignment.centerLeft,
+                              children: [
+                                CustomText(
+                                  text:
+                                      currentPatientData!
+                                              .patient
+                                              .visits[index]
+                                              .consultant!
+                                              .name ==
+                                          ''
+                                      ? 'No data'
+                                      : currentPatientData!
+                                            .patient
+                                            .visits[index]
+                                            .consultant!
+                                            .name,
+                                ),
+                                Align(
+                                  alignment: Alignment.topRight,
 
-                                child: Container(
-                                  margin: EdgeInsets.only(top: 5.h),
-                                  alignment: Alignment.center,
-                                  height: 16.h,
-                                  width: 31.w,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3.r),
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  child: CustomText(
-                                    text: 'abds',
-                                    fontSize: 12,
-                                    color: AppColors.textWhiteColor,
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 5.h),
+                                    alignment: Alignment.center,
+                                    height: 16.h,
+                                    width: 31.w,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(3.r),
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    child: CustomText(
+                                      text: 'abds',
+                                      fontSize: 12,
+                                      color: AppColors.textWhiteColor,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10.h),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: CustomText(
-                      text: 'Assessment Finding',
-                      fontSize: 14,
-                      color: AppColors.primaryColor,
+                    SizedBox(height: 10.h),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: CustomText(
+                        text: 'Assessment Finding',
+                        fontSize: 14,
+                        color: AppColors.primaryColor,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10.h),
+                    SizedBox(height: 10.h),
 
-                  _text(
-                    firstText: 'Observation',
-                    secondText: consultantAssessments.observationFindings
-                        .toString(),
-                  ),
-                  SizedBox(height: 7.h),
-
-                  _text(
-                    firstText: 'Palpation',
-                    secondText: consultantAssessments.palpationResults,
-                  ),
-                  SizedBox(height: 7.h),
-
-                  _text(
-                    firstText: 'ROM',
-                    secondText: consultantAssessments.romAssessment,
-                  ),
-                  SizedBox(height: 7.h),
-
-                  _text(
-                    firstText: 'Neuro Test:',
-                    secondText: consultantAssessments.neuroSpecialTests,
-                  ),
-                  Divider(thickness: 1, color: Colors.black),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: CustomText(
-                      text: 'Medications',
-                      fontSize: 14,
-                      color: AppColors.primaryColor,
+                    _text(
+                      firstText: 'Observation',
+                      secondText:
+                          consultantAssessments.observationFindings ??
+                          'no data',
                     ),
-                  ),
-                  SizedBox(height: 10.h),
+                    SizedBox(height: 7.h),
 
-                  _text(
-                    firstText: 'Pain Relieve',
-                    secondText: consultantAssessments.medPainReliever,
-                  ),
-                  SizedBox(height: 7.h),
-
-                  _text(
-                    firstText: 'Muscle Relaxant',
-                    secondText: consultantAssessments.medMuscleRelaxant,
-                  ),
-                  SizedBox(height: 7.h),
-
-                  _text(
-                    firstText: 'Supplements',
-                    secondText: consultantAssessments.medSupplements,
-                  ),
-
-                  Divider(thickness: 1, color: Colors.black),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: CustomText(
-                      text: 'Diagnosis & Treament',
-                      fontSize: 14,
-                      color: AppColors.primaryColor,
+                    _text(
+                      firstText: 'Palpation',
+                      secondText:
+                          consultantAssessments.palpationResults ?? 'no data',
                     ),
-                  ),
-                  SizedBox(height: 10.h),
+                    SizedBox(height: 7.h),
 
-                  _text(
-                    firstText: 'Final Diagnosis',
-                    secondText: consultantAssessments.finalDiagnosis,
-                  ),
-                  SizedBox(height: 7.h),
+                    _text(
+                      firstText: 'ROM',
+                      secondText:
+                          consultantAssessments.romAssessment ?? 'no data',
+                    ),
+                    SizedBox(height: 7.h),
 
-                  _text(
-                    firstText: 'Frequency',
-                    secondText: consultantAssessments.freqPerWeek.toString(),
-                  ),
-                  SizedBox(height: 7.h),
+                    _text(
+                      firstText: 'Neuro Test:',
+                      secondText:
+                          consultantAssessments.neuroSpecialTests ?? 'no data',
+                    ),
+                    Divider(thickness: 1, color: Colors.black),
 
-                  _text(
-                    firstText: 'Duration',
-                    secondText: consultantAssessments.durationWeeks.toString(),
-                  ),
-                ],
-              ),
-            );
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: CustomText(
+                        text: 'Medications',
+                        fontSize: 14,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+
+                    _text(
+                      firstText: 'Pain Relieve',
+                      secondText:
+                          consultantAssessments.medPainReliever ?? 'no data',
+                    ),
+                    SizedBox(height: 7.h),
+
+                    _text(
+                      firstText: 'Muscle Relaxant',
+                      secondText:
+                          consultantAssessments.medMuscleRelaxant ?? 'no data',
+                    ),
+                    SizedBox(height: 7.h),
+
+                    _text(
+                      firstText: 'Supplements',
+                      secondText:
+                          consultantAssessments.medSupplements ?? 'no data',
+                    ),
+
+                    Divider(thickness: 1, color: Colors.black),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: CustomText(
+                        text: 'Diagnosis & Treament',
+                        fontSize: 14,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+
+                    _text(
+                      firstText: 'Final Diagnosis',
+                      secondText:
+                          consultantAssessments.finalDiagnosis ?? 'no data',
+                    ),
+                    SizedBox(height: 7.h),
+
+                    _text(
+                      firstText: 'Frequency',
+                      secondText:
+                          consultantAssessments.freqPerWeek.toString().isEmpty
+                          ? 'no data'
+                          : consultantAssessments.freqPerWeek.toString(),
+                    ),
+                    SizedBox(height: 7.h),
+
+                    _text(
+                      firstText: 'Duration',
+                      secondText:
+                          consultantAssessments.durationWeeks.toString().isEmpty
+                          ? 'no data'
+                          : consultantAssessments.durationWeeks.toString(),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return Center(child: Container());
           }),
-          // SizedBox(height: 24.h),
-          //
-          // Container(
-          //   padding: EdgeInsets.symmetric(horizontal: 10.w),
-          //   height: 60.h,
-          //   width: 350.w,
-          //   decoration: BoxDecoration(
-          //     border: Border.all(width: 2, color: AppColors.primaryColor),
-          //     borderRadius: BorderRadius.circular(12.r),
-          //   ),
-          //   child: Row(
-          //     children: [
-          //       SizedBox(
-          //         width: MediaQuery.sizeOf(context).width / 1.3 - 15,
-          //         child: Stack(
-          //           alignment: Alignment.centerLeft,
-          //           children: [
-          //             CustomText(text: 'Nov 29, 2025- Dr Danyal Muhammad'),
-          //             Align(
-          //               alignment: Alignment.topRight,
-          //
-          //               child: Container(
-          //                 margin: EdgeInsets.only(top: 10.h),
-          //                 alignment: Alignment.center,
-          //                 height: 16.h,
-          //                 width: 31.w,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(3.r),
-          //                   color: AppColors.primaryColor,
-          //                 ),
-          //                 child: CustomText(
-          //                   text: 'abds',
-          //                   fontSize: 12,
-          //                   color: AppColors.textWhiteColor,
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(height: 17.h),
-          //
-          // Container(
-          //   padding: EdgeInsets.symmetric(horizontal: 10.w),
-          //   height: 60.h,
-          //   width: 350.w,
-          //   decoration: BoxDecoration(
-          //     border: Border.all(width: 2, color: AppColors.primaryColor),
-          //     borderRadius: BorderRadius.circular(12.r),
-          //   ),
-          //   child: Row(
-          //     children: [
-          //       SizedBox(
-          //         width: MediaQuery.sizeOf(context).width / 1.3 - 15,
-          //         child: Stack(
-          //           alignment: Alignment.centerLeft,
-          //           children: [
-          //             CustomText(text: 'Nov 29, 2025- Dr Danyal Muhammad'),
-          //             Align(
-          //               alignment: Alignment.topRight,
-          //
-          //               child: Container(
-          //                 margin: EdgeInsets.only(top: 10.h),
-          //                 alignment: Alignment.center,
-          //                 height: 16.h,
-          //                 width: 31.w,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(3.r),
-          //                   color: AppColors.primaryColor,
-          //                 ),
-          //                 child: CustomText(
-          //                   text: 'abds',
-          //                   fontSize: 12,
-          //                   color: AppColors.textWhiteColor,
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // SizedBox(height: 17.h),
-          //
-          // Container(
-          //   padding: EdgeInsets.symmetric(horizontal: 10.w),
-          //   height: 60.h,
-          //   width: 350.w,
-          //   decoration: BoxDecoration(
-          //     border: Border.all(width: 2, color: AppColors.primaryColor),
-          //     borderRadius: BorderRadius.circular(12.r),
-          //   ),
-          //   child: Row(
-          //     children: [
-          //       SizedBox(
-          //         width: MediaQuery.sizeOf(context).width / 1.3 - 15,
-          //         child: Stack(
-          //           alignment: Alignment.centerLeft,
-          //           children: [
-          //             CustomText(text: 'Nov 29, 2025- Dr Danyal Muhammad'),
-          //             Align(
-          //               alignment: Alignment.topRight,
-          //
-          //               child: Container(
-          //                 margin: EdgeInsets.only(top: 10.h),
-          //                 alignment: Alignment.center,
-          //                 height: 16.h,
-          //                 width: 31.w,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(3.r),
-          //                   color: AppColors.primaryColor,
-          //                 ),
-          //                 child: CustomText(
-          //                   text: 'abds',
-          //                   fontSize: 12,
-          //                   color: AppColors.textWhiteColor,
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );
@@ -352,7 +248,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: CustomText(text: firstText, fontSize: 12)),
+          Expanded(child: CustomText(text: firstText, fontSize: 12)), //
           Expanded(
             child: secondText != null
                 ? CustomText(

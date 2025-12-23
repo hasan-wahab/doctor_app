@@ -71,7 +71,8 @@ class _HomeScreen2State extends State<HomeScreen2> {
                             SizedBox(
                               width: 200.w,
                               child: CustomText(
-                                text: 'Hi, ${profileData!.user!.name.toString()}',
+                                text:
+                                    'Hi, ${profileData!.user!.name.toString()}',
                                 fontSize: 20,
                               ),
                             ),

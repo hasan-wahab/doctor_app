@@ -51,10 +51,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: List.generate(
-                    currentPatientData!.patient!.visits.length,
+                    currentPatientData!.patient.visits.length,
                     (index) {
-                      final currentPatient =
-                          currentPatientData!.patient!.visits;
+                      final currentPatient = currentPatientData!.patient.visits;
                       return Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 12.w,
@@ -85,8 +84,10 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                             ),
                             _text(
                               firstText: 'Doctor',
-                              secondText: currentPatient[index].consultant!.name
-                                  .toString(),
+                              secondText:
+                                  currentPatient[index].consultant == null
+                                  ? 'no data'
+                                  : currentPatient[index].consultant!.name,
                             ),
                             _text(
                               firstText: 'Stage',
@@ -94,8 +95,11 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                             ),
                             _text(
                               firstText: 'Amount',
-                              secondText: currentPatient[index].consultationFee
-                                  .toString(),
+                              secondText:
+                                  currentPatient[index].consultationFee == null
+                                  ? 'no data'
+                                  : currentPatient[index].consultationFee
+                                        .toString(),
                             ),
                             _text(
                               firstText: 'Status',

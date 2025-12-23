@@ -49,11 +49,11 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(
-              currentPatientData!.patient!.visits.length,
-              (index) {
-                var assistantManager =
-                    currentPatientData!.patient!.visits[index];
+            children: List.generate(currentPatientData!.patient.visits.length, (
+              index,
+            ) {
+              var assistantManager = currentPatientData!.patient.visits[index];
+              if (assistantManager.assistantManager != null) {
                 return Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 15.w,
@@ -73,15 +73,23 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                     children: [
                       _text(
                         firstText: 'Visit Date #',
-                        secondText: assistantManager.createdAt.toString(),
+                        secondText:
+                            assistantManager.createdAt.toString().isEmpty
+                            ? 'no data'
+                            : assistantManager.createdAt.toString(),
                       ),
                       _text(
                         firstText: 'AM Name',
-                        secondText: assistantManager.assistantManager!.name,
+                        secondText:
+                            assistantManager.assistantManager!.name.isEmpty
+                            ? 'no data'
+                            : assistantManager.assistantManager!.name,
                       ),
                       _text(
                         firstText: 'Consultant',
-                        secondText: assistantManager.consultant!.name,
+                        secondText: assistantManager.consultant!.name.isEmpty
+                            ? 'no data'
+                            : assistantManager.consultant!.name,
                       ),
 
                       _text(
@@ -93,7 +101,12 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                       _text(
                         firstText: 'Chief Complaint',
                         secondText:
-                            assistantManager.amAssessment!.chiefComplaint,
+                            assistantManager
+                                .amAssessment!
+                                .chiefComplaint
+                                .isEmpty
+                            ? 'no data'
+                            : assistantManager.amAssessment!.chiefComplaint,
                       ),
                       _text(
                         firstText: 'Complaint Onset',
@@ -171,8 +184,9 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                     ],
                   ),
                 );
-              },
-            ),
+              }
+              return Center(child: Container());
+            }),
           ),
         ],
       ),
