@@ -4,6 +4,7 @@ import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -48,14 +49,16 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             Container(
                               height: 118.h,
                               width: 118.w,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
+                              decoration: BoxDecoration(shape: BoxShape.circle),
+                              child: ClipOval(
+                                child: Image.network(
                                   fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                    profileData?.user!.profilePicture ?? '',
-                                  ),
+                                  profileData?.user!.profilePicture ?? '',
+                                  headers: {
+                                    "Authorization":
+                                        "Bearer ${profileData!.accessToken.toString()}",
+                                  },
                                 ),
-                                shape: BoxShape.circle,
                               ),
                             ),
                             Align(
@@ -67,14 +70,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                     AppRoutes.updateProfile,
                                     arguments: <String, List<String>>{
                                       'data': [
-                                        profileData!.user!.profilePicture
+                                        profileData!
+                                            .patientData!
+                                            .patientInfo!
+                                            .image
                                             .toString(),
                                         profileData!.user!.name.toString(),
                                         profileData!.user!.phone.toString(),
                                         'Male',
-                                        '12/02/2023',
+                                        DateAndTimeFormater.dateFormat(
+                                          profileData!
+                                              .patientData!
+                                              .patientInfo!
+                                              .birthDate
+                                              .toString(),
+                                        ),
                                         profileData!.user!.email.toString(),
                                         profileData!.user!.cnic.toString(),
+                                        profileData!.accessToken.toString(),
                                       ],
                                     },
                                   );
@@ -151,13 +164,31 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         children: [
                           CustomText(text: 'DOB', fontSize: 20),
 
+                          profileData!.patientData!.patientInfo!.birthDate ==
+                                  null.toString()
+                              ? CustomText(
+                                  text: DateAndTimeFormater.dateFormat(
+                                    profileData!
+                                        .patientData!
+                                        .patientInfo!
+                                        .birthDate,
+                                  ),
+
+                                  fontSize: 20,
+                                )
+                              : CustomText(text: "No data"),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                        children: [
+                          CustomText(text: 'Age', fontSize: 20),
+
                           CustomText(
-                            text: profileData!
-                                .patientData!
-                                .patientInfo!
-                                .birthDate
-                                .toString()
-                                .toString(),
+                            text: DateAndTimeFormater.calculateAge(
+                              profileData!.patientData!.patientInfo!.birthDate,
+                            ).toString(),
 
                             fontSize: 20,
                           ),

@@ -1,5 +1,6 @@
 import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -39,82 +40,104 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         centerTitle: true,
         title: Text('My visits'),
       ),
-      body: currentPatientData != null
-          ? ListView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              children: [
-                CustomText(
-                  text: 'Visit History',
-                  fontSize: 20,
-                  color: AppColors.primaryColor,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: List.generate(
-                    currentPatientData!.patient.visits.length,
-                    (index) {
-                      final currentPatient = currentPatientData!.patient.visits;
-                      return Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 12.h,
-                        ),
-                        margin: EdgeInsets.only(top: 10.h),
-                        height: 178.h,
-                        width: 360.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: AppColors.primaryColor,
-                            width: 2,
-                          ),
-                        ),
+      body: currentPatientData!.patient!.visits.isNotEmpty
+          ? currentPatientData != null
+                ? ListView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
+                    ),
+                    children: [
+                      CustomText(
+                        text: 'Visit History',
+                        fontSize: 20,
+                        color: AppColors.primaryColor,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: List.generate(
+                          currentPatientData!.patient!.visits.length,
+                          (index) {
+                            final currentPatient =
+                                currentPatientData!.patient!.visits;
+                            return Container(
+                              margin: EdgeInsets.only(top: 10.h),
+                              height: 178.h,
+                              width: 360.w,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
 
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _text(
-                              firstText: 'Date',
-                              secondText: currentPatient[index].visitAt
-                                  .toString(),
-                            ),
-                            _text(
-                              firstText: 'Type',
-                              buttonText: currentPatient[index].type.toString(),
-                            ),
-                            _text(
-                              firstText: 'Doctor',
-                              secondText:
-                                  currentPatient[index].consultant == null
-                                  ? 'no data'
-                                  : currentPatient[index].consultant!.name,
-                            ),
-                            _text(
-                              firstText: 'Stage',
-                              secondText: currentPatient[index].currentStage,
-                            ),
-                            _text(
-                              firstText: 'Amount',
-                              secondText:
-                                  currentPatient[index].consultationFee == null
-                                  ? 'no data'
-                                  : currentPatient[index].consultationFee
-                                        .toString(),
-                            ),
-                            _text(
-                              firstText: 'Status',
-                              buttonText:
-                                  currentPatient[index].status ?? 'Pending',
-                            ),
-                          ],
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                color: AppColors.secondaryColor,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    vertical: 12.h,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _text(
+                                        firstText: 'Date',
+                                        secondText:
+                                            DateAndTimeFormater.dateFormat(
+                                              currentPatient[index].visitAt
+                                                  .toString(),
+                                            ),
+                                      ),
+                                      _text(
+                                        firstText: 'Type',
+                                        buttonText: currentPatient[index].type
+                                            .toString(),
+                                      ),
+                                      _text(
+                                        firstText: 'Doctor',
+                                        secondText:
+                                            currentPatient[index].consultant ==
+                                                null
+                                            ? 'no data'
+                                            : currentPatient[index]
+                                                  .consultant!
+                                                  .name,
+                                      ),
+                                      _text(
+                                        firstText: 'Stage',
+                                        secondText:
+                                            currentPatient[index].currentStage,
+                                      ),
+                                      _text(
+                                        firstText: 'Amount',
+                                        secondText:
+                                            currentPatient[index]
+                                                .consultationFee
+                                                .isNaN
+                                            ? 'no data'
+                                            : currentPatient[index]
+                                                  .consultationFee
+                                                  .toString(),
+                                      ),
+                                      _text(
+                                        firstText: 'Status',
+                                        buttonText:
+                                            currentPatient[index].status == ''
+                                            ? 'No data'
+                                            : currentPatient[index].status,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            )
-          : Center(child: CircularProgressIndicator()),
+                      ),
+                    ],
+                  )
+                : Center(child: CircularProgressIndicator())
+          : Center(child: Text('No data')),
     );
   }
 

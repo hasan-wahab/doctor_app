@@ -9,6 +9,7 @@ import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_scr
 import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +28,16 @@ class DashbordScreen extends StatefulWidget {
 class _DashbordScreenState extends State<DashbordScreen> {
   bool isLoading = false;
   bool isObscureBalanceText = true;
-  late int totalSession;
-  late int usedSession;
+  int totalSession = 8;
+  int usedSession = 6;
 
+  int totalPayment = 10;
+  int paidPayment = 5;
+  late int remainingPayments;
   @override
   void initState() {
     getCurrentUserDataFromApi();
+
     super.initState();
   }
 
@@ -65,16 +70,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
   CurrentPatientModel? currentPatientData;
   @override
   Widget build(BuildContext context) {
-    totalSession = 8;
-    usedSession = 5;
-    List colorsList = List.generate((usedSession), (index) {
-      return usedSession != 0
-          ? AppColors.primaryColor
-          : AppColors.secondaryColor;
-    });
-    List colorsList2 = List.generate((totalSession - usedSession), (index) {
-      return AppColors.secondaryColor;
-    });
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: isLoading == true
@@ -88,6 +83,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                 child: ListView(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10),
                   children: [
+                    /// AppBar
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -111,9 +107,16 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           .toString(),
                                     ),
                                   ),
-                                  border: Border.all(
-                                    color: AppColors.primaryColor,
-                                    width: 2.w,
+                                ),
+                                child: ClipOval(
+                                  child: Image.network(
+                                    fit: BoxFit.cover,
+                                    profileData!.user!.profilePicture
+                                        .toString(),
+                                    headers: {
+                                      "Authorization":
+                                          "Bearer ${profileData!.accessToken.toString()}",
+                                    },
                                   ),
                                 ),
                               ),
@@ -181,125 +184,203 @@ class _DashbordScreenState extends State<DashbordScreen> {
                     ),
 
                     SizedBox(height: 24.67.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 10.h,
-                      ),
-                      height: 80.h,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.primaryColor,
-                            Colors.greenAccent.shade200,
-                            AppColors.bgColor,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(12.r),
-                        color: AppColors.whiteIconColor,
-                        border: Border.fromBorderSide(
-                          BorderSide(color: AppColors.primaryColor),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                text: 'Balance',
-                                fontSize: 16,
-                                color: AppColors.textWhiteColor,
-                              ),
 
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                spacing: 10,
+                    /// Balance Card
+                    Card(
+                      color: AppColors.secondaryColor,
+                      margin: EdgeInsets.zero,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 10.h,
+                        ),
+                        // height: 120.h,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.primaryColor,
+                              Colors.greenAccent.shade200,
+                              AppColors.secondaryColor,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12.r),
+                          color: AppColors.whiteIconColor,
+                          // border: Border.fromBorderSide(
+                          //   BorderSide(color: AppColors.primaryColor),
+                          // ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                spacing: 10.h,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   CustomText(
-                                    text: isObscureBalanceText != true
-                                        ? 'PKR 3000.00'
-                                        : '* * * * * *',
-                                    fontSize: 20,
+                                    text: 'Balance',
+                                    fontSize: 16,
                                     color: AppColors.textWhiteColor,
                                   ),
-                                  InkWell(
+
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    spacing: 10,
+                                    children: [
+                                      CustomText(
+                                        text: isObscureBalanceText != true
+                                            ? 'PKR ${currentPatientData!.patient!.walletBalance}'
+                                            : '* * * * * *',
+                                        fontSize: 13,
+                                        color: AppColors.textWhiteColor,
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isObscureBalanceText =
+                                                !isObscureBalanceText;
+                                          });
+                                        },
+                                        child: isObscureBalanceText
+                                            ? Icon(
+                                                Icons.visibility_off,
+                                                size: 18.r,
+                                                color: AppColors.whiteIconColor,
+                                              )
+                                            : Icon(
+                                                Icons.visibility,
+                                                size: 18.r,
+                                                color: AppColors.whiteIconColor,
+                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                  AppButton(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    text: 'Recharge wallet',
+                                    width: 110,
+                                    isColor: false,
+                                    height: 34,
+                                    textSize: 11,
                                     onTap: () {
-                                      setState(() {
-                                        isObscureBalanceText =
-                                            !isObscureBalanceText;
-                                      });
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.rechargeScreen,
+                                      );
                                     },
-                                    child: isObscureBalanceText
-                                        ? Icon(
-                                            Icons.visibility_off,
-                                            size: 18.r,
-                                            color: AppColors.whiteIconColor,
-                                          )
-                                        : Icon(
-                                            Icons.visibility,
-                                            size: 18.r,
-                                            color: AppColors.whiteIconColor,
-                                          ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                          AppButton(
-                            borderRadius: BorderRadius.circular(8.r),
-                            text: 'Recharge wallet',
-                            width: 110,
-                            isColor: false,
-                            height: 34,
-                            textSize: 11,
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                AppRoutes.rechargeScreen,
-                              );
-                            },
-                          ),
-                        ],
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: SizedBox(
+                                height: 100.h,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    CustomText(
+                                      text:
+                                          'Total:  ${currentPatientData!.stats!.totalAmount.toInt()}',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textWhiteColor,
+                                    ),
+
+                                    CustomText(
+                                      text:
+                                          'Paid: ${currentPatientData!.stats!.totalSpend.toInt()}',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textWhiteColor,
+                                    ),
+                                    CustomText(
+                                      text:
+                                          'Remaining: ${currentPatientData!.stats!.totalAmount - currentPatientData!.stats!.totalSpend.toInt()}',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textWhiteColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 80.h,
+                                    width: 80.w,
+                                    child: CircularProgressIndicator(
+                                      value: getTotalPaymentProgress(),
+                                      strokeWidth: 12,
+                                      backgroundColor: Colors.grey.shade300,
+                                      valueColor: AlwaysStoppedAnimation(
+                                        AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    children: [
+                                      CustomText(
+                                        text:
+                                            "${(getTotalPaymentProgress() * 100).toStringAsFixed(0)}%",
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      CustomText(
+                                        text: "Completed",
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
                     SizedBox(height: 10.h),
 
+                    /// OverView
                     CustomText(text: 'Quick Overview', fontSize: 14),
                     SizedBox(height: 10.h),
 
                     SizedBox(
-                      height: 200.h,
+                      width: MediaQuery.sizeOf(context).width - 15,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        runSpacing: 15.h,
+                        direction: Axis.horizontal,
+                        verticalDirection: VerticalDirection.down,
 
-                      child: Center(
-                        child: GridView.builder(
-                          padding: EdgeInsets.zero,
-                          physics: NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                mainAxisSpacing: 12,
-                                crossAxisSpacing: 12,
-                                crossAxisCount: 2,
-                                mainAxisExtent: 55.h,
-                              ),
-                          itemCount: 6,
-                          itemBuilder: (context, index) {
+                        children: [
+                          ...List.generate((6), (index) {
                             List cardSecondText = [
-                              currentPatientData!.patient!.visits!.length
+                              currentPatientData!.patient!.visits.length
                                   .toString(),
-                              currentPatientData!.patient!.packages!.length
+                              currentPatientData!.patient!.packages.length
                                   .toString(),
                               '',
-                              currentPatientData!.recentInvoices!.length
+                              currentPatientData!.recentInvoices.length
                                   .toString(),
-                              currentPatientData!.therapySessions!.length
+                              currentPatientData!.therapySessions.length
                                   .toString(),
                               '',
                             ];
-
+                            final screenWidth =
+                                MediaQuery.sizeOf(context).width / 2.2;
                             return InkWell(
                               onTap: () async {
                                 Navigator.pushNamed(
@@ -310,147 +391,170 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                   },
                                 );
                               },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                  vertical: 5.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: AppColors.primaryColor,
-                                    width: 1,
+                              child: Card(
+                                color: Colors.transparent,
+                                margin: EdgeInsets.zero,
+                                child: Container(
+                                  height: 58.h,
+                                  width: screenWidth,
+
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                    vertical: 5.h,
                                   ),
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          cardSecondText[index] != ''
-                                          ? MainAxisAlignment.spaceBetween
-                                          : MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: 100.w,
-                                          child: CustomText(
-                                            text: cardText[index],
-                                            fontSize: 12,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondaryColor,
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            cardSecondText[index] != ''
+                                            ? MainAxisAlignment.spaceBetween
+                                            : MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 100.w,
+                                            child: CustomText(
+                                              text: cardText[index],
+                                              fontSize: 12,
+                                              maxLines: index == 5 ? 2 : 1,
+                                            ),
                                           ),
-                                        ),
-                                        cardSecondText[index] != ''
-                                            ? SizedBox(
-                                                width: 100.w,
-                                                child: CustomText(
-                                                  text: cardSecondText[index],
-                                                ),
-                                              )
-                                            : Container(),
-                                      ],
-                                    ),
-                                    Icon(icons[index]),
-                                  ],
+                                          cardSecondText[index] != ''
+                                              ? SizedBox(
+                                                  width: 100.w,
+                                                  child: CustomText(
+                                                    text: cardSecondText[index],
+                                                  ),
+                                                )
+                                              : Container(),
+                                        ],
+                                      ),
+                                      Icon(icons[index]),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
-                          },
-                        ),
+                          }),
+                        ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CustomText(text: 'Patient overview', fontSize: 14),
-                      ],
-                    ),
-                    SizedBox(height: 10.h),
 
-                    DashboardChartsCustom(),
                     SizedBox(height: 10.h),
 
                     /// Session Progress
-                    CustomText(text: 'Session Progress'),
+                    currentPatientData!.patient!.packages.isNotEmpty
+                        ? CustomText(text: 'Session Progress')
+                        : Container(),
                     SizedBox(height: 10.h),
-
                     ...List.generate(
-                      currentPatientData!.patient.packages.length,
+                      currentPatientData!.patient!.packages.isNotEmpty
+                          ? currentPatientData!.patient!.packages.length
+                          : 1,
 
                       (index) {
                         return Container(
-                          margin: EdgeInsets.only(
-                            bottom: 10.h
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.h,
-                            vertical: 10,
-                          ),
+                          margin: EdgeInsets.only(bottom: 10.h),
+
                           height: 110.h,
                           width: 360.w,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              width: 2,
-                              color: AppColors.primaryColor,
-                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(text: 'adsfsadf', fontSize: 12),
-                              Row(
+                          child: Card(
+                            color: AppColors.secondaryColor,
+                            margin: EdgeInsets.zero,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.h,
+                                vertical: 10,
+                              ),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomText(
-                                    text: 'Sessions Progress',
+                                    text:
+                                        currentPatientData!
+                                            .patient!
+                                            .packages
+                                            .isEmpty
+                                        ? 'No data'
+                                        : currentPatientData!
+                                              .patient!
+                                              .packages[index]
+                                              .name,
                                     fontSize: 12,
-                                    color: AppColors.secondaryTextColor,
                                   ),
-                                  CustomText(
-                                    text: '$usedSession/$totalSession',
-                                    fontSize: 10,
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText(
+                                        text: 'Sessions Progress',
+                                        fontSize: 12,
+                                        color: AppColors.secondaryTextColor,
+                                      ),
+                                      CustomText(
+                                        text:
+                                            '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsTotal : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsUsed : 0}',
+                                        fontSize: 10,
+                                      ),
+                                    ],
+                                  ),
+
+                                  LinearProgressIndicator(
+                                    value:
+                                        currentPatientData!
+                                            .patient!
+                                            .packages
+                                            .isEmpty
+                                        ? 1.0
+                                        : getSessionProgress(index),
+                                    valueColor: AlwaysStoppedAnimation(
+                                      AppColors.primaryColor,
+                                    ),
+                                  ),
+
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CustomText(
+                                        text: 'Next Session Date',
+                                        fontSize: 15,
+                                      ),
+                                      CustomText(
+                                        text:
+                                            currentPatientData!
+                                                .patient!
+                                                .packages
+                                                .isNotEmpty
+                                            ? DateAndTimeFormater.dateFormat(
+                                                currentPatientData!
+                                                    .therapySessions[index]
+                                                    .nextSessionDate
+                                                    .toString(),
+                                              )
+                                            : 'No data',
+                                        fontSize: 12,
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-
-                              Container(
-                                height: 5.h,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [...colorsList, ...colorsList2],
-                                  ),
-
-                                  borderRadius: BorderRadius.circular(20.r),
-                                ),
-                              ),
-
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomText(
-                                    text: 'Next Session',
-                                    fontSize: 15,
-                                  ),
-                                  CustomText(
-                                    text: currentPatientData!
-                                        .therapySessions
-                                        .first
-                                        .nextSessionDate
-                                        .toString(),
-                                    fontSize: 12,
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
                         );
                       },
@@ -520,5 +624,33 @@ class _DashbordScreenState extends State<DashbordScreen> {
               ),
       ],
     );
+  }
+
+  double getTotalPaymentProgress() {
+    final total = currentPatientData!.stats!.totalAmount;
+    final paid = currentPatientData!.stats!.totalSpend;
+
+    if (total == 0) return 0.0;
+
+    final progress = paid / total;
+
+    if (progress.isNaN || progress.isInfinite) return 0.0;
+
+    return progress.clamp(0.0, 1.0);
+  }
+
+  double getSessionProgress(int index) {
+    final total =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsTotal;
+    final used =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsUsed;
+
+    if (total == 0) return 0.0;
+
+    final progress = used / total;
+
+    if (progress.isNaN || progress.isInfinite) return 0.0;
+
+    return progress.clamp(0.0, 1.0);
   }
 }

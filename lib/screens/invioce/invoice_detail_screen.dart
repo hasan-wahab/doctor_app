@@ -1,5 +1,6 @@
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -17,6 +18,7 @@ class InvoiceDetailScreen extends StatefulWidget {
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   CurrentPatientModel? currentPatientData;
   var isExpanded;
+  double remainingPayments = 0;
 
   @override
   void didChangeDependencies() {
@@ -68,81 +70,135 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               index,
             ) {
               var invoice = currentPatientData!.recentInvoices[index];
-              return Container(
-                padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 20.h),
-                margin: EdgeInsets.only(top: 10.h),
-                width: 360.w,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: AppColors.primaryColor, width: 2),
-                ),
+              return Card(
+                margin: EdgeInsets.only(top: 15.h),
+                color: AppColors.secondaryColor,
+                child: Container(
+                  padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 20.h),
 
-                child: Column(
-                  spacing: 10.h,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _text(
-                      firstText: 'Invoice #',
-                      secondText: invoice.id.toString(),
-                    ),
+                  width: 360.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                  ),
 
-                    _text(
-                      firstText: 'Date',
-                      secondText: invoice.createdAt.toString(),
-                    ),
-                    _text(firstText: 'Type', buttonText: invoice.type),
-                    _text(
-                      firstText: 'Total amount',
-                      secondText: invoice.amount,
-                    ),
-                    _text(firstText: 'Status', buttonText: invoice.status),
+                  child: Column(
+                    spacing: 10.h,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _text(
+                        firstText: 'Invoice #',
+                        secondText: invoice.id.toString(),
+                      ),
 
-                    isExpanded[index] == true
-                        ? Column(
-                            children: [
-                              Divider(color: AppColors.primaryColor),
-                              _text(
-                                firstText: 'Partial payments',
-                                secondText: '',
-                              ),
-                              ...List.generate(invoice.payments.length, (
-                                index,
-                              ) {
-                                return _text(
-                                  firstText: '${index + 1}',
-                                  secondText: invoice.payments[index].amount,
-                                );
-                              }),
-                              Divider(color: AppColors.primaryColor),
-                            ],
-                          )
-                        : Container(),
+                      _text(
+                        firstText: 'Date',
+                        secondText: DateAndTimeFormater.dateFormat(
+                          invoice.createdAt.toString(),
+                        ),
+                      ),
+                      _text(firstText: 'Type', buttonText: invoice.type),
+                      _text(
+                        firstText: 'Total amount',
+                        secondText: invoice.amount!.toString(),
+                      ),
+                      _text(firstText: 'Status', buttonText: invoice.status),
 
-                    SizedBox(height: 5.h),
-                    invoice.status != 'paid'
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AppButton(
-                                onTap: () {
-                                  setState(() {
-                                    isExpanded[index] = !isExpanded[index];
-                                  });
-                                },
-                                text: isExpanded[index] == true
-                                    ? 'see less'
-                                    : 'see more',
-                                width: 100,
-                                height: 20,
-                                isColor: false,
-                                textSize: 12,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ],
-                          )
-                        : Container(),
-                    SizedBox(height: 2.h),
-                  ],
+                      isExpanded[index] == true
+                          ? Column(
+                              children: [
+                                Divider(color: AppColors.primaryColor),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomText(
+                                        text: 'Paid Payments',
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: CustomText(
+                                        text: 'Remaining Payments',
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ...List.generate(
+                                            invoice.payments.length,
+                                            (index) {
+                                              remainingPayments =
+                                                  double.parse(
+                                                    invoice.amount.toString(),
+                                                  ) -
+                                                  invoice.paidAmount!;
+                                              return CustomText(
+                                                text: double.parse(
+                                                  invoice
+                                                      .payments[index]
+                                                      .amount,
+                                                ).toInt().toString(),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          CustomText(
+                                            text: remainingPayments
+                                                .toInt()
+                                                .toString(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                Divider(color: AppColors.primaryColor),
+                              ],
+                            )
+                          : Container(),
+
+                      SizedBox(height: 5.h),
+                      invoice.status != 'paid'
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AppButton(
+                                  onTap: () {
+                                    setState(() {
+                                      isExpanded[index] = !isExpanded[index];
+                                    });
+                                  },
+                                  text: isExpanded[index] == true
+                                      ? 'see less'
+                                      : 'see more',
+                                  width: 100,
+                                  height: 20,
+                                  isColor: false,
+                                  textSize: 12,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ],
+                            )
+                          : Container(),
+                      SizedBox(height: 2.h),
+                    ],
+                  ),
                 ),
               );
             }),

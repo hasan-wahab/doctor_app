@@ -24,30 +24,33 @@ class AppButton extends StatelessWidget {
     this.textColor,
     this.textSize,
     this.height,
-    this.borderRadius
+    this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        height: height?.h ?? 50.h,
-        width: width?.w ?? MediaQuery.sizeOf(context).width.w,
-        decoration: BoxDecoration(
-          color: isColor ? AppColors.primaryColor : AppColors.whiteIconColor,
-          borderRadius:borderRadius?? BorderRadius.circular(12.r),
-          border: isColor == false
-              ? Border.all(color: borderColor ?? AppColors.primaryColor)
-              : null,
-        ),
-        child: CustomText(
-          text: text,
-          color: isColor
-              ? textColor ?? AppColors.textWhiteColor
-              : textColor ?? AppColors.primaryColor,
-          fontSize: textSize?.sp ?? 18.sp,
+      child: Card(
+        color: AppColors.secondaryColor,
+        child: Container(
+          alignment: Alignment.center,
+          height: height?.h ?? 50.h,
+          width: width?.w ?? MediaQuery.sizeOf(context).width.w,
+          decoration: BoxDecoration(
+            color: isColor ? AppColors.primaryColor : AppColors.whiteIconColor,
+            borderRadius: borderRadius ?? BorderRadius.circular(12.r),
+            // border: isColor == false
+            //     ? Border.all(color: borderColor ?? AppColors.primaryColor)
+            //     : null,
+          ),
+          child: CustomText(
+            text: text,
+            color: isColor
+                ? textColor ?? AppColors.textWhiteColor
+                : textColor ?? AppColors.primaryColor,
+            fontSize: textSize?.sp ?? 18.sp,
+          ),
         ),
       ),
     );

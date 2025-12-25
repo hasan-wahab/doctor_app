@@ -23,6 +23,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
     PackageModel(
       name: 'Lumber Spine',
       imageUrl: 'assets/images/lumber_spine.jpg',
+
     ),
     PackageModel(
       name: 'Neck spine',

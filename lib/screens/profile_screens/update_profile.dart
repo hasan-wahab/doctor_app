@@ -7,11 +7,13 @@ import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/aut
 import 'package:doctor_app/screens/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../../app_styles/app_colors.dart';
 import '../../widgets/custom_text.dart';
@@ -27,6 +29,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Map<String, List<String>> data = {};
   bool isLoading = false;
   String? selectedValue;
+  DateTime? pickedData;
   @override
   void didChangeDependencies() {
     data =
@@ -72,14 +75,35 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                 height: 118.h,
                                 width: 118.w,
                                 decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: pickImage == null
-                                        ? NetworkImage(data['data']?[0] ?? '')
-                                        : FileImage(pickImage!),
-                                  ),
                                   shape: BoxShape.circle,
                                 ),
+                                child: isLoading == false
+                                    ? pickImage == null
+                                          ? ClipOval(
+                                              child: Image.network(
+                                                fit: BoxFit.cover,
+                                                data['data']?[0] ?? '',
+                                                headers: {
+                                                  "Authorization":
+                                                      "Bearer ${data['data']![7]}",
+                                                },
+                                              ),
+                                            )
+                                          : ClipOval(
+                                              child: Image.file(
+                                                fit: BoxFit.cover,
+                                                pickImage!,
+                                              ),
+                                            )
+                                    : Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          CircularProgressIndicator(
+                                            color: AppColors.primaryColor,
+                                          ),
+                                        ],
+                                      ),
                               ),
                               InkWell(
                                 onTap: () {
@@ -222,27 +246,49 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomText(text: 'DOB'),
+
                         InkWell(
                           onTap: () {
+                            // Original string from your data
+                            String dateStr =
+                                data['data']![4]; // e.g., "01/26/2005"
+                            print(dateStr);
+
+                            // Parse the string to DateTime
+                            DateFormat format = DateFormat("MM/dd/yyyy");
+                            DateTime parsedDate = format.parse(dateStr);
+                            // Show date picker
                             showDatePicker(
                               context: context,
-                              firstDate: DateTime(1800),
+                              firstDate: DateTime(
+                                1800,
+                              ), // Minimum selectable date
                               lastDate: DateTime.now(),
-                            );
+                              initialDate: parsedDate,
+                            ).then((pickedDate1) {
+                              if (pickedDate1 != null) {
+                                pickedData = pickedDate1;
+                              }
+                            });
                           },
                           child: Container(
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: 12.w),
-                            height: 50.h,
-                            width: MediaQuery.sizeOf(context).width,
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            height: 50,
+                            width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.r),
-
-                              border: Border.all(
-                                color: AppColors.secondaryTextColor,
-                              ),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey),
                             ),
-                            child: Text(data['data']![4]),
+                            child: Text(
+                              DateAndTimeFormater.dateFormat(
+                                    pickedData.toString(),
+                                  ).isEmpty
+                                  ? data['data']![4]
+                                  : DateAndTimeFormater.dateFormat(
+                                      pickedData.toString(),
+                                    ),
+                            ),
                           ),
                         ),
                       ],
@@ -362,11 +408,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
   }
 
   void pickImageFromUser() async {
+    setState(() {
+      isLoading == true;
+    });
     final picker = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     final pickedImage = File(picker!.path);
 
     pickImage = pickedImage;
-    setState(() {});
+    setState(() {
+      isLoading == false;
+    });
   }
 }

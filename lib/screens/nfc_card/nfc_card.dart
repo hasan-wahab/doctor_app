@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class NfcCard extends StatefulWidget {
   const NfcCard({super.key});
@@ -17,7 +18,7 @@ class NfcCard extends StatefulWidget {
 }
 
 class _NfcCardState extends State<NfcCard> {
-  LoginModel1? profileData;
+  late LoginModel1 profileData;
   static const platform = MethodChannel('hce.channel');
 
   void _sendIdToHce(String id) async {
@@ -37,12 +38,15 @@ class _NfcCardState extends State<NfcCard> {
 
   @override
   void initState() {
-    getCurrentUserData();
     super.initState();
+    getCurrentUserData();
   }
 
   @override
   Widget build(BuildContext context) {
+    // DateTime date = DateTime.parse(
+    //   profileData!.patientData!.patientInfo!.birthDate,
+    // );
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: AppBar(
@@ -56,276 +60,358 @@ class _NfcCardState extends State<NfcCard> {
           child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
         ),
       ),
-      body: profileData!.user != null
-          ? SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 260.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.0),
-                      gradient: const LinearGradient(
-                        colors: [Colors.red, Colors.amber],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
+      body: profileData.patientData!.patientInfo!.cardUid != null
+          ? profileData.user != null
+                ? SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 15.w,
+                      vertical: 15.h,
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15.w,
-                        vertical: 10.h,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const CustomText(
-                                    text: "ALI THERAPY",
-                                    fontSize: 18,
-                                    color: Colors.yellow,
-                                  ),
-                                  SizedBox(height: 15.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    spacing: 10.w,
-                                    children: [
-                                      Container(
-                                        height: 50.h,
-                                        width: 50.w,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            12.r,
-                                          ),
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            image: NetworkImage(
-                                              profileData!
-                                                  .patientData!
-                                                  .patientInfo!
-                                                  .image
-                                                  .toString()
-                                                  .toString(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          CustomText(
-                                            text: profileData!.user!.name
-                                                .toString(),
-                                            fontSize: 18,
-                                            color: AppColors.secondaryColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          CustomText(
-                                            text: profileData!
-                                                .patientData!
-                                                .patientInfo!
-                                                .cardUid
-                                                .toString(),
-                                            fontSize: 15,
-                                            color: AppColors.textWhiteColor,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(5),
-                                height: 70.h,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 10,
-                                      spreadRadius: 1,
-                                      offset: Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.asset(
-                                  'assets/images/main_logo.png',
-                                ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          height: 260.h,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15.0),
+                            gradient: const LinearGradient(
+                              colors: [Colors.red, Colors.amber],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
                               ),
                             ],
                           ),
-                          SizedBox(height: 8.h),
-                          SizedBox(
-                            width: MediaQuery.sizeOf(context).width / 2,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 15.w,
+                              vertical: 10.h,
+                            ),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    CustomText(
-                                      text: 'Phone',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const CustomText(
+                                          text: "ALI THERAPY",
+                                          fontSize: 18,
+                                          color: Colors.yellow,
+                                        ),
+                                        SizedBox(height: 15.h),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          spacing: 10.w,
+                                          children: [
+                                            Container(
+                                              height: 50.h,
+                                              width: 50.w,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(12.r),
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(
+                                                    profileData!
+                                                            .patientData!
+                                                            .patientInfo!
+                                                            .image
+                                                            .toString()
+                                                            .isNotEmpty
+                                                        ? profileData!
+                                                              .patientData!
+                                                              .patientInfo!
+                                                              .image
+                                                              .toString()
+                                                        : "No data",
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                CustomText(
+                                                  text: profileData!.user!.name
+                                                      .toString(),
+                                                  fontSize: 18,
+                                                  color:
+                                                      AppColors.secondaryColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                CustomText(
+                                                  text:
+                                                      profileData!
+                                                              .patientData!
+                                                              .patientInfo!
+                                                              .cardUid
+                                                              .toString() ==
+                                                          null.toString()
+                                                      ? 'No data'
+                                                      : profileData!
+                                                            .patientData!
+                                                            .patientInfo!
+                                                            .cardUid
+                                                            .toString(),
+                                                  fontSize: 15,
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    CustomText(
-                                      text: profileData!
-                                          .patientData!
-                                          .patientInfo!
-                                          .phone
-                                          .toString(),
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      height: 70.h,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 10,
+                                            spreadRadius: 1,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Image.asset(
+                                        'assets/images/main_logo.png',
+                                      ),
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: 8.h),
+                                SizedBox(
+                                  width: MediaQuery.sizeOf(context).width / 2,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: 'Phone',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                profileData!
+                                                    .patientData!
+                                                    .patientInfo!
+                                                    .phone
+                                                    .toString()
+                                                    .isNotEmpty
+                                                ? profileData!
+                                                      .patientData!
+                                                      .patientInfo!
+                                                      .phone
+                                                      .toString()
+                                                : 'No data',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: 'CNIC',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                profileData!
+                                                    .patientData!
+                                                    .patientInfo!
+                                                    .cnic
+                                                    .toString()
+                                                    .isNotEmpty
+                                                ? profileData!
+                                                      .patientData!
+                                                      .patientInfo!
+                                                      .cnic
+                                                      .toString()
+                                                : 'No data',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: 'Blood',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                profileData!
+                                                    .patientData!
+                                                    .patientInfo!
+                                                    .bloodGroup
+                                                    .toString()
+                                                    .isNotEmpty
+                                                ? profileData!
+                                                      .patientData!
+                                                      .patientInfo!
+                                                      .bloodGroup
+                                                      .toString()
+                                                : 'No data',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: 'Gender',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                profileData!
+                                                    .patientData!
+                                                    .patientInfo!
+                                                    .gender
+                                                    .toString()
+                                                    .isNotEmpty
+                                                ? profileData!
+                                                      .patientData!
+                                                      .patientInfo!
+                                                      .gender
+                                                      .toString()
+                                                : 'No data',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CustomText(
+                                            text: 'Date',
+                                            color: AppColors.textWhiteColor,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+
+                                          profileData!
+                                                      .patientData!
+                                                      .patientInfo
+                                                      ?.birthDate
+                                                      .toString() ==
+                                                  null
+                                              ? CustomText(
+                                                  text: DateFormat("dd-MM-yyyy")
+                                                      .format(
+                                                        DateTime.parse(
+                                                          profileData!
+                                                              .patientData!
+                                                              .patientInfo!
+                                                              .birthDate,
+                                                        ),
+                                                      ),
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  fontSize: 13,
+                                                )
+                                              : CustomText(
+                                                  text: 'No data',
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CustomText(
-                                      text: 'CNIC',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        CustomText(
+                                          text:
+                                              'Main Boulevard, Gulberg III, Lahore',
+                                          fontSize: 12,
+                                          color: AppColors.secondaryTextColor,
+                                        ),
+                                        CustomText(
+                                          text:
+                                              '+92 42 3578 5555 | +92 300 1234567',
+                                          fontSize: 12,
+                                          color: AppColors.secondaryTextColor,
+                                        ),
+                                      ],
                                     ),
-                                    CustomText(
-                                      text: profileData!
-                                          .patientData!
-                                          .patientInfo!
-                                          .cnic
-                                          .toString(),
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText(
-                                      text: 'Blood',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    CustomText(
-                                      text: profileData!
-                                          .patientData!
-                                          .patientInfo!
-                                          .bloodGroup
-                                          .toString(),
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText(
-                                      text: 'Gender',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    CustomText(
-                                      text: profileData!
-                                          .patientData!
-                                          .patientInfo!
-                                          .gender
-                                          .toString(),
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomText(
-                                      text: 'Date',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    CustomText(
-                                      text: ' 03-Dec-25',
-                                      color: AppColors.textWhiteColor,
-                                      fontSize: 13,
+                                    Icon(
+                                      Icons.wifi,
+                                      color: AppColors.whiteIconColor,
+                                      size: 40.r,
                                     ),
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 8.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(
-                                    text: 'Main Boulevard, Gulberg III, Lahore',
-                                    fontSize: 12,
-                                    color: AppColors.secondaryTextColor,
-                                  ),
-                                  CustomText(
-                                    text: '+92 42 3578 5555 | +92 300 1234567',
-                                    fontSize: 12,
-                                    color: AppColors.secondaryTextColor,
-                                  ),
-                                ],
-                              ),
-                              Icon(
-                                Icons.wifi,
-                                color: AppColors.whiteIconColor,
-                                size: 40.r,
-                              ),
-                            ],
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const Center(
+                          child: Text(
+                            "Hold phone close to the NFC reader",
+                            style: TextStyle(color: Colors.black87),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  const Center(
-                    child: Text(
-                      "Hold phone close to the NFC reader",
-                      style: TextStyle(color: Colors.black87),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : Center(child: CircularProgressIndicator()),
+                  )
+                : Center(child: CircularProgressIndicator())
+          : Center(child: CustomText(text: 'No Card Available')),
     );
   }
 
@@ -336,9 +422,9 @@ class _NfcCardState extends State<NfcCard> {
 
       final jsonData = jsonDecode(data!);
       profileData = LoginModel1.fromJson(jsonData);
-      if (profileData!.patientData!.patientInfo != null) {
-        _sendIdToHce(profileData!.patientData!.patientInfo!.cardUid.toString());
-        print(profileData!.patientData!.patientInfo!.image.toString());
+      if (profileData.patientData!.patientInfo!.cardUid != null) {
+        _sendIdToHce(profileData.patientData!.patientInfo!.cardUid.toString());
+        print(profileData.patientData!.patientInfo!.image.toString());
       }
 
       setState(() {});

@@ -19,8 +19,8 @@ class AppTField extends StatelessWidget {
     this.width,
     this.icon,
     this.isIconsLeft = true,
-    this.obscureText=false,
-    this.autoFucus=false,
+    this.obscureText = false,
+    this.autoFucus = false,
   });
 
   @override
@@ -28,28 +28,36 @@ class AppTField extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
-          height: 62.h,
-          width: width ?? MediaQuery.sizeOf(context).width,
-          decoration: BoxDecoration(
-            color: Color.fromRGBO(217, 217, 217, 0.35),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: AppColors.primaryColor),
-          ),
-          child: TextFormField(
-            autofocus: autoFucus,
-            obscureText: obscureText,
-            controller: controller,
-            decoration: InputDecoration(
-              // icon: Icon(Icons.add),
-              //  suffix: Icon(Icons.add),
-              contentPadding: EdgeInsets.only(top: 20, left:isIconsLeft==false?20: 40, right: 20),
-              border: InputBorder.none,
-              hintText: '${hintText ?? ''}',
-
-              // label: Text(lableText),
+        Card(
+          margin: EdgeInsets.zero,
+          color: AppColors.secondaryColor,
+          child: Container(
+            height: 62.h,
+            width: width ?? MediaQuery.sizeOf(context).width,
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(217, 217, 217, 0.35),
+              borderRadius: BorderRadius.circular(12.r),
+              // border: Border.all(color: AppColors.primaryColor),
             ),
-            validator: (value) => validator!(value) ?? null,
+            child: TextFormField(
+              autofocus: autoFucus,
+              obscureText: obscureText,
+              controller: controller,
+              decoration: InputDecoration(
+                // icon: Icon(Icons.add),
+                //  suffix: Icon(Icons.add),
+                contentPadding: EdgeInsets.only(
+                  top: 20,
+                  left: isIconsLeft == false ? 20 : 40,
+                  right: 20,
+                ),
+                border: InputBorder.none,
+                hintText: '${hintText ?? ''}',
+
+                // label: Text(lableText),
+              ),
+              validator: (value) => validator!(value) ?? null,
+            ),
           ),
         ),
         Padding(
@@ -61,7 +69,7 @@ class AppTField extends StatelessWidget {
             alignment: isIconsLeft == true
                 ? Alignment.centerLeft
                 : Alignment.centerRight,
-            child:  icon,
+            child: icon,
           ),
         ),
       ],

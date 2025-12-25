@@ -1,4 +1,5 @@
 import 'package:doctor_app/widgets/app_t_field.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -51,22 +52,24 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
 
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(
-              currentPatientData!.therapySessions.length,
-              (index) {
-                var therapySessions =
-                    currentPatientData!.therapySessions[index];
-                return Container(
+            children: List.generate(currentPatientData!.therapySessions.length, (
+              index,
+            ) {
+              var therapySessions = currentPatientData!.therapySessions[index];
+              return Card(
+                color: AppColors.secondaryColor,
+                margin: EdgeInsets.only(top: 15.h),
+                child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 15.w,
                     vertical: 20.h,
                   ),
-                  margin: EdgeInsets.only(top: 10.h),
+
                   height: 178.h,
                   width: 360.w,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: AppColors.primaryColor, width: 2),
+                    //  border: Border.all(color: AppColors.primaryColor, width: 2),
                   ),
 
                   child: Column(
@@ -80,11 +83,13 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                       ),
                       _text(
                         firstText: 'Next session date',
-                        secondText: therapySessions.nextSessionDate.toString(),
+                        secondText: DateAndTimeFormater.dateFormat(
+                          therapySessions.nextSessionDate.toString(),
+                        ),
                       ),
                       _text(
                         firstText: 'Therapist',
-                        secondText: therapySessions.therapist.name.toString(),
+                        secondText: therapySessions.therapist!.name.toString(),
                       ),
 
                       _text(
@@ -97,9 +102,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ),
         ],
       ),

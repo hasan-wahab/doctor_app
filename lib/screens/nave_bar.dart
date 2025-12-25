@@ -34,13 +34,13 @@ class _NaveBarState extends State<NaveBar> {
   ];
   List<Widget> screenList = [
     HomeScreen(),
-    MapScreen(),
+    MapScreen(isNavigateFromNaveBar: true),
     SessionRecord(),
     LoginScreen(),
   ];
   List<Widget> screenList2 = [
     DashbordScreen(),
-    MapScreen(),
+    MapScreen(isNavigateFromNaveBar: true),
     SessionRecord(),
     ProfileScreen(),
   ];

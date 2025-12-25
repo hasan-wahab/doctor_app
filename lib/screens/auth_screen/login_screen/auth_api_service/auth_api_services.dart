@@ -157,6 +157,7 @@ class AuthApiServices {
 
     if (response.statusCode == 200) {
       print("Image updated!");
+      print(response.request!.url);
       return true;
     } else {
       AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
@@ -185,8 +186,7 @@ class AuthApiServices {
     required String patientId,
     required String currentUserToken,
     required BuildContext context,
-  })
-  async {
+  }) async {
     try {
       final url = Uri.parse(
         '${ApiKeys.baseUrl}/patient/apipatients/$patientId',

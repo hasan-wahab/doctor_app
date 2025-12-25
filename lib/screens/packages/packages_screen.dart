@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app_styles/app_colors.dart';
 import '../../models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
+import '../../widgets/date_time_foemat.dart';
 
 class PackagesScreen extends StatefulWidget {
   const PackagesScreen({super.key});
@@ -48,108 +49,107 @@ class _PackagesScreenState extends State<PackagesScreen> {
             color: AppColors.primaryColor,
           ),
           Column(
-            children: List.generate(
-              (currentPatientData!.patient!.packages!.length),
-              (index) {
-                final totalSession =
-                    currentPatientData!
-                        .patient!
-                        .packages![index]
-                        .pivot!
-                        .sessionsTotal ??
-                    7;
-                final usedSession = currentPatientData!
-                    .patient!
-                    .packages![index]
-                    .pivot!
-                    .sessionsUsed;
-                List colorsList = List.generate(
-                  (usedSession == 0 ? 1 : usedSession!),
-                  (index) {
-                    return usedSession != 0
-                        ? AppColors.primaryColor
-                        : AppColors.secondaryColor;
-                  },
-                );
-                List colorsList2 = List.generate((7 - usedSession!), (index) {
-                  return AppColors.secondaryColor;
-                });
-                return Container(
-                  margin: EdgeInsets.only(top: 20.h),
-                  padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 20),
-                  height: 157.h,
-                  width: 360.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(width: 2, color: AppColors.primaryColor),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        text:
-                            '${currentPatientData!.patient!.packages![index].name.toString()} ',
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Session Progress
+              SizedBox(height: 10.h),
+              ...List.generate(
+                currentPatientData!.patient!.packages.isNotEmpty
+                    ? currentPatientData!.patient!.packages.length
+                    : 1,
 
-                        fontSize: 12,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(
-                            text: 'Sessions Progress',
-                            fontSize: 13,
-                            color: AppColors.secondaryTextColor,
-                          ),
-                          CustomText(
-                            text: '$usedSession/$totalSession',
-                            fontSize: 12,
-                          ),
-                        ],
-                      ),
+                (index) {
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 10.h),
 
-                      Container(
-                        height: 10.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [...colorsList, ...colorsList2],
-                          ),
+                    height: 110.h,
+                    width: 360.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Card(
+                      color: AppColors.secondaryColor,
+                      margin: EdgeInsets.zero,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.h,
+                          vertical: 10,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              text:
+                                  currentPatientData!.patient!.packages.isEmpty
+                                  ? 'No Data'
+                                  : currentPatientData!
+                                        .patient!
+                                        .packages[index]
+                                        .name,
+                              fontSize: 12,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomText(
+                                  text: 'Sessions Progress',
+                                  fontSize: 12,
+                                  color: AppColors.secondaryTextColor,
+                                ),
+                                CustomText(
+                                  text:
+                                      '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsTotal : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsUsed : 0}',
+                                  fontSize: 10,
+                                ),
+                              ],
+                            ),
 
-                          borderRadius: BorderRadius.circular(20.r),
+                            LinearProgressIndicator(
+                              value:
+                                  currentPatientData!.patient!.packages.isEmpty
+                                  ? 1.0
+                                  : getSessionProgress(index),
+                              valueColor: AlwaysStoppedAnimation(
+                                AppColors.primaryColor,
+                              ),
+                            ),
+
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomText(
+                                  text: 'Next Session Date',
+                                  fontSize: 15,
+                                ),
+                                CustomText(
+                                  text:
+                                      currentPatientData!
+                                          .patient!
+                                          .packages
+                                          .isNotEmpty
+                                      ? DateAndTimeFormater.dateFormat(
+                                          currentPatientData!
+                                              .therapySessions
+                                              .first
+                                              .nextSessionDate
+                                              .toString(),
+                                        )
+                                      : 'No data',
+                                  fontSize: 12,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 10.w,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _text(
-                            firstText: 'Price',
-                            secondText: currentPatientData!
-                                .patient!
-                                .packages![index]
-                                .pivot!
-                                .price
-                                .toString(),
-                          ),
-                          _text(
-                            firstText: 'Status',
-                            buttonText: currentPatientData!
-                                .patient!
-                                .packages![index]
-                                .pivot!
-                                .status,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -191,5 +191,20 @@ class _PackagesScreenState extends State<PackagesScreen> {
               ),
       ],
     );
+  }
+
+  double getSessionProgress(int index) {
+    final total =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsTotal;
+    final used =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsUsed;
+
+    if (total == 0) return 0.0;
+
+    final progress = used / total;
+
+    if (progress.isNaN || progress.isInfinite) return 0.0;
+
+    return progress.clamp(0.0, 1.0);
   }
 }
