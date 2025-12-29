@@ -18,7 +18,7 @@ class NfcCard extends StatefulWidget {
 }
 
 class _NfcCardState extends State<NfcCard> {
-  late LoginModel1 profileData;
+  LoginModel1? profileData;
   static const platform = MethodChannel('hce.channel');
 
   void _sendIdToHce(String id) async {
@@ -44,9 +44,6 @@ class _NfcCardState extends State<NfcCard> {
 
   @override
   Widget build(BuildContext context) {
-    // DateTime date = DateTime.parse(
-    //   profileData!.patientData!.patientInfo!.birthDate,
-    // );
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: AppBar(
@@ -60,14 +57,11 @@ class _NfcCardState extends State<NfcCard> {
           child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
         ),
       ),
-      body: profileData.patientData!.patientInfo!.cardUid != null
-          ? profileData.user != null
-                ? SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15.w,
-                      vertical: 15.h,
-                    ),
-                    child: Column(
+      body: profileData != null
+          ? SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+              child: profileData!.patientData!.patientInfo!.cardUid != null
+                  ? Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
@@ -408,10 +402,10 @@ class _NfcCardState extends State<NfcCard> {
                           ),
                         ),
                       ],
-                    ),
-                  )
-                : Center(child: CircularProgressIndicator())
-          : Center(child: CustomText(text: 'No Card Available')),
+                    )
+                  : Center(child: Text('No Card Available')),
+            )
+          : Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -422,9 +416,9 @@ class _NfcCardState extends State<NfcCard> {
 
       final jsonData = jsonDecode(data!);
       profileData = LoginModel1.fromJson(jsonData);
-      if (profileData.patientData!.patientInfo!.cardUid != null) {
-        _sendIdToHce(profileData.patientData!.patientInfo!.cardUid.toString());
-        print(profileData.patientData!.patientInfo!.image.toString());
+      if (profileData!.patientData!.patientInfo!.cardUid != null) {
+        _sendIdToHce(profileData!.patientData!.patientInfo!.cardUid.toString());
+        print(profileData!.patientData!.patientInfo!.image.toString());
       }
 
       setState(() {});

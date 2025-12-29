@@ -13,6 +13,7 @@ import '../../local_storage/local_storage.dart';
 import '../../models/current_patient_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/custom_text.dart';
+import '../../widgets/date_time_foemat.dart';
 
 class SessionRecord extends StatefulWidget {
   const SessionRecord({super.key});
@@ -87,8 +88,145 @@ class _SessionRecordState extends State<SessionRecord> {
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20.w),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 23.h),
+                              SizedBox(height: 15.h),
+                              currentPatientData!.patient!.packages.isNotEmpty
+                                  ? CustomText(
+                                      text: 'Session Progress',
+                                      color: AppColors.primaryColor,
+                                    )
+                                  : Container(),
+                              SizedBox(height: 10.h),
+                              ...List.generate(
+                                currentPatientData!.patient!.packages.isNotEmpty
+                                    ? currentPatientData!
+                                          .patient!
+                                          .packages
+                                          .length
+                                    : 1,
+
+                                (index) {
+                                  return Container(
+                                    margin: EdgeInsets.only(bottom: 10.h),
+
+                                    height: 110.h,
+                                    width: 360.w,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                    child: Card(
+                                      color: AppColors.secondaryColor,
+                                      margin: EdgeInsets.zero,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.h,
+                                          vertical: 10,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CustomText(
+                                              text:
+                                                  currentPatientData!
+                                                      .patient!
+                                                      .packages
+                                                      .isEmpty
+                                                  ? 'No data'
+                                                  : currentPatientData!
+                                                        .patient!
+                                                        .packages[index]
+                                                        .name,
+                                              fontSize: 12,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                CustomText(
+                                                  text: 'Sessions Progress',
+                                                  fontSize: 12,
+                                                  color: AppColors
+                                                      .secondaryTextColor,
+                                                ),
+                                                CustomText(
+                                                  text:
+                                                      '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsTotal : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsUsed : 0}',
+                                                  fontSize: 10,
+                                                ),
+                                              ],
+                                            ),
+
+                                            LinearProgressIndicator(
+                                              value:
+                                                  currentPatientData!
+                                                      .patient!
+                                                      .packages
+                                                      .isEmpty
+                                                  ? 1.0
+                                                  : getSessionProgress(index),
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                    AppColors.primaryColor,
+                                                  ),
+                                            ),
+
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                CustomText(
+                                                  text: 'Next Session Date',
+                                                  fontSize: 15,
+                                                ),
+                                                CustomText(
+                                                  text:
+                                                      currentPatientData!
+                                                          .patient!
+                                                          .packages
+                                                          .isNotEmpty
+                                                      ? DateAndTimeFormater.dateFormat(
+                                                          currentPatientData!
+                                                              .therapySessions[index]
+                                                              .nextSessionDate
+                                                              .toString(),
+                                                        )
+                                                      : 'No data',
+                                                  fontSize: 12,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 10.h),
+
+                              /// All Visits
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomText(
+                                    text: 'My Visits',
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  CustomText(text: '23/9', fontSize: 12),
+                                ],
+                              ),
+                              SizedBox(height: 10.h),
 
                               ...List.generate(visits.length, (index) {
                                 final visit = visits[index];
@@ -96,112 +234,119 @@ class _SessionRecordState extends State<SessionRecord> {
                                 return Container(
                                   margin: EdgeInsets.only(bottom: 10.h),
                                   alignment: Alignment.center,
-                                  padding: EdgeInsets.only(
-                                    top: 11.h,
-                                    left: 20.w,
-                                    right: 12.w,
-                                    bottom: 10.h,
-                                  ),
+
                                   height: 120.h,
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      width: 2,
-                                      color: AppColors.primaryColor,
-                                    ),
-                                    color: AppColors.bgColor,
                                     borderRadius: BorderRadius.circular(12.r),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      /// TOP ROW
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                  child: Card(
+                                    margin: EdgeInsets.zero,
+                                    color: AppColors.secondaryColor,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        top: 11.h,
+                                        left: 20.w,
+                                        right: 12.w,
+                                        bottom: 10.h,
+                                      ),
+                                      child: Column(
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              CustomText(
-                                                text:
-                                                    visit
-                                                            .therapist
-                                                            ?.name
-                                                            .isNotEmpty ==
-                                                        true
-                                                    ? visit.therapist!.name
-                                                    : 'no data',
-                                                fontSize: 20,
-                                                color: AppColors
-                                                    .firstTextBlackColor,
-                                              ),
-                                              const CustomText(
-                                                text: 'Physiotherapist',
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ],
-                                          ),
+                                          /// TOP ROW
                                           Row(
-                                            children: [
-                                              Icon(
-                                                Icons.star,
-                                                size: 20.r,
-                                                color: Colors.amber,
-                                              ),
-                                              const CustomText(text: '4.5'),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-
-                                      const Spacer(),
-
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              CustomText(
-                                                text: visit.visitAt.toString(),
-                                                fontSize: 15,
-                                                color: AppColors
-                                                    .secondaryTextColor,
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText(
+                                                    text:
+                                                        visit
+                                                                .therapist
+                                                                ?.name
+                                                                .isNotEmpty ==
+                                                            true
+                                                        ? visit.therapist!.name
+                                                        : 'no data',
+                                                    fontSize: 20,
+                                                    color: AppColors
+                                                        .firstTextBlackColor,
+                                                  ),
+
+                                                  const CustomText(
+                                                    text: 'Physiotherapist',
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ],
                                               ),
-                                              CustomText(
-                                                text:
-                                                    visit.type ??
-                                                    'Cognitive Therapy',
-                                                fontSize: 15,
-                                                color: AppColors
-                                                    .secondaryTextColor,
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.star,
+                                                    size: 20.r,
+                                                    color: Colors.amber,
+                                                  ),
+                                                  const CustomText(text: '4.5'),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                          AppButton(
-                                            borderRadius: BorderRadius.circular(
-                                              8.r,
-                                            ),
-                                            onTap: () => Navigator.pushNamed(
-                                              context,
-                                              AppRoutes.notesScreen,
-                                            ),
-                                            height: 33,
-                                            text: 'Visit Details',
-                                            width: 96,
-                                            textSize: 13,
-                                            isColor: false,
+
+                                          const Spacer(),
+
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText(
+                                                    text: visit.visitAt
+                                                        .toString(),
+                                                    fontSize: 15,
+                                                    color: AppColors
+                                                        .secondaryTextColor,
+                                                  ),
+                                                  CustomText(
+                                                    text:
+                                                        visit.type ??
+                                                        'Cognitive Therapy',
+                                                    fontSize: 15,
+                                                    color: AppColors
+                                                        .secondaryTextColor,
+                                                  ),
+                                                ],
+                                              ),
+                                              AppButton(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                onTap: () =>
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      AppRoutes.notesScreen,
+                                                      arguments: {
+                                                        'index': index,
+                                                      },
+                                                    ),
+                                                height: 33,
+                                                text: 'Visit Details',
+                                                width: 96,
+                                                textSize: 13,
+                                                isColor: false,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 );
                               }),
@@ -367,5 +512,20 @@ class _SessionRecordState extends State<SessionRecord> {
     );
 
     setState(() => isLoading = false);
+  }
+
+  double getSessionProgress(int index) {
+    final total =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsTotal;
+    final used =
+        currentPatientData!.patient!.packages[index].pivot!.sessionsUsed;
+
+    if (total == 0) return 0.0;
+
+    final progress = used / total;
+
+    if (progress.isNaN || progress.isInfinite) return 0.0;
+
+    return progress.clamp(0.0, 1.0);
   }
 }

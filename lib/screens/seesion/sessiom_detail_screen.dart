@@ -16,13 +16,14 @@ class SessionDetailScreen extends StatefulWidget {
 
 class _SessionDetailScreenState extends State<SessionDetailScreen> {
   CurrentPatientModel? currentPatientData;
+  var therapySession;
   @override
   void didChangeDependencies() {
-    Map<String, CurrentPatientModel> data =
-        ModalRoute.of(context)?.settings.arguments
-            as Map<String, CurrentPatientModel>;
+    Map<String, dynamic> data =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     if (data != null) {
       currentPatientData = data['data'];
+      therapySession = data['therapySession'];
     }
     super.didChangeDependencies();
   }
@@ -50,62 +51,121 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             color: AppColors.primaryColor,
           ),
 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(currentPatientData!.therapySessions.length, (
-              index,
-            ) {
-              var therapySessions = currentPatientData!.therapySessions[index];
-              return Card(
-                color: AppColors.secondaryColor,
-                margin: EdgeInsets.only(top: 15.h),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 15.w,
-                    vertical: 20.h,
-                  ),
-
-                  height: 178.h,
-                  width: 360.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                  ),
-
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _text(
-                        firstText: 'Sessions#',
-                        secondText: therapySessions.sessionNumber == null
-                            ? 'No data'
-                            : therapySessions.sessionNumber.toString(),
+          if (therapySession == null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: List.generate(
+                currentPatientData!.therapySessions.length,
+                (index) {
+                  var therapySessions =
+                      currentPatientData!.therapySessions[index];
+                  return Card(
+                    color: AppColors.secondaryColor,
+                    margin: EdgeInsets.only(top: 15.h),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15.w,
+                        vertical: 20.h,
                       ),
-                      _text(
-                        firstText: 'Next session date',
-                        secondText: DateAndTimeFormater.dateFormat(
-                          therapySessions.nextSessionDate.toString(),
+
+                      height: 178.h,
+                      width: 360.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                      ),
+
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _text(
+                            firstText: 'Sessions#',
+                            secondText: therapySessions.sessionNumber == null
+                                ? 'No data'
+                                : therapySessions.sessionNumber.toString(),
+                          ),
+                          _text(
+                            firstText: 'Next session date',
+                            secondText: DateAndTimeFormater.dateFormat(
+                              therapySessions.nextSessionDate.toString(),
+                            ),
+                          ),
+                          _text(
+                            firstText: 'Therapist',
+                            secondText: therapySessions.therapist!.name
+                                .toString(),
+                          ),
+
+                          _text(
+                            firstText: 'Duration',
+                            secondText: therapySessions.durationSeconds
+                                .toString(),
+                          ),
+                          _text(
+                            firstText: 'Notes',
+                            secondText: therapySessions.notes,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  color: AppColors.secondaryColor,
+                  margin: EdgeInsets.only(top: 15.h),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 15.w,
+                      vertical: 20.h,
+                    ),
+
+                    height: 178.h,
+                    width: 360.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                    ),
+
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _text(
+                          firstText: 'Sessions#',
+                          secondText: therapySession.sessionNumber == null
+                              ? 'No data'
+                              : therapySession.sessionNumber.toString(),
                         ),
-                      ),
-                      _text(
-                        firstText: 'Therapist',
-                        secondText: therapySessions.therapist!.name.toString(),
-                      ),
+                        _text(
+                          firstText: 'Next session date',
+                          secondText: DateAndTimeFormater.dateFormat(
+                            therapySession.nextSessionDate.toString(),
+                          ),
+                        ),
+                        _text(
+                          firstText: 'Therapist',
+                          secondText: therapySession.therapist!.name.toString(),
+                        ),
 
-                      _text(
-                        firstText: 'Duration',
-                        secondText: therapySessions.durationSeconds.toString(),
-                      ),
-                      _text(
-                        firstText: 'Notes',
-                        secondText: therapySessions.notes,
-                      ),
-                    ],
+                        _text(
+                          firstText: 'Duration',
+                          secondText: therapySession.durationSeconds.toString(),
+                        ),
+                        _text(
+                          firstText: 'Notes',
+                          secondText: therapySession.notes,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              );
-            }),
-          ),
+              ],
+            ),
         ],
       ),
     );

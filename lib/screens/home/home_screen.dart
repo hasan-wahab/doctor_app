@@ -65,8 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         children: [
           SizedBox(height: 15.h),
-          FirstSlider(currentValue: currentValue1, controller: _pageController1)
-        ,
+          FirstSlider(
+            currentValue: currentValue1,
+            controller: _pageController1,
+          ),
           SizedBox(height: 15.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -99,8 +101,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SizedBox(height: 20.h,),
-          SecondSlider(controller: _pageController2, currentValue: currentValue2)
+          SizedBox(height: 20.h),
+          SecondSlider(
+            controller: _pageController2,
+            currentValue: currentValue2,
+          ),
         ],
       ),
       backgroundColor: AppColors.bgColor,
@@ -161,5 +166,4 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController2.dispose();
     super.dispose();
   }
-
 }

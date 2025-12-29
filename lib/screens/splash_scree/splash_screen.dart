@@ -35,31 +35,26 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            firstText == true
-                ? Container(
-                    //  height: 100.h,
-                    width: 300.w,
-                    child: Image.asset("assets/images/main_logo.png"),
-                  )
-                : Container(),
+            Container(
+              //  height: 100.h,
+              width: 300.w,
+              child: Image.asset("assets/images/main_logo.png"),
+            ),
             SizedBox(height: 20),
 
-            thirdText == true
-                ? Text(
-                    'A L I T H E R A P Y',
-                    style: TextStyle(
-                      color: AppColors.textWhiteColor,
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : Container(),
-            fourthText == true
-                ? CustomText(
-                    text: 'Your Health, Our Priority',
-                    color: Color.fromRGBO(255, 255, 255, 0.8),
-                  )
-                : Container(),
+            Text(
+              'A L I T H E R A P Y',
+              style: TextStyle(
+                color: AppColors.textWhiteColor,
+                fontSize: 35,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            CustomText(
+              text: 'Your Health, Our Priority',
+              color: Color.fromRGBO(255, 255, 255, 0.8),
+            ),
           ],
         ),
       ),
@@ -67,32 +62,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> splashScreenNavigation() async {
-    await Future.delayed(Duration(seconds: 2))
-        .then((_) {
-          firstText = true;
-          setState(() {});
-        })
-        .then((_) async {
-          await Future.delayed(Duration(seconds: 2))
-              .then((_) {
-                thirdText = true;
-                setState(() {});
-              })
-              .then((_) async {
-                await Future.delayed(Duration(seconds: 2))
-                    .then((_) {
-                      fourthText = true;
-                      setState(() {});
-                    })
-                    .then((_) async {
-                      await Future.delayed(Duration(seconds: 2)).then((_) {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.naveBar,
-                        );
-                      });
-                    });
-              });
-        });
+    await Future.delayed(Duration(seconds: 3)).then((_) {
+      Navigator.pushReplacementNamed(context, AppRoutes.naveBar);
+    });
   }
 }

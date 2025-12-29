@@ -1,13 +1,47 @@
+import 'dart:convert';
+
+import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class SessionNotes extends StatelessWidget {
+import '../../local_storage/local_storage.dart';
+import '../../models/current_patient_model.dart';
+import '../auth_screen/login_screen/auth_api_service/auth_api_services.dart';
+import '../auth_screen/login_screen/auth_model/login_model_1.dart';
+
+class SessionNotes extends StatefulWidget {
   const SessionNotes({super.key});
 
   @override
+  State<SessionNotes> createState() => _SessionNotesState();
+}
+
+class _SessionNotesState extends State<SessionNotes> {
+  bool isLoading = false;
+  CurrentPatientModel? currentPatientData;
+  bool isVisitDetail = false;
+  Map<String, int>? index;
+
+  @override
+  void didChangeDependencies() {
+    getPatientData();
+    index = ModalRoute.of(context)!.settings.arguments as Map<String, int>;
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading || currentPatientData == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final visits = List.from(currentPatientData!.patient!.visits);
+    final therapySessions = List.from(currentPatientData!.therapySessions);
+
+    visits.sort((a, b) => a.visitAt.compareTo(b.visitAt));
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -24,105 +58,119 @@ class SessionNotes extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
-          spacing: 10.h,
+          spacing: visits[index!['index'] ?? 0].consultantAssessment != null
+              ? 20.h
+              : 0,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              children: List.generate((1), (index) {
-                final totalSession = 7;
-                final usedSession = 6;
-                List colorsList = List.generate(
-                  (usedSession == 0 ? 1 : usedSession),
-                  (index) {
-                    return usedSession != 0
-                        ? AppColors.primaryColor
-                        : AppColors.secondaryColor;
-                  },
-                );
-                List colorsList2 = List.generate((7 - usedSession), (index) {
-                  return AppColors.secondaryColor;
-                });
-                return Container(
-                  margin: EdgeInsets.only(top: 20.h),
-                  padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 20),
-                  height: 157.h,
-                  width: 360.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(width: 2, color: AppColors.primaryColor),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(text: 'adsfsadf', fontSize: 12),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(
-                            text: 'Sessions Progress',
-                            fontSize: 13,
-                            color: AppColors.secondaryTextColor,
+            visits[index!['index'] ?? 0].consultantAssessment != null
+                ? InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.assistantManagerScreen,
+                        arguments: {
+                          "amAssessments": visits[index!['index'] ?? 0],
+                        },
+                      );
+                    },
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55.h,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        color: AppColors.secondaryColor,
+                        child: Padding(
+                          padding: EdgeInsets.all(10.r),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(
+                                text: 'Assistant Manager Assessment',
+                                color: AppColors.primaryColor,
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                size: 14.r,
+                                color: AppColors.primaryColor,
+                              ),
+                            ],
                           ),
-                          CustomText(
-                            text: '$usedSession/$totalSession',
-                            fontSize: 12,
-                          ),
-                        ],
-                      ),
-
-                      Container(
-                        height: 10.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [...colorsList, ...colorsList2],
-                          ),
-
-                          borderRadius: BorderRadius.circular(20.r),
                         ),
                       ),
-
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 10.w,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _text(
-                            firstText: 'Price',
-                            secondText: 'currentPatientData',
+                    ),
+                  )
+                : Container(),
+            visits[index!['index'] ?? 0].consultantAssessment != null
+                ? InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.assessmentScreen,
+                        arguments: {"consultant": visits[index!['index'] ?? 0]},
+                      );
+                    },
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55.h,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        color: AppColors.secondaryColor,
+                        child: Padding(
+                          padding: EdgeInsets.all(10.r),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(
+                                text: 'Consultant Assessment',
+                                color: AppColors.primaryColor,
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                size: 14.r,
+                                color: AppColors.primaryColor,
+                              ),
+                            ],
                           ),
-                          _text(firstText: 'Status', buttonText: 'jg'),
-                        ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  )
+                : Container(),
+            InkWell(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.sessionsDetailScreen,
+                  arguments: {
+                    "therapySession": therapySessions[index!['index'] ?? 0],
+                  },
                 );
-              }),
-            ),
-            Container(
-              width: double.infinity,
-              height: 50.h,
-              child: Card(
-                child: Center(
-                  child: CustomText(text: 'Assistant Manager Assessment'),
+              },
+              child: SizedBox(
+                width: double.infinity,
+                height: 55.h,
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  color: AppColors.secondaryColor,
+                  child: Padding(
+                    padding: EdgeInsets.all(10.r),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText(
+                          text: 'Therapy Session',
+                          color: AppColors.primaryColor,
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          size: 14.r,
+                          color: AppColors.primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 50.h,
-              child: Card(
-                child: Center(child: CustomText(text: 'Consultant Assessment')),
-              ),
-            ),
-
-            Container(
-              width: double.infinity,
-              height: 50.h,
-              child: Card(
-                child: Center(child: CustomText(text: 'Therapy Session')),
               ),
             ),
           ],
@@ -166,5 +214,25 @@ class SessionNotes extends StatelessWidget {
               ),
       ],
     );
+  }
+
+  Future<void> getPatientData() async {
+    setState(() => isLoading = true);
+
+    final currentUserToken = await LocalStorage.getUserToken('token');
+    final currentUserData = await LocalStorage.getUserToken(currentUserToken!);
+
+    final jsonData = jsonDecode(currentUserData!);
+    LoginModel1 data = LoginModel1.fromJson(jsonData);
+
+    final patientId = data.patientData!.patientInfo!.id;
+
+    currentPatientData = await AuthApiServices.getPatientData(
+      patientId: patientId.toString(),
+      currentUserToken: currentUserToken,
+      context: context,
+    );
+
+    setState(() => isLoading = false);
   }
 }
