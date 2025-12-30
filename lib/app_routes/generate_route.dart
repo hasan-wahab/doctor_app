@@ -10,7 +10,7 @@ import 'package:doctor_app/screens/book_appoinment_screen/confirm_appointment_sc
 import 'package:doctor_app/screens/book_appoinment_screen/payment_option_screen.dart';
 import 'package:doctor_app/screens/book_appoinment_screen/select_date_screen.dart';
 import 'package:doctor_app/screens/map_screen.dart';
-import 'package:doctor_app/screens/nave_bar.dart';
+import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/packages/packages_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/bank_transfer_screen.dart';
 import 'package:doctor_app/screens/pament_method_screen/cridit_card_payment_screen.dart';

@@ -31,7 +31,7 @@ class _BankTransferScreenState extends State<BankTransferScreen> {
         ),
       ),
       body: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 20.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -46,7 +46,7 @@ class _BankTransferScreenState extends State<BankTransferScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 50.h,),
+            SizedBox(height: 50.h),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               height: 292.h,
@@ -87,11 +87,13 @@ class _BankTransferScreenState extends State<BankTransferScreen> {
                       value: selectedBank,
                       menuMaxHeight: 100,
                       isExpanded: true,
-
-                       borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12.r),
                       underline: Container(),
                       items: [
-                        DropdownMenuItem(value: 'Allied', child: Text('Allied')),
+                        DropdownMenuItem(
+                          value: 'Allied',
+                          child: Text('Allied'),
+                        ),
                         DropdownMenuItem(value: 'UBL', child: Text('UBL')),
                         DropdownMenuItem(
                           value: 'Sada Pay',
@@ -105,9 +107,15 @@ class _BankTransferScreenState extends State<BankTransferScreen> {
                     ),
                   ),
                   SizedBox(height: 18.h),
-                  AppButton(text: 'Proceed',onTap: (){
-                    Navigator.pushNamed(context, AppRoutes.successPaymentScreen);
-                  },),
+                  AppButton(
+                    text: 'Proceed',
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.successPaymentScreen,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
+import 'package:doctor_app/models/current_patient_model.dart';
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -21,6 +24,7 @@ class MyProfileScreen extends StatefulWidget {
 class _MyProfileScreenState extends State<MyProfileScreen> {
   String? userToken;
   LoginModel1? profileData;
+  CurrentPatientModel? currentPatientData;
 
   @override
   void initState() {
@@ -42,24 +46,36 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   Column(
                     children: [
                       SizedBox(
-                        height: 120.h,
-                        width: 120.w,
+                        height: 110.h,
+                        width: 110.h,
                         child: Stack(
                           children: [
                             Container(
-                              height: 118.h,
-                              width: 118.w,
-                              decoration: BoxDecoration(shape: BoxShape.circle),
-                              child: ClipOval(
-                                child: Image.network(
-                                  fit: BoxFit.cover,
-                                  profileData?.user!.profilePicture ?? '',
-                                  headers: {
-                                    "Authorization":
-                                        "Bearer ${profileData!.accessToken.toString()}",
-                                  },
+                              height: 110.h,
+                              width: 110.h,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: AppColors.primaryColor,
+                                  width: 2.h,
                                 ),
+                                shape: BoxShape.circle,
                               ),
+                              child: currentPatientData != null
+                                  ? ClipOval(
+                                      child:
+                                          // profileData!.user!.profilePicture != null
+                                          //    ?
+                                          Image.network(
+                                            fit: BoxFit.cover,
+                                            'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+
+                                            headers: {
+                                              "Authorization":
+                                                  "Bearer ${profileData!.accessToken.toString()}",
+                                            },
+                                          ),
+                                    )
+                                  : Center(child: CircularProgressIndicator()),
                             ),
                             Align(
                               alignment: Alignment.bottomRight,
@@ -70,11 +86,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                     AppRoutes.updateProfile,
                                     arguments: <String, List<String>>{
                                       'data': [
-                                        profileData!
-                                            .patientData!
-                                            .patientInfo!
-                                            .image
-                                            .toString(),
+                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
                                         profileData!.user!.name.toString(),
                                         profileData!.user!.phone.toString(),
                                         'Male',
@@ -119,90 +131,247 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 80),
+                  SizedBox(height: 40),
+
                   Column(
                     spacing: 20.h,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(text: 'Name', fontSize: 20),
-                          CustomText(
-                            text: profileData!.user!.name.toString(),
-                            fontSize: 20,
+                      InkWell(
+                        onTap: () {
+                          print(currentPatientData!.patient!.image);
+                        },
+                        child: Card(
+                          color: AppColors.secondaryColor,
+                          margin: EdgeInsets.zero,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 10.h,
+                            ),
+                            child: Row(
+                              spacing: 20.w,
+                              children: [
+                                Icon(
+                                  Icons.person_2_outlined,
+                                  color: AppColors.primaryColor,
+                                  size: 30,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: 'Name',
+                                      fontSize: 12,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    CustomText(
+                                      text: profileData!.user!.name.toString(),
+                                      fontSize: 15,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(text: 'Phone', fontSize: 20),
-                          CustomText(
-                            text: profileData!.user!.phone.toString(),
-                            fontSize: 20,
+                      Card(
+                        color: AppColors.secondaryColor,
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
                           ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-                          CustomText(text: 'Gender', fontSize: 20),
-
-                          CustomText(
-                            text: profileData!.patientData!.patientInfo!.gender
-                                .toString(),
-
-                            fontSize: 20,
+                          child: Row(
+                            spacing: 20.w,
+                            children: [
+                              Icon(
+                                Icons.phone_outlined,
+                                color: AppColors.primaryColor,
+                                size: 30,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'Phone',
+                                    fontSize: 12,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  CustomText(
+                                    text: profileData!.user!.phone.toString(),
+                                    fontSize: 15,
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-                          CustomText(text: 'DOB', fontSize: 20),
-
-                          profileData!.patientData!.patientInfo!.birthDate ==
-                                  null.toString()
-                              ? CustomText(
-                                  text: DateAndTimeFormater.dateFormat(
-                                    profileData!
+                      Card(
+                        color: AppColors.secondaryColor,
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
+                          ),
+                          child: Row(
+                            spacing: 20.w,
+                            children: [
+                              profileData!.patientData!.patientInfo!.gender
+                                          .toString() ==
+                                      'Male'
+                                  ? Icon(
+                                      Icons.male,
+                                      color: AppColors.primaryColor,
+                                      size: 30,
+                                    )
+                                  : Icon(
+                                      Icons.female,
+                                      color: AppColors.primaryColor,
+                                      size: 30,
+                                    ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'Gender',
+                                    fontSize: 12,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  CustomText(
+                                    text: profileData!
                                         .patientData!
                                         .patientInfo!
-                                        .birthDate,
+                                        .gender
+                                        .toString(),
+                                    fontSize: 15,
                                   ),
-
-                                  fontSize: 20,
-                                )
-                              : CustomText(text: "No data"),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                        children: [
-                          CustomText(text: 'Age', fontSize: 20),
-
-                          CustomText(
-                            text: DateAndTimeFormater.calculateAge(
-                              profileData!.patientData!.patientInfo!.birthDate,
-                            ).toString(),
-
-                            fontSize: 20,
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomText(text: 'Email', fontSize: 20),
-                          CustomText(
-                            text: profileData!.user!.email.toString(),
-                            fontSize: 20,
+                      Card(
+                        color: AppColors.secondaryColor,
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
                           ),
-                        ],
+                          child: Row(
+                            spacing: 20.w,
+                            children: [
+                              Icon(
+                                Icons.calendar_month,
+                                color: AppColors.primaryColor,
+                                size: 30,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'DOB',
+                                    fontSize: 12,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  profileData!
+                                              .patientData!
+                                              .patientInfo!
+                                              .birthDate !=
+                                          null.toString()
+                                      ? CustomText(
+                                          text: DateAndTimeFormater.dateFormat(
+                                            profileData!
+                                                .patientData!
+                                                .patientInfo!
+                                                .birthDate,
+                                          ),
+
+                                          fontSize: 15,
+                                        )
+                                      : CustomText(text: "No data"),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        color: AppColors.secondaryColor,
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
+                          ),
+                          child: Row(
+                            spacing: 20.w,
+                            children: [
+                              Icon(
+                                Icons.cake_outlined,
+                                color: AppColors.primaryColor,
+                                size: 30,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'Age',
+                                    fontSize: 12,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  CustomText(
+                                    text: DateAndTimeFormater.calculateAge(
+                                      profileData!
+                                          .patientData!
+                                          .patientInfo!
+                                          .birthDate,
+                                    ).toString(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        color: AppColors.secondaryColor,
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
+                          ),
+                          child: Row(
+                            spacing: 20.w,
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                color: AppColors.primaryColor,
+                                size: 30,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    text: 'Email',
+                                    fontSize: 12,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  CustomText(
+                                    text: profileData!.user!.email.toString(),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -227,6 +396,18 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       Map<String, dynamic> jsonData = jsonDecode(data);
 
       profileData = LoginModel1.fromJson(jsonData);
+      setState(() {});
+      getPatientData();
+    }
+  }
+
+  void getPatientData() async {
+    if (profileData != null) {
+      currentPatientData = await AuthApiServices.getPatientData(
+        patientId: profileData!.patientData!.patientInfo!.id.toString(),
+        currentUserToken: profileData!.accessToken.toString(),
+        context: context,
+      );
       setState(() {});
     }
   }

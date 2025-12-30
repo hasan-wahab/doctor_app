@@ -4,15 +4,15 @@ import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashbord_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
-import 'package:doctor_app/screens/home/home_screen_2.dart';
 import 'package:doctor_app/screens/map_screen.dart';
+import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../local_storage/local_storage.dart';
+import '../../local_storage/local_storage.dart';
 
 class NaveBar extends StatefulWidget {
   int? currentIndex;
@@ -25,10 +25,10 @@ class NaveBar extends StatefulWidget {
 class _NaveBarState extends State<NaveBar> {
   int currentIndex = 0;
   String? token;
-  final List<String> iconText = ['Home', 'Location', 'Records', 'Account'];
+  final List<String> iconText = ['Home', 'My card', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
-    Icons.location_on_outlined,
+    Icons.credit_card,
     Icons.list_alt_rounded,
     Icons.person_2_outlined,
   ];
@@ -40,7 +40,7 @@ class _NaveBarState extends State<NaveBar> {
   ];
   List<Widget> screenList2 = [
     DashbordScreen(),
-    MapScreen(isNavigateFromNaveBar: true),
+    NfcCard(),
     SessionRecord(),
     ProfileScreen(),
   ];
@@ -89,6 +89,7 @@ class _NaveBarState extends State<NaveBar> {
                     }
                   });
                 },
+
                 child: Column(
                   children: [
                     Icon(

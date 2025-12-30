@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
-import 'package:doctor_app/screens/nave_bar.dart';
+import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
@@ -73,8 +73,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             children: [
                               Container(
                                 height: 118.h,
-                                width: 118.w,
+                                width: 118.h,
                                 decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: AppColors.primaryColor,
+                                    width: 2.h,
+                                  ),
+
                                   shape: BoxShape.circle,
                                 ),
                                 child: isLoading == false
@@ -250,8 +255,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         InkWell(
                           onTap: () {
                             // Original string from your data
-                            String dateStr =
-                                data['data']![4]; // e.g., "01/26/2005"
+                            String dateStr = data['data']![4].isEmpty
+                                ? '01/26/2005'
+                                : data['data']![4]; // e.g., "01/26/2005"
                             print(dateStr);
 
                             // Parse the string to DateTime
@@ -413,11 +419,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
     });
     final picker = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    final pickedImage = File(picker!.path);
+    if (picker != null) {
+      final pickedImage = File(picker.path);
 
-    pickImage = pickedImage;
-    setState(() {
-      isLoading == false;
-    });
+      pickImage = pickedImage;
+      setState(() {
+        isLoading == false;
+      });
+    }
   }
 }

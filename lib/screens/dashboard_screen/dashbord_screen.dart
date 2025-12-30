@@ -101,23 +101,20 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                 width: 50.w,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                      profileData!.user!.profilePicture
-                                          .toString(),
-                                    ),
-                                  ),
                                 ),
                                 child: ClipOval(
-                                  child: Image.network(
-                                    fit: BoxFit.cover,
-                                    profileData!.user!.profilePicture
-                                        .toString(),
-                                    headers: {
-                                      "Authorization":
-                                          "Bearer ${profileData!.accessToken.toString()}",
-                                    },
-                                  ),
+                                  child:
+                                      // profileData!.user!.profilePicture != null
+                                      //    ?
+                                      Image.network(
+                                        fit: BoxFit.cover,
+                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+
+                                        headers: {
+                                          "Authorization":
+                                              "Bearer ${profileData!.accessToken.toString()}",
+                                        },
+                                      ),
                                 ),
                               ),
                             ),
@@ -145,6 +142,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         ),
                         InkWell(
                           onTap: () {
+                            //print(profileData!.patientData!.patientInfo!.image);
                             Navigator.pushNamed(
                               context,
                               AppRoutes.searchScreen,
@@ -568,9 +566,11 @@ class _DashbordScreenState extends State<DashbordScreen> {
   }
 
   getCurrentUserDataFromApi() async {
+    if (!mounted) return;
     setState(() {
       isLoading = true;
     });
+
     final token = await LocalStorage.getUserToken('token');
     final currentUserData = await LocalStorage.getProfileData(token!);
 
@@ -583,6 +583,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
       currentUserToken: profileData!.accessToken.toString(),
       context: context,
     );
+    if (!mounted) return;
 
     setState(() {
       isLoading = false;

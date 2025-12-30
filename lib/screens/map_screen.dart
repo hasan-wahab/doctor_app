@@ -1,5 +1,5 @@
 import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/screens/nave_bar.dart';
+import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

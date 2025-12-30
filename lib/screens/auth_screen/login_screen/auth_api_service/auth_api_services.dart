@@ -209,7 +209,17 @@ class AuthApiServices {
         );
         return currentPatientData;
       } else {
-        AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
+        if (response.statusCode == 401) {
+          await LocalStorage.clearAllData();
+
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.naveBar,
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
+        }
       }
     } on Exception catch (e) {
       print(e.toString());

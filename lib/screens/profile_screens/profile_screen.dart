@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
-import '../nave_bar.dart';
+import '../nave_bar/nave_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   final isNavigateFromNaveBar = false;
@@ -24,6 +25,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   LoginModel1? profileData;
   String? currentUserToken;
+  CurrentPatientModel? currentPatientData;
+
   bool isLoading = false;
 
   @override
@@ -76,17 +79,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     Container(
                                       height: 118.h,
-                                      width: 118.w,
+                                      width: 118.h,
                                       decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: NetworkImage(
-                                            profileData!.user!.profilePicture
-                                                .toString(),
-                                          ),
+                                        border: Border.all(
+                                          color: AppColors.primaryColor,
+                                          width: 2.h,
                                         ),
+
                                         shape: BoxShape.circle,
                                       ),
+                                      child: currentPatientData != null
+                                          ? ClipOval(
+                                              child:
+                                                  // profileData!.user!.profilePicture != null
+                                                  //    ?
+                                                  Image.network(
+                                                    fit: BoxFit.cover,
+                                                    'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+
+                                                    headers: {
+                                                      "Authorization":
+                                                          "Bearer ${profileData!.accessToken.toString()}",
+                                                    },
+                                                  ),
+                                            )
+                                          : Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
                                     ),
                                   ],
                                 ),
@@ -313,12 +333,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void getCurrentUserData() async {
     String? token = await LocalStorage.getUserToken('token');
-
     String? data = await LocalStorage.getProfileData(token!);
     if (data != null) {
       Map<String, dynamic> jsonData = jsonDecode(data);
       profileData = LoginModel1.fromJson(jsonData);
       currentUserToken = token;
+
+      currentPatientData = await AuthApiServices.getPatientData(
+        patientId: profileData!.patientData!.patientInfo!.id.toString(),
+        currentUserToken: profileData!.accessToken.toString(),
+        context: context,
+      );
       setState(() {});
     }
   }
