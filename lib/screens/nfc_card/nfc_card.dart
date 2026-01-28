@@ -45,18 +45,20 @@ class _NfcCardState extends State<NfcCard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios_new),
+        ),
         centerTitle: true,
         title: Text('My Card'),
         automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
-        ),
       ),
+      backgroundColor: AppColors.bgColor,
+
       body: profileData != null
           ? SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),

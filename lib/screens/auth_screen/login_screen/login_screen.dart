@@ -1,11 +1,12 @@
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../api_service/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -118,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (form!.validate()) {
                         isLoading = true;
                         setState(() {});
-                        await AuthApiServices.loginApi(
+                        await ApiServices.loginApi(
                           context,
                           email: email.toString(),
                           password: password.toString(),

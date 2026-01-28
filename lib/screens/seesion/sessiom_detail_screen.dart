@@ -31,17 +31,30 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   leading: InkWell(
+      //     onTap: () {
+      //       Navigator.pop(context);
+      //     },
+      //     child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+      //   ),
+      //   centerTitle: true,
+      //   title: Text('Sessions'),
+      // ),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         title: Text('Sessions'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         children: [
@@ -103,7 +116,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                           ),
                           _text(
                             firstText: 'Notes',
-                            secondText: therapySessions.notes,
+                            secondText: therapySessions.notes == ''
+                                ? 'asd'
+                                : therapySessions.notes,
                           ),
                         ],
                       ),
@@ -158,7 +173,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                         ),
                         _text(
                           firstText: 'Notes',
-                          secondText: therapySession.notes,
+                          secondText: therapySession.notes == ''
+                              ? 'no data'
+                              : therapySession.notes,
                         ),
                       ],
                     ),

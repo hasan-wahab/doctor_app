@@ -3,7 +3,6 @@ import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/models/current_patient_model.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../api_service/api_service.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 import '../nave_bar/nave_bar.dart';
 
@@ -101,6 +101,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       "Authorization":
                                                           "Bearer ${profileData!.accessToken.toString()}",
                                                     },
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return profileData!
+                                                                      .user !=
+                                                                  null
+                                                              ? Image.network(
+                                                                  profileData!
+                                                                      .user!
+                                                                      .profilePicture
+                                                                      .toString(),
+                                                                )
+                                                              : Container();
+                                                        },
                                                   ),
                                             )
                                           : Center(
@@ -113,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  AuthApiServices.getPatientData(
+                                  ApiServices.getPatientData(
                                     patientId: profileData!
                                         .patientData!
                                         .patientInfo!
@@ -125,7 +142,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                                 child: CustomText(
-                                  text: profileData!.user!.name.toString(),
+                                  text: currentPatientData!.patient!.user!.name
+                                      .toString(),
                                   fontSize: 20,
                                 ),
                               ),
@@ -270,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         isLoading = true;
                                       });
                                       Navigator.pop(context);
-                                      await AuthApiServices.logoutUser(
+                                      await ApiServices.logoutUser(
                                         currentUserToken,
                                       ).then((value) async {
                                         await LocalStorage.userLogOutToken()
@@ -338,12 +356,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Map<String, dynamic> jsonData = jsonDecode(data);
       profileData = LoginModel1.fromJson(jsonData);
       currentUserToken = token;
-
-      currentPatientData = await AuthApiServices.getPatientData(
+      if (!mounted) return;
+      currentPatientData = await ApiServices.getPatientData(
         patientId: profileData!.patientData!.patientInfo!.id.toString(),
         currentUserToken: profileData!.accessToken.toString(),
         context: context,
       );
+      if (!mounted) return;
       setState(() {});
     }
   }

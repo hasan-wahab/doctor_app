@@ -31,16 +31,18 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         title: Text('Assistant manager'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         children: [
@@ -92,9 +94,8 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                                 _text(
                                   firstText: 'AM Name',
                                   secondText:
-                                      assistantManager
-                                          .assistantManager!
-                                          .name
+                                      assistantManager.assistantManager!.name
+                                          .toString()
                                           .isEmpty
                                       ? 'no data'
                                       : assistantManager.assistantManager!.name,
@@ -102,7 +103,7 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                                 _text(
                                   firstText: 'Consultant',
                                   secondText:
-                                      assistantManager.consultant!.name.isEmpty
+                                      assistantManager.consultant!.name!.isEmpty
                                       ? 'no data'
                                       : assistantManager.consultant!.name,
                                 ),
@@ -120,7 +121,7 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                                   secondText:
                                       assistantManager
                                           .amAssessment!
-                                          .chiefComplaint
+                                          .chiefComplaint!
                                           .isEmpty
                                       ? 'no data'
                                       : assistantManager

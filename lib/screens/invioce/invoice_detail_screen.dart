@@ -39,17 +39,30 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   leading: InkWell(
+      //     onTap: () {
+      //       Navigator.pop(context);
+      //     },
+      //     child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+      //   ),
+      //   centerTitle: true,
+      //   title: Text('Invoice'),
+      // ),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         title: Text('Invoice'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         children: [
@@ -79,7 +92,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   width: 360.w,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
-                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                    //  border: Border.all(color: AppColors.primaryColor, width: 2),
                   ),
 
                   child: Column(
@@ -141,9 +154,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                   invoice.paidAmount!;
                                               return CustomText(
                                                 text: double.parse(
-                                                  invoice
-                                                      .payments[index]
-                                                      .amount,
+                                                  invoice.payments[index].amount
+                                                      .toString(),
                                                 ).toInt().toString(),
                                               );
                                             },

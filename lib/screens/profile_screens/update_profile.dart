@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
@@ -15,6 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../api_service/api_service.dart';
 import '../../app_styles/app_colors.dart';
 import '../../widgets/custom_text.dart';
 
@@ -62,7 +62,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                 child: Column(
-                  spacing: 10.h,
+                  spacing: 15.h,
                   children: [
                     Column(
                       children: [
@@ -210,43 +210,43 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         ),
                       ],
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CustomText(text: 'Gender'),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          width: MediaQuery.sizeOf(context).width,
-                          height: 50.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.r),
-                            border: Border.all(
-                              color: AppColors.secondaryTextColor,
-                            ),
-                          ),
-                          child: DropdownButton<String>(
-                            value: data['data']?[3],
-                            menuMaxHeight: 100,
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem(
-                                value: 'Male',
-                                child: Text('Male'),
-                              ),
-                              DropdownMenuItem(
-                                value: ' Female',
-                                child: Text('Female'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                data['data']![2] = value!;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     CustomText(text: 'Gender'),
+                    //     Container(
+                    //       padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    //       width: MediaQuery.sizeOf(context).width,
+                    //       height: 50.h,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(8.r),
+                    //         border: Border.all(
+                    //           color: AppColors.secondaryTextColor,
+                    //         ),
+                    //       ),
+                    //       child: DropdownButton<String>(
+                    //         value: data['data']?[3],
+                    //         menuMaxHeight: 100,
+                    //         isExpanded: true,
+                    //         items: [
+                    //           DropdownMenuItem(
+                    //             value: 'Male',
+                    //             child: Text('Male'),
+                    //           ),
+                    //           DropdownMenuItem(
+                    //             value: ' Female',
+                    //             child: Text('Female'),
+                    //           ),
+                    //         ],
+                    //         onChanged: (value) {
+                    //           setState(() {
+                    //             data['data']![2] = value!;
+                    //           });
+                    //         },
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -352,14 +352,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           if (token != null) {
                             if (pickImage != null) {
                               bool iaUpdated =
-                                  await AuthApiServices.updateProfileImage(
+                                  await ApiServices.updateProfileImage(
                                     pickImage!,
                                     token,
                                     context,
                                   );
 
                               if (iaUpdated == true) {
-                                await AuthApiServices.updateApiCall(
+                                await ApiServices.updateApiCall(
                                   name: name,
                                   email: email,
                                   cnic: cnic,
@@ -377,7 +377,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                 });
                               }
                             } else {
-                              await AuthApiServices.updateApiCall(
+                              await ApiServices.updateApiCall(
                                 name: name,
                                 email: email,
                                 cnic: cnic,

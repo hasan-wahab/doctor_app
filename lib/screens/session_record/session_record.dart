@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../api_service/api_service.dart';
 import '../../app_routes/routes_name.dart';
 import '../../app_styles/app_colors.dart';
 import '../../local_storage/local_storage.dart';
@@ -57,6 +57,7 @@ class _SessionRecordState extends State<SessionRecord> {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: AppColors.bgColor,
           leading: IconButton(
             onPressed: isVisitDetail == true
                 ? () {
@@ -79,6 +80,7 @@ class _SessionRecordState extends State<SessionRecord> {
           ),
           automaticallyImplyLeading: false,
         ),
+        backgroundColor: AppColors.bgColor,
         body: visits.isNotEmpty
             ? isVisitDetail == true
                   // Visit Records
@@ -118,10 +120,14 @@ class _SessionRecordState extends State<SessionRecord> {
                                           margin: EdgeInsets.only(bottom: 10.h),
 
                                           height: 110.h,
-                                          width:currentPatientData!
-                                              .patient!
-                                              .packages
-                                              .length==1? 350.w:300,
+                                          width:
+                                              currentPatientData!
+                                                      .patient!
+                                                      .packages
+                                                      .length ==
+                                                  1
+                                              ? 350.w
+                                              : 300,
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                               12.r,
@@ -152,7 +158,8 @@ class _SessionRecordState extends State<SessionRecord> {
                                                         : currentPatientData!
                                                               .patient!
                                                               .packages[index]
-                                                              .name,
+                                                              .name
+                                                              .toString(),
                                                     fontSize: 12,
                                                   ),
                                                   Row(
@@ -526,13 +533,13 @@ class _SessionRecordState extends State<SessionRecord> {
     LoginModel1 data = LoginModel1.fromJson(jsonData);
 
     final patientId = data.patientData!.patientInfo!.id;
-
-    currentPatientData = await AuthApiServices.getPatientData(
+    if (!mounted) return;
+    currentPatientData = await ApiServices.getPatientData(
       patientId: patientId.toString(),
       currentUserToken: currentUserToken,
       context: context,
     );
-
+    if (!mounted) return;
     setState(() => isLoading = false);
   }
 
@@ -544,7 +551,7 @@ class _SessionRecordState extends State<SessionRecord> {
 
     if (total == 0) return 0.0;
 
-    final progress = used / total;
+    final progress = used! / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

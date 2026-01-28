@@ -6,9 +6,9 @@ import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../api_service/api_service.dart';
 import '../../local_storage/local_storage.dart';
 import '../../models/current_patient_model.dart';
-import '../auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 
 class SessionNotes extends StatefulWidget {
@@ -43,16 +43,18 @@ class _SessionNotesState extends State<SessionNotes> {
     visits.sort((a, b) => a.visitAt.compareTo(b.visitAt));
 
     return Scaffold(
+
       appBar: AppBar(
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios_new),
+        ),
         centerTitle: true,
         title: Text('Visit detail'),
         automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
-        ),
       ),
       backgroundColor: AppColors.bgColor,
       body: Padding(
@@ -63,6 +65,42 @@ class _SessionNotesState extends State<SessionNotes> {
               : 0,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            visits[index!['index'] ?? 0].historyTaker != null
+                ? InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.assessmentScreen,
+                        arguments: {"consultant": visits[index!['index'] ?? 0]},
+                      );
+                    },
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55.h,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        color: AppColors.secondaryColor,
+                        child: Padding(
+                          padding: EdgeInsets.all(10.r),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText(
+                                text: 'History Tracker',
+                                color: AppColors.primaryColor,
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                size: 14.r,
+                                color: AppColors.primaryColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
             visits[index!['index'] ?? 0].consultantAssessment != null
                 ? InkWell(
                     onTap: () {
@@ -137,6 +175,7 @@ class _SessionNotesState extends State<SessionNotes> {
                     ),
                   )
                 : Container(),
+
             InkWell(
               onTap: () {
                 Navigator.pushNamed(
@@ -227,7 +266,7 @@ class _SessionNotesState extends State<SessionNotes> {
 
     final patientId = data.patientData!.patientInfo!.id;
 
-    currentPatientData = await AuthApiServices.getPatientData(
+    currentPatientData = await ApiServices.getPatientData(
       patientId: patientId.toString(),
       currentUserToken: currentUserToken,
       context: context,

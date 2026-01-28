@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:doctor_app/api_service/api_service.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
+import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/models/all_packages_model.dart';
 import 'package:doctor_app/screens/all_packages_screen/package_model.dart';
 import 'package:doctor_app/screens/all_packages_screen/widgets/all_packages_appbar.dart';
 import 'package:doctor_app/widgets/home_appbar.dart';
@@ -8,7 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../widgets/custom_text.dart';
 import '../../widgets/outline_button.dart';
-import '../home/home_widget/packages_widget.dart' show PackagesWidget;
+import '../home/home_widget/packages_widget.dart';
 
 class AllPackagesScreen extends StatefulWidget {
   const AllPackagesScreen({super.key});
@@ -18,133 +23,105 @@ class AllPackagesScreen extends StatefulWidget {
 }
 
 class _AllPackagesScreenState extends State<AllPackagesScreen> {
-  List<PackageModel> result = [];
-  final List<PackageModel> therapyName = [
-    PackageModel(
-      name: 'Lumber Spine',
-      imageUrl: 'assets/images/lumber_spine.jpg',
+  List<AllPackagesModel> packages = [];
+  List<AllPackagesModel> searchResult = [];
 
-    ),
-    PackageModel(
-      name: 'Neck spine',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_09398bb8.jpg',
-    ),
-    PackageModel(
-      name: 'Knee',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_b67304dd.jpg',
-    ),
-    PackageModel(
-      name: 'Shoulder',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_fa78fbd2.jpg',
-    ),
-    PackageModel(
-      name: 'Ankle',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_161d70ba.jpg',
-    ),
-    PackageModel(
-      name: 'Hip',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_a2ce2777.jpg',
-    ),
-    PackageModel(
-      name: 'Lumber Spine',
-      imageUrl: 'assets/images/lumber_spine.jpg',
-    ),
-    PackageModel(
-      name: 'Neck spine',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_09398bb8.jpg',
-    ),
-    PackageModel(
-      name: 'Knee',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_b67304dd.jpg',
-    ),
-    PackageModel(
-      name: 'Shoulder',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_fa78fbd2.jpg',
-    ),
-    PackageModel(
-      name: 'Ankle',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_161d70ba.jpg',
-    ),
-    PackageModel(
-      name: 'Hip',
-      imageUrl:
-          'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_a2ce2777.jpg',
-    ),
-  ];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AllPackagesAppbar(
-        onChanged: (value) {
-          final searchResult = therapyName.where((element) {
-            final test = element.name.toLowerCase();
-            return test.contains(value!.toLowerCase());
-          });
-          result = searchResult.toList();
-          setState(() {});
-        },
-      ),
-      body: Padding(
-        padding: EdgeInsets.only(top: 36.h, left: 20.w, right: 20.w),
-        child: GridView.builder(
-          itemCount: result.isEmpty ? therapyName.length : result.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            mainAxisExtent: 150.h,
-            crossAxisSpacing: 10.w,
-            mainAxisSpacing: 10.w,
-            crossAxisCount: 3,
-          ),
-          itemBuilder: (context, index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  height: 100.h,
-                  width: 100.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.sp),
+    return FutureBuilder(
+      future: ApiServices.getAllPackagesData(context),
+      builder: (context, snap) {
+        if (snap.hasData) {
+          var data = snap.data!;
+          packages = snap.data!;
+          return Scaffold(
+            appBar: AllPackagesAppbar(
+              onChanged: (value) {
+                var searchQuery = data.where((test) {
+                  final name = test.name!.toLowerCase();
+                  final result = name.contains(value!.toLowerCase());
+                  return result;
+                });
+                searchResult = searchQuery.toList();
+                setState(() {});
+              },
+            ),
+            body: Padding(
+              padding: EdgeInsets.only(top: 36.h, left: 20.w, right: 20.w),
+              child: GridView.builder(
+                itemCount: searchResult.isEmpty
+                    ? packages.length
+                    : searchResult.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisExtent: 210.h,
+                  crossAxisSpacing: 10.w,
+                  mainAxisSpacing: 10.w,
+                  crossAxisCount: 3,
+                ),
+                itemBuilder: (context, index) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                            height: 100.h,
+                            width: 100.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.secondaryColor,
 
-                    image: DecorationImage(
-                      image: AssetImage(
-                        result.isEmpty
-                            ? therapyName[index].imageUrl
-                            : result[index].imageUrl,
+                              borderRadius: BorderRadius.circular(10.sp),
+                            ),
+                            child: packages[index].image != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      packages[index].image != null
+                                          ? packages[index].image.toString()
+                                          : searchResult[index].image
+                                                .toString(),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.image,
+                                    size: 30.r,
+                                    color: AppColors.primaryColor,
+                                  ),
+                          ),
+                          CustomText(
+                            maxLines: 4,
+                            text: searchResult.isEmpty
+                                ? packages[index].name.toString()
+                                : searchResult[index].name.toString(),
+                            fontSize: 12,
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ),
-                CustomText(
-                  text: result.isEmpty
-                      ? therapyName[index].name
-                      : result[index].name,
-                  fontSize: 12,
-                ),
-                AppOutlineButton(
-                  onTap: () async {
-                    final user = await LocalStorage.getUserToken('token');
-                    if (user == null) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        AppRoutes.loginScreen,
-                      );
-                    }
-                  },
-                  text: 'Book',
-                ),
-              ],
-            );
-          },
-        ),
-      ),
+
+                      AppOutlineButton(
+                        onTap: () async {
+                          final user = await LocalStorage.getUserToken('token');
+                          if (user == null) {
+                            if (context.mounted) {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                AppRoutes.loginScreen,
+                              );
+                            }
+                          }
+                        },
+                        text: 'Book',
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          );
+        } else {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+      },
     );
   }
 }

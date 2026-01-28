@@ -29,17 +29,20 @@ class _PackagesScreenState extends State<PackagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         title: Text('Packages'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         children: [
@@ -86,7 +89,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                   : currentPatientData!
                                         .patient!
                                         .packages[index]
-                                        .name,
+                                        .name.toString(),
                               fontSize: 12,
                             ),
                             Row(
@@ -201,7 +204,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
 
     if (total == 0) return 0.0;
 
-    final progress = used / total;
+    final progress = used! / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

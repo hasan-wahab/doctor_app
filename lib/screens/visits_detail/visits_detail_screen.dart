@@ -29,17 +29,20 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
-        title: Text('My visits'),
+        title: Text('My visit'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: currentPatientData!.patient!.visits.isNotEmpty
           ? currentPatientData != null
                 ? ListView(
@@ -122,9 +125,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                       _text(
                                         firstText: 'Status',
                                         buttonText:
-                                            currentPatient[index].status == ''
-                                            ? 'No data'
-                                            : currentPatient[index].status,
+                                            currentPatient[index].status ?? 'No data',
                                       ),
                                     ],
                                   ),

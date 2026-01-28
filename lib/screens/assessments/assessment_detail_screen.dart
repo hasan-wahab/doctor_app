@@ -30,19 +30,34 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   leading: InkWell(
+      //     onTap: () {
+      //       Navigator.pop(context);
+      //     },
+      //     child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+      //   ),
+      //   centerTitle: true,
+      //   title: consultantAssessments == null
+      //       ? Text('Consultant Assessments')
+      //       : Text('Assessments'),
+      // ),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: InkWell(
-          onTap: () {
+        backgroundColor: AppColors.bgColor,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
+          icon: Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         title: consultantAssessments == null
             ? Text('Consultant Assessments')
             : Text('Assessments'),
+        automaticallyImplyLeading: false,
       ),
+      backgroundColor: AppColors.bgColor,
       body: consultantAtIndex == null
           ? ListView(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
@@ -70,7 +85,6 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         width: 350.w,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
-                          //     border: Border.all(width: 2, color: AppColors.primaryColor),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +118,8 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                                                     .patient!
                                                     .visits[index]
                                                     .consultant!
-                                                    .name,
+                                                    .name
+                                                    .toString(),
                                         ),
                                         Align(
                                           alignment: Alignment.topRight,
@@ -279,7 +294,6 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                       width: 350.w,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.r),
-                        //     border: Border.all(width: 2, color: AppColors.primaryColor),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

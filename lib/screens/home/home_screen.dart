@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:doctor_app/api_service/api_service.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/models/all_packages_model.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/heding_text.dart';
 import 'package:doctor_app/widgets/outline_button.dart';
@@ -29,23 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentValue1 = 0;
   int currentValue2 = 0;
   late Timer _timer;
-
-  List<String> therapyName = [
-    'Lumber Spine',
-    'Neck spine',
-    'Knee',
-    'Shoulder',
-    'Ankle',
-    'Hip',
-  ];
-  List<String> therapyImages = [
-    'assets/images/lumber_spine.jpg',
-    'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_09398bb8.jpg',
-    'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_b67304dd.jpg',
-    'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_fa78fbd2.jpg',
-    'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_161d70ba.jpg',
-    'assets/images/WhatsApp Image 2025-11-20 at 17.41.20_a2ce2777.jpg',
-  ];
 
   @override
   void initState() {
@@ -86,21 +71,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           SizedBox(height: 9.h),
-          PackagesWidget(imageList: therapyImages, textList: therapyName),
+          AllPackagesWidget(),
           SizedBox(height: 12.h),
-          Container(
-            height: 210.h,
-            width: 350.w,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              image: DecorationImage(
-                image: AssetImage(
-                  'assets/images/WhatsApp Image 2025-11-19 at 5.05.31 PM (1) 1.png',
-                ),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          // FutureBuilder(
+          //   future: ApiServices.getCoverPhoto(),
+          //   builder: (context, snap) {
+          //     var images = snap.data;
+          //     return Container(
+          //       height: 210.h,
+          //       width: 350.w,
+          //       decoration: BoxDecoration(
+          //         borderRadius: BorderRadius.circular(12.r),
+          //         image: DecorationImage(
+          //           image: snap.data == null
+          //               ? images!.data.isEmpty
+          //                     ? AssetImage(
+          //                         'assets/images/WhatsApp Image 2025-11-19 at 5.05.31 PM (1) 1.png',
+          //                       )
+          //                     : NetworkImage(images.data.first.toString())
+          //               : AssetImage(
+          //                   'assets/images/WhatsApp Image 2025-11-19 at 5.05.31 PM (1) 1.png',
+          //                 ),
+          //           fit: BoxFit.cover,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
           SizedBox(height: 20.h),
           SecondSlider(
             controller: _pageController2,
@@ -108,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
       backgroundColor: AppColors.bgColor,
       floatingActionButton: InkWell(
         onTap: () async {

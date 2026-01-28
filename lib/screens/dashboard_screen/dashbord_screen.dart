@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/models/current_patient_model.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_api_service/auth_api_services.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
@@ -16,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../local_storage/local_storage.dart';
+import '../../api_service/api_service.dart';
 import '../../widgets/app_button.dart';
 
 class DashbordScreen extends StatefulWidget {
@@ -114,6 +114,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           "Authorization":
                                               "Bearer ${profileData!.accessToken.toString()}",
                                         },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return profileData!.user != null
+                                                  ? Image.network(
+                                                      profileData!
+                                                          .user!
+                                                          .profilePicture
+                                                          .toString(),
+                                                    )
+                                                  : Container();
+                                            },
                                       ),
                                 ),
                               ),
@@ -126,7 +137,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                   width: 200.w,
                                   child: CustomText(
                                     text:
-                                        'Hi, ${profileData!.user!.name.toString()}',
+                                        'Hi, ${currentPatientData!.patient!.user!.name.toString()}',
                                     fontSize: 18,
                                   ),
                                 ),
@@ -142,7 +153,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         ),
                         InkWell(
                           onTap: () {
-                            //print(profileData!.patientData!.patientInfo!.image);
                             Navigator.pushNamed(
                               context,
                               AppRoutes.searchScreen,
@@ -284,7 +294,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                   children: [
                                     CustomText(
                                       text:
-                                          'Total:  ${currentPatientData!.stats!.totalAmount.toInt()}',
+                                          'Total:  ${int.parse(currentPatientData!.stats!.totalAmount.toString())}',
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textWhiteColor,
@@ -292,14 +302,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
                                     CustomText(
                                       text:
-                                          'Paid: ${currentPatientData!.stats!.totalSpend.toInt()}',
+                                          'Paid: ${double.parse(currentPatientData!.stats!.totalSpend!)}',
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textWhiteColor,
                                     ),
                                     CustomText(
                                       text:
-                                          'Remaining: ${currentPatientData!.stats!.totalAmount - currentPatientData!.stats!.totalSpend.toInt()}',
+                                          'Remaining: ${currentPatientData!.stats!.totalAmount! - double.parse(currentPatientData!.stats!.totalSpend!)}',
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textWhiteColor,
@@ -489,7 +499,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         : currentPatientData!
                                               .patient!
                                               .packages[index]
-                                              .name,
+                                              .name.toString(),
                                     fontSize: 12,
                                   ),
                                   Row(
@@ -578,7 +588,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
     profileData = LoginModel1.fromJson(jsonData);
 
-    currentPatientData = await AuthApiServices.getPatientData(
+    currentPatientData = await ApiServices.getPatientData(
       patientId: profileData!.patientData!.patientInfo!.id.toString(),
       currentUserToken: profileData!.accessToken.toString(),
       context: context,
@@ -633,7 +643,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
     if (total == 0) return 0.0;
 
-    final progress = paid / total;
+    final progress = double.parse(paid.toString()) / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 
@@ -648,7 +658,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
     if (total == 0) return 0.0;
 
-    final progress = used / total;
+    final progress = used! / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

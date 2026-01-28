@@ -4,14 +4,17 @@ import 'dart:io';
 import 'package:doctor_app/app_keys/api_keys.dart';
 import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/models/all_packages_model.dart';
+import 'package:doctor_app/models/cover_photo_model.dart';
 import 'package:doctor_app/models/current_patient_model.dart';
+import 'package:doctor_app/models/slider_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-class AuthApiServices {
-  AuthApiServices._();
+class ApiServices {
+  ApiServices._();
 
   /// Post Login Api Call
 
@@ -225,4 +228,65 @@ class AuthApiServices {
       print(e.toString());
     }
   }
+
+  /// Get Api | Before login all packages api
+
+  static Future<List<AllPackagesModel>> getAllPackagesData(
+    BuildContext context,
+  ) async {
+    final url = Uri.parse('${ApiKeys.baseUrl}/allpakages');
+    List<AllPackagesModel> allPackagesList = [];
+    try {
+      http.Response response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+
+        for (var a in jsonData['data']) {
+          allPackagesList.add(AllPackagesModel.fromJson(a));
+        }
+
+        return allPackagesList;
+      } else {
+        return allPackagesList;
+      }
+    } on Exception catch (err) {
+      if (context.mounted) {
+        AppMsg.showErrorMsg(context, msg: err.toString());
+      }
+      return allPackagesList;
+    }
+  }
+
+  /// Get Api | Before login youtube videos
+  static Future<SliderModel?> getSliderImages() async {
+    var url = Uri.parse('${ApiKeys.baseUrl}/apisliders');
+    SliderModel? model;
+
+    http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      model = SliderModel.fromJson(jsonData);
+      return model;
+    }
+    return model;
+  }
+
+  /// Get Api | Before login youtube videos
+  static Future<CoverPhotoModel?> getCoverPhoto() async {
+    var url = Uri.parse('${ApiKeys.baseUrl}/apicoverphotos');
+    CoverPhotoModel? model;
+
+    http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      model = CoverPhotoModel.fromJson(jsonData);
+
+      return model;
+    }
+    return model;
+  }
 }
+
+//Future<List<String>>
