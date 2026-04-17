@@ -4,7 +4,6 @@ import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
-import 'package:doctor_app/screens/book_appoinment_screen/appointment_detail_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
@@ -274,12 +273,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                     isColor: false,
                                     height: 34,
                                     textSize: 11,
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.rechargeScreen,
-                                      );
-                                    },
+                                    onTap: () {},
                                   ),
                                 ],
                               ),
@@ -302,14 +296,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
                                     CustomText(
                                       text:
-                                          'Paid: ${double.parse(currentPatientData!.stats!.totalSpend!)}',
+                                          'Paid: ${double.parse(currentPatientData!.stats!.totalSpend)}',
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textWhiteColor,
                                     ),
                                     CustomText(
                                       text:
-                                          'Remaining: ${currentPatientData!.stats!.totalAmount! - double.parse(currentPatientData!.stats!.totalSpend!)}',
+                                          'Remaining: ${currentPatientData!.stats!.totalAmount - double.parse(currentPatientData!.stats!.totalSpend)}',
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textWhiteColor,
@@ -499,7 +493,8 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         : currentPatientData!
                                               .patient!
                                               .packages[index]
-                                              .name.toString(),
+                                              .name
+                                              .toString(),
                                     fontSize: 12,
                                   ),
                                   Row(
@@ -587,6 +582,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
     final jsonData = jsonDecode(currentUserData!);
 
     profileData = LoginModel1.fromJson(jsonData);
+    if (!mounted) return;
 
     currentPatientData = await ApiServices.getPatientData(
       patientId: profileData!.patientData!.patientInfo!.id.toString(),

@@ -1,6 +1,7 @@
 class ApiKeys {
   ApiKeys._();
-  static String baseUrl = 'https://alitherapy.neonweb.tech/api';
+  // old static String baseUrl = 'https://alitherapy.neonweb.tech/api';
+  static String baseUrl = 'http://cms.dralitherapy.com/api';
 
   /// Login Api Key
   static String loginKey = '$baseUrl/patient/login';

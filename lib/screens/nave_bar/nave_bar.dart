@@ -4,7 +4,6 @@ import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashbord_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
-import 'package:doctor_app/screens/map_screen.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
@@ -34,13 +33,14 @@ class _NaveBarState extends State<NaveBar> {
   ];
   List<Widget> screenList = [
     HomeScreen(),
-    MapScreen(isNavigateFromNaveBar: true),
+    NfcCardPage(),
+
     SessionRecord(),
     LoginScreen(),
   ];
   List<Widget> screenList2 = [
     DashbordScreen(),
-    NfcCard(),
+    NfcCardPage(),
     SessionRecord(),
     ProfileScreen(),
   ];

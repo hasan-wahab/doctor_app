@@ -1,9 +1,12 @@
 import 'package:doctor_app/app_routes/generate_route.dart';
+import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 }
 
 class MyApp extends StatefulWidget {
@@ -24,7 +27,6 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
-        // home: LoginScreen(),
         onGenerateRoute: (RouteSettings settings) {
           return AppGenerateRoute.onGenerateRoute(settings, context);
         },

@@ -8,7 +8,6 @@ import 'package:doctor_app/models/all_packages_model.dart';
 import 'package:doctor_app/models/cover_photo_model.dart';
 import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/models/slider_model.dart';
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
