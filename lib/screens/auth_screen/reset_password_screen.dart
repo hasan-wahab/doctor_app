@@ -1,4 +1,3 @@
-import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:flutter/material.dart';

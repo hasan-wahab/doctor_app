@@ -3,8 +3,8 @@ import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../app_styles/app_colors.dart';
-import '../../models/current_patient_model.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
 
 class SessionDetailScreen extends StatefulWidget {

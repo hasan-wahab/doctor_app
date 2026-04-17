@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/models/current_patient_model.dart';
+
+
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
@@ -10,7 +8,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../api_service/api_service.dart';
+
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_storage.dart';
+import '../../data/models/current_patient_model.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 import '../nave_bar/nave_bar.dart';
 

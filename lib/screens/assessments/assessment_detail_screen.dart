@@ -1,9 +1,10 @@
-import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../models/current_patient_model.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/models/current_patient_model.dart';
+
 
 class AssessmentDetailScreen extends StatefulWidget {
   const AssessmentDetailScreen({super.key});

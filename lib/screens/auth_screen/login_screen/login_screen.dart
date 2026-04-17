@@ -1,12 +1,20 @@
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
+import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../api_service/api_service.dart';
+import '../../../core/app_routes/routes_name.dart';
+import '../../../core/app_styles/app_colors.dart';
+import '../../../data/api_service/api_service.dart';
+import '../../../widgets/show_msg.dart';
+import '../bloc/login_states.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   String? email;
   String? password;
-  bool isLoading = false;
   bool obscureText = true;
 
   @override
@@ -44,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
             SizedBox(height: 50.h),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [Text('Login', style: TextStyle(fontSize: 40))],
@@ -107,28 +114,56 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             SizedBox(height: 30.h),
-            isLoading
-                ? Row(
+
+            BlocConsumer<LoginBloc, LoginState>(
+              listener: (context, state) {
+                if (state is LoginSuccessState) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.naveBar,
+                    (Route<dynamic> route) => false,
+                  );
+                } else if (state is LoginErrorState) {
+                  if (kDebugMode) {
+                    print(state.error);
+                  }
+                  AppMsg.showErrorMsg(context, msg: state.error.toString());
+                }
+              },
+              builder: (context, state) {
+                if (state is LoginLoadingState) {
+                  return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [CircularProgressIndicator()],
-                  )
-                : AppButton(
+                  );
+                } else {
+                  return AppButton(
                     text: 'Login',
                     onTap: () async {
                       final form = _formKey.currentState;
                       if (form!.validate()) {
-                        isLoading = true;
-                        setState(() {});
-                        await ApiServices.loginApi(
-                          context,
-                          email: email.toString(),
-                          password: password.toString(),
+                        context.read<LoginBloc>().add(
+                          LoginEvents(
+                            email: emailController.text,
+                            password: passwordController.text,
+                          ),
                         );
-                        isLoading = false;
-                        setState(() {});
+
+                        // isLoading = true;
+                        // setState(() {});
+                        // await ApiServices.loginApi(
+                        //   context,
+                        //   email: email.toString(),
+                        //   password: password.toString(),
+                        // );
+                        // isLoading = false;
+                        // setState(() {});
                       }
                     },
-                  ),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),

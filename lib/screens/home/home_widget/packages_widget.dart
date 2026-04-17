@@ -1,11 +1,13 @@
-import 'package:doctor_app/api_service/api_service.dart';
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/models/all_packages_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../app_styles/app_colors.dart';
-import '../../../local_storage/local_storage.dart';
+
+import '../../../core/app_routes/routes_name.dart';
+import '../../../core/app_styles/app_colors.dart';
+import '../../../data/api_service/api_service.dart';
+import '../../../data/local_storage/local_storage.dart';
+import '../../../data/models/all_packages_model.dart';
 import '../../../widgets/custom_text.dart';
 import '../../../widgets/heding_text.dart';
 import '../../../widgets/outline_button.dart';
@@ -23,7 +25,6 @@ class _AllPackagesWidgetState extends State<AllPackagesWidget> {
   @override
   void initState() {
     getTokenValue();
-
     super.initState();
   }
 

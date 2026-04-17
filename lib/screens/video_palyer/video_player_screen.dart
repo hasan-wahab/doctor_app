@@ -1,9 +1,10 @@
-import 'package:doctor_app/app_styles/app_colors.dart'; // Make sure this import is correct
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Required for fullscreen
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../../core/app_styles/app_colors.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   const VideoPlayerScreen({super.key});

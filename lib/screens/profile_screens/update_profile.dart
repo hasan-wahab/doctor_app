@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
@@ -14,8 +12,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-import '../../api_service/api_service.dart';
-import '../../app_styles/app_colors.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_storage.dart';
 import '../../widgets/custom_text.dart';
 
 class UpdateProfile extends StatefulWidget {

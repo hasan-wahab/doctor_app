@@ -1,10 +1,10 @@
-import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../app_styles/app_colors.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/models/current_patient_model.dart';
 
 class VisitsDetailScreen extends StatefulWidget {
   const VisitsDetailScreen({super.key});

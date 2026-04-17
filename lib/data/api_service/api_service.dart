@@ -1,73 +1,75 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:doctor_app/app_keys/api_keys.dart';
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/models/all_packages_model.dart';
-import 'package:doctor_app/models/cover_photo_model.dart';
-import 'package:doctor_app/models/current_patient_model.dart';
-import 'package:doctor_app/models/slider_model.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+
+import '../../core/app_keys/api_keys.dart';
+import '../../core/app_routes/routes_name.dart';
+import '../local_storage/local_storage.dart';
+import '../models/all_packages_model.dart';
+import '../models/cover_photo_model.dart';
+import '../models/current_patient_model.dart';
+import '../models/slider_model.dart';
 
 class ApiServices {
   ApiServices._();
 
   /// Post Login Api Call
 
-  static loginApi(
-    BuildContext context, {
-    required String email,
-    required String password,
-    bool isLoginCall = true,
-  }) async {
-    try {
-      final jsonData = {"email": email, "password": password};
-      final url = Uri.parse(ApiKeys.loginKey);
-
-      http.Response response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(jsonData),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        String token = data['data']['access_token'];
-        print(token);
-        Map<String, dynamic> profileData = data['data'];
-        print(profileData);
-        await LocalStorage.saveProfileData(token, jsonEncode(profileData));
-        await LocalStorage.saveUserToken(token).then((onValue) async {
-          await LocalStorage.saveProfileData('password', password.toString());
-          if (isLoginCall == true) {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              AppRoutes.naveBar,
-              (Route<dynamic> route) => false,
-            );
-          } else {}
-        });
-        return response;
-      } else if (response.statusCode == 401) {
-        return AppMsg.showErrorMsg(
-          context,
-          msg: 'Error : No user found for that email & password',
-        );
-      } else {
-        return AppMsg.showErrorMsg(
-          context,
-          msg: 'Error : ${response.statusCode}',
-        );
-      }
-    } on Exception catch (err) {
-      print(err);
-      return AppMsg.showErrorMsg(context, msg: 'Error : ${err.toString()}');
-    }
-  }
+  // static loginApi(
+  //   BuildContext context, {
+  //   required String email,
+  //   required String password,
+  //   bool isLoginCall = true,
+  // })
+  // async {
+  //   try {
+  //     final jsonData = {"email": email, "password": password};
+  //     final url = Uri.parse(ApiKeys.loginKey);
+  //
+  //     http.Response response = await http.post(
+  //       url,
+  //       headers: {"Content-Type": "application/json"},
+  //       body: jsonEncode(jsonData),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //
+  //       String token = data['data']['access_token'];
+  //       print(token);
+  //       Map<String, dynamic> profileData = data['data'];
+  //       print(profileData);
+  //       await LocalStorage.saveProfileData(token, jsonEncode(profileData));
+  //       await LocalStorage.saveUserToken(token).then((onValue) async {
+  //         await LocalStorage.saveProfileData('password', password.toString());
+  //         if (isLoginCall == true) {
+  //           Navigator.pushNamedAndRemoveUntil(
+  //             context,
+  //             AppRoutes.naveBar,
+  //             (Route<dynamic> route) => false,
+  //           );
+  //         } else {}
+  //       });
+  //       return response;
+  //     } else if (response.statusCode == 401) {
+  //       return AppMsg.showErrorMsg(
+  //         context,
+  //         msg: 'Error : No user found for that email & password',
+  //       );
+  //     } else {
+  //       return AppMsg.showErrorMsg(
+  //         context,
+  //         msg: 'Error : ${response.statusCode}',
+  //       );
+  //     }
+  //   } on Exception catch (err) {
+  //     print(err);
+  //     return AppMsg.showErrorMsg(context, msg: 'Error : ${err.toString()}');
+  //   }
+  // }
 
   /// Update current user profile
 

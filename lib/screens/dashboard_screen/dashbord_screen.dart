@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/models/current_patient_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
@@ -12,9 +9,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../../local_storage/local_storage.dart';
-import '../../api_service/api_service.dart';
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_storage.dart';
+import '../../data/models/current_patient_model.dart';
 import '../../widgets/app_button.dart';
 
 class DashbordScreen extends StatefulWidget {

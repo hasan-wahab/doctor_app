@@ -1,9 +1,9 @@
-import 'package:doctor_app/app_routes/routes_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../app_styles/app_colors.dart';
+import '../core/app_routes/routes_name.dart';
+import '../core/app_styles/app_colors.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});

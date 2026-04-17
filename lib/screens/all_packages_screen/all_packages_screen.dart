@@ -1,16 +1,19 @@
 import 'dart:convert';
 
-import 'package:doctor_app/api_service/api_service.dart';
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/models/all_packages_model.dart';
+
+
+import 'package:doctor_app/data/models/all_packages_model.dart';
+
 import 'package:doctor_app/screens/all_packages_screen/package_model.dart';
 import 'package:doctor_app/screens/all_packages_screen/widgets/all_packages_appbar.dart';
 import 'package:doctor_app/widgets/home_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_storage.dart';
 import '../../widgets/custom_text.dart';
 import '../../widgets/outline_button.dart';
 import '../home/home_widget/packages_widget.dart';
@@ -37,12 +40,12 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
           return Scaffold(
             appBar: AllPackagesAppbar(
               onChanged: (value) {
-                var searchQuery = data.where((test) {
-                  final name = test.name!.toLowerCase();
-                  final result = name.contains(value!.toLowerCase());
-                  return result;
-                });
-                searchResult = searchQuery.toList();
+                // var searchQuery = data.where((test) {
+                //   final name = test?.name!.toLowerCase();
+                //   final result = name.contains(value!.toLowerCase());
+                //   return result;
+                // });
+               // searchResult = searchQuery.toList();
                 setState(() {});
               },
             ),

@@ -1,14 +1,16 @@
 import 'dart:convert';
 
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
+
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../api_service/api_service.dart';
-import '../../local_storage/local_storage.dart';
-import '../../models/current_patient_model.dart';
+
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_storage.dart';
+import '../../data/models/current_patient_model.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 
 class SessionNotes extends StatefulWidget {

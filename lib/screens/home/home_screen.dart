@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:doctor_app/api_service/api_service.dart';
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
-import 'package:doctor_app/models/all_packages_model.dart';
+
+
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/heding_text.dart';
 import 'package:doctor_app/widgets/outline_button.dart';
@@ -13,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
 import '../../widgets/home_appbar.dart';
 import 'home_widget/packages_widget.dart';
 import 'home_widget/second_slider.dart';

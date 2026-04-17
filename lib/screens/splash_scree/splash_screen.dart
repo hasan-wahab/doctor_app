@@ -1,10 +1,11 @@
-import 'package:doctor_app/app_routes/routes_name.dart';
-import 'package:doctor_app/app_styles/app_colors.dart';
-import 'package:doctor_app/local_storage/local_storage.dart';
+
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../core/app_routes/routes_name.dart';
+import '../../core/app_styles/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

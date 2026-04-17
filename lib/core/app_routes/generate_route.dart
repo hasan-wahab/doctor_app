@@ -1,4 +1,4 @@
-import 'package:doctor_app/app_routes/routes_name.dart';
+import 'package:doctor_app/core/app_routes/routes_name.dart';
 import 'package:doctor_app/screens/all_packages_screen/all_packages_screen.dart';
 import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
 import 'package:doctor_app/screens/assestent_manager/assistent_manager.dart';
@@ -18,10 +18,11 @@ import 'package:doctor_app/screens/visits_detail/visits_detail_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/home/search_screen.dart';
-import '../screens/invioce/invoice_detail_screen.dart';
-import '../screens/nfc_card/nfc_card.dart';
-import '../screens/seesion/sessiom_detail_screen.dart';
+import '../../screens/home/search_screen.dart';
+import '../../screens/invioce/invoice_detail_screen.dart';
+import '../../screens/nfc_card/nfc_card.dart';
+import '../../screens/seesion/sessiom_detail_screen.dart';
+
 
 class AppGenerateRoute {
   String routeName;

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:doctor_app/app_styles/app_colors.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashbord_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
@@ -8,10 +7,13 @@ import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../local_storage/local_storage.dart';
+import '../../core/app_styles/app_colors.dart';
+import '../../data/local_storage/local_storage.dart';
+
 
 class NaveBar extends StatefulWidget {
   int? currentIndex;
@@ -119,5 +121,8 @@ class _NaveBarState extends State<NaveBar> {
   void getToken() async {
     token = await LocalStorage.getUserToken('token');
     setState(() {});
+    if (kDebugMode) {
+      print(token);
+    }
   }
 }
