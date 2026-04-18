@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:doctor_app/data/local_storage/local_storage.dart';
+import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:flutter/foundation.dart';
 
@@ -11,7 +12,8 @@ import 'auth_repo_base.dart';
 
 class AuthRepoImpl implements AuthRepoBase {
   BaseApi api;
-  AuthRepoImpl({required this.api});
+  ProfileLocalRepo localRepo;
+  AuthRepoImpl({required this.api, required this.localRepo});
   @override
   Future<LoginModel1> userLogin({
     required String email,
@@ -26,19 +28,19 @@ class AuthRepoImpl implements AuthRepoBase {
       );
     }
     try {
-      LoginModel1 model1;
-      model1 = LoginModel1.fromJson(jsonResponse['data']);
-      if (model1.accessToken != null) {
-        await LocalStorage.saveProfileData(
-          model1.accessToken.toString(),
-          jsonEncode(model1.toJson()),
-        ).then((_) async {
-          await LocalStorage.saveUserToken(model1.accessToken.toString());
-        });
+      LoginModel1 model;
+      model = LoginModel1.fromJson(jsonResponse['data']);
+      if (model.accessToken != null) {
+        await localRepo.deleteProfile();
+        await localRepo.saveProfile(loginModel: model);
+        await LocalStorage.saveUserToken(model.accessToken.toString());
       }
 
-      return model1;
+      return model;
     } catch (e) {
+      if (kDebugMode) {
+        print("AuthRepo Impl Error: $e");
+      }
       throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
     }
   }

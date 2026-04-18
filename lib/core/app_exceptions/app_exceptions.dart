@@ -1,4 +1,3 @@
-
 import 'base_exceptions.dart';
 
 class NoInternetException extends BaseExceptions {
@@ -12,7 +11,7 @@ class NoInternetException extends BaseExceptions {
 class UnauthorisedException extends BaseExceptions {
   UnauthorisedException()
     : super(
-        message: 'Invalid email or password',
+        message: 'Invalid email or password !',
         debugMessage: '401 Unauthorized',
       );
 }
@@ -43,7 +42,8 @@ class ServerException extends BaseExceptions {
 class TimeOutException extends BaseExceptions {
   TimeOutException()
     : super(
-        message: 'Request timeout, try again',
+        message:
+            'Request timeout, try again\nPlease check your internet connection!',
         debugMessage: 'Request timed out',
       );
 }

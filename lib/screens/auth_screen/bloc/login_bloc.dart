@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:doctor_app/repos/api_repo/auth_repo.dart';
-import 'package:doctor_app/repos/api_repo/auth_repo_base.dart';
+
 import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_states.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:flutter/foundation.dart';
+
+import '../../../repos/auth_repo/auth_repo_base.dart';
 
 class LoginBloc extends Bloc<LoginEvents, LoginState> {
   final AuthRepoBase authRepo;

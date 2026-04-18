@@ -10,4 +10,7 @@ class ApiKeys {
 
   /// Sign Up Api Key
   static String updateProfileKey = '$baseUrl/patient/update-profile';
+
+  /// Get Patient Api Key
+ static String getPatientKey = '$baseUrl/patient/apipatients';
 }

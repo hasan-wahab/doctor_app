@@ -16,11 +16,13 @@ class BaseApiImpl implements BaseApi {
   Future postApi({required String email, required String password}) async {
     var url = Uri.parse(ApiKeys.loginKey);
     try {
-      http.Response response = await http.post(
-        url,
-        body: jsonEncode({"email": email, "password": password}),
-        headers: {"Content-Type": "application/json"},
-      );
+      http.Response response = await http
+          .post(
+            url,
+            body: jsonEncode({"email": email, "password": password}),
+            headers: {"Content-Type": "application/json"},
+          )
+          .timeout(const Duration(seconds: 10));
 
       return responseHandle(response);
     } on SocketException {
@@ -28,6 +30,35 @@ class BaseApiImpl implements BaseApi {
     } on TimeoutException {
       throw TimeOutException();
     } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+    }
+  }
+
+  @override
+  Future getApi({required String url, String? patientId, String? token}) async {
+    var urL = Uri.parse("$url/$patientId");
+    try {
+      http.Response response = await http
+          .get(
+            urL,
+            headers: {
+              "Accept": "application/json",
+              if (token != null) "Authorization": "Bearer $token",
+            },
+          )
+          .timeout(const Duration(seconds: 50));
+      return responseHandle(response);
+    } on SocketException {
+      throw NoInternetException();
+    } on TimeoutException {
+      throw TimeOutException();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
     }
   }
@@ -39,6 +70,9 @@ dynamic responseHandle(http.Response response) {
   switch (statusCode) {
     case 200:
     case 201:
+      if (kDebugMode) {
+        print(response.body);
+      }
       return jsonDecode(response.body);
 
     case 400:
