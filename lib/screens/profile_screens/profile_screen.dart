@@ -1,24 +1,30 @@
 import 'dart:convert';
 
-
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_state.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
 import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../data/models/current_patient_model.dart';
+import '../auth_screen/bloc/login_bloc.dart';
+import '../auth_screen/bloc/login_events.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
 import '../nave_bar/nave_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final isNavigateFromNaveBar = false;
   const ProfileScreen({super.key});
 
   @override
@@ -34,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    getCurrentUserData();
+    context.read<ProfileBloc>().add(MyProfileEvent());
     super.initState();
   }
 
@@ -51,322 +57,320 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.bgColor,
-        appBar: ProfileAppbar(
-          title: 'Profile',
-          isLeading: true,
-          leadingOnTap: () {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              AppRoutes.naveBar,
-              (Route<dynamic> route) => false,
-            );
-          },
-        ),
-        body: isLoading == false
-            ? profileData != null
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.0.w,
-                        vertical: 20.h,
-                      ),
-                      child: Column(
-                        children: [
-                          Column(
+      child: BlocConsumer<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileLoadingState) {
+            isLoading = true;
+          } else if (state is MyProfileState) {
+            isLoading = false;
+            profileData = state.profileData;
+            currentPatientData = state.currentPatientModel;
+          } else {
+            isLoading = false;
+            AppMsg.showErrorMsg(context, msg: state.toString());
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            backgroundColor: AppColors.bgColor,
+            appBar: ProfileAppbar(
+              title: 'Profile',
+              isLeading: true,
+              leadingOnTap: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.naveBar,
+                  (Route<dynamic> route) => false,
+                );
+              },
+            ),
+            body: isLoading == false
+                ? profileData != null
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.0.w,
+                            vertical: 20.h,
+                          ),
+                          child: Column(
                             children: [
-                              SizedBox(
-                                height: 120.h,
-                                width: 120.w,
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 118.h,
-                                      width: 118.h,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: AppColors.primaryColor,
-                                          width: 2.h,
-                                        ),
-
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: currentPatientData != null
-                                          ? ClipOval(
-                                              child:
-                                                  // profileData!.user!.profilePicture != null
-                                                  //    ?
-                                                  Image.network(
-                                                    fit: BoxFit.cover,
-                                                    'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
-
-                                                    headers: {
-                                                      "Authorization":
-                                                          "Bearer ${profileData!.accessToken.toString()}",
-                                                    },
-                                                    errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) {
-                                                          return profileData!
-                                                                      .user !=
-                                                                  null
-                                                              ? Image.network(
-                                                                  profileData!
-                                                                      .user!
-                                                                      .profilePicture
-                                                                      .toString(),
-                                                                )
-                                                              : Container();
-                                                        },
-                                                  ),
-                                            )
-                                          : Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 120.h,
+                                    width: 120.w,
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          height: 118.h,
+                                          width: 118.h,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: AppColors.primaryColor,
+                                              width: 2.h,
                                             ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  ApiServices.getPatientData(
-                                    patientId: profileData!
-                                        .patientData!
-                                        .patientInfo!
-                                        .id
-                                        .toString(),
-                                    currentUserToken: profileData!.accessToken
-                                        .toString(),
-                                    context: context,
-                                  );
-                                },
-                                child: CustomText(
-                                  text: currentPatientData!.patient!.user!.name
-                                      .toString(),
-                                  fontSize: 20,
-                                ),
-                              ),
-                              CustomText(
-                                text:
-                                    'Patient ID: ${profileData!.user!.id.toString()}',
-                                color: AppColors.secondaryTextColor,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 40.h),
-                          Column(
-                            spacing: 20.h,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.myProfileScreen,
-                                  );
-                                },
-                                child: Card(
-                                  color: AppColors.secondaryColor,
 
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10.r),
-                                    child: SizedBox(
-                                      height: 50.h,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: currentPatientData != null
+                                              ? ClipOval(
+                                                  child:
+                                                      // profileData!.user!.profilePicture != null
+                                                      //    ?
+                                                      Image.network(
+                                                        fit: BoxFit.cover,
+                                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
 
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            spacing: 10.w,
-                                            children: [
-                                              Icon(
-                                                Icons.person,
-                                                color: AppColors.primaryColor,
-                                              ),
-                                              CustomText(text: 'My Profile'),
-                                            ],
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 18.r,
-                                          ),
-                                        ],
-                                      ),
+                                                        headers: {
+                                                          "Authorization":
+                                                              "Bearer ${profileData!.accessToken.toString()}",
+                                                        },
+                                                        errorBuilder:
+                                                            (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return profileData!
+                                                                          .user !=
+                                                                      null
+                                                                  ? Image.network(
+                                                                      profileData!
+                                                                          .user!
+                                                                          .profilePicture
+                                                                          .toString(),
+                                                                    )
+                                                                  : Container();
+                                                            },
+                                                      ),
+                                                )
+                                              : Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.myNFCCardScreen,
-                                  );
-                                },
-                                child: Card(
-                                  color: AppColors.secondaryColor,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10.r),
-                                    child: SizedBox(
-                                      height: 50.h,
-
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            spacing: 10.w,
-                                            children: [
-                                              Icon(
-                                                Icons.credit_card,
-                                                color: AppColors.primaryColor,
-                                              ),
-                                              CustomText(text: 'My Card'),
-                                            ],
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 18.r,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.mapScreen,
-                                  );
-                                },
-                                child: Card(
-                                  color: AppColors.secondaryColor,
-
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10.r),
-                                    child: SizedBox(
-                                      height: 50.h,
-
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            spacing: 10.w,
-                                            children: [
-                                              Icon(
-                                                Icons.location_on,
-                                                color: AppColors.primaryColor,
-                                              ),
-                                              CustomText(text: 'Location'),
-                                            ],
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 18.r,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  AppMsg.showErrorMsg(
-                                    context,
-                                    msgTitle: 'Confirmation!',
-                                    msg: 'Are your sure you want to log out',
-                                    actionText: 'No',
-                                    actionText2: 'Yes',
-                                    action2: () async {
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-                                      Navigator.pop(context);
-                                      await ApiServices.logoutUser(
-                                        currentUserToken,
-                                      ).then((value) async {
-                                        await LocalStorage.userLogOutToken()
-                                            .then((onValue) async {
-                                              await LocalStorage.clearAllData();
-                                              setState(() {
-                                                isLoading = false;
-                                              });
-                                              Navigator.pushNamedAndRemoveUntil(
-                                                context,
-                                                AppRoutes.naveBar,
-                                                (Route<dynamic> route) => true,
-                                              );
-                                            });
-                                      });
+                                  InkWell(
+                                    onTap: () {
+                                      ApiServices.getPatientData(
+                                        patientId: profileData!
+                                            .patientData!
+                                            .patientInfo!
+                                            .id
+                                            .toString(),
+                                        currentUserToken: profileData!
+                                            .accessToken
+                                            .toString(),
+                                        context: context,
+                                      );
                                     },
-                                  );
-                                },
-                                child: Card(
-                                  color: AppColors.secondaryColor,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10.r),
-                                    child: SizedBox(
-                                      height: 50.h,
+                                    child: CustomText(
+                                      text: currentPatientData!
+                                          .patient!
+                                          .user!
+                                          .name
+                                          .toString(),
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  CustomText(
+                                    text:
+                                        'Patient ID: ${profileData!.user!.id.toString()}',
+                                    color: AppColors.secondaryTextColor,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 40.h),
+                              Column(
+                                spacing: 20.h,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.myProfileScreen,
+                                      );
+                                    },
+                                    child: Card(
+                                      color: AppColors.secondaryColor,
 
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            spacing: 10.w,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.r),
+                                        child: SizedBox(
+                                          height: 50.h,
+
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Icon(
-                                                Icons.logout,
-                                                color: AppColors.primaryColor,
+                                              Row(
+                                                spacing: 10.w,
+                                                children: [
+                                                  Icon(
+                                                    Icons.person,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                  CustomText(
+                                                    text: 'My Profile',
+                                                  ),
+                                                ],
                                               ),
-                                              CustomText(text: 'Log Out'),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 18.r,
+                                              ),
                                             ],
                                           ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 18.r,
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.myNFCCardScreen,
+                                      );
+                                    },
+                                    child: Card(
+                                      color: AppColors.secondaryColor,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.r),
+                                        child: SizedBox(
+                                          height: 50.h,
+
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                spacing: 10.w,
+                                                children: [
+                                                  Icon(
+                                                    Icons.credit_card,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                  CustomText(text: 'My Card'),
+                                                ],
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 18.r,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.mapScreen,
+                                      );
+                                    },
+                                    child: Card(
+                                      color: AppColors.secondaryColor,
+
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.r),
+                                        child: SizedBox(
+                                          height: 50.h,
+
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                spacing: 10.w,
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                  CustomText(text: 'Location'),
+                                                ],
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 18.r,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () async {
+                                      AppMsg.showErrorMsg(
+                                        context,
+                                        msgTitle: 'Confirmation!',
+                                        msg:
+                                            'Are your sure you want to log out',
+                                        actionText: 'No',
+                                        actionText2: 'Yes',
+                                        action2: () async {
+                                          Navigator.pop(context);
+                                          context.read<LoginBloc>().add(
+                                            LoginLogoutEvent(),
+                                          );
+                                          context.read<NaveBarBloc>().add(NaveBarEvent(index: 3));
+                                        },
+                                      );
+                                    },
+                                    child: Card(
+                                      color: AppColors.secondaryColor,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.r),
+                                        child: SizedBox(
+                                          height: 50.h,
+
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                spacing: 10.w,
+                                                children: [
+                                                  Icon(
+                                                    Icons.logout,
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                  CustomText(text: 'Log Out'),
+                                                ],
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 18.r,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    )
-                  : Center(child: CircularProgressIndicator())
-            : Center(child: CircularProgressIndicator()),
+                        )
+                      : Center(child: CircularProgressIndicator())
+                : Center(child: CircularProgressIndicator()),
+          );
+        },
       ),
     );
-  }
-
-  void getCurrentUserData() async {
-    String? token = await LocalStorage.getUserToken('token');
-    String? data = await LocalStorage.getProfileData(token!);
-    if (data != null) {
-      Map<String, dynamic> jsonData = jsonDecode(data);
-      profileData = LoginModel1.fromJson(jsonData);
-      currentUserToken = token;
-      if (!mounted) return;
-      currentPatientData = await ApiServices.getPatientData(
-        patientId: profileData!.patientData!.patientInfo!.id.toString(),
-        currentUserToken: profileData!.accessToken.toString(),
-        context: context,
-      );
-      if (!mounted) return;
-      setState(() {});
-    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
@@ -30,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? email;
   String? password;
   bool obscureText = true;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -118,52 +121,42 @@ class _LoginScreenState extends State<LoginScreen> {
             BlocConsumer<LoginBloc, LoginState>(
               listener: (context, state) {
                 if (state is LoginSuccessState) {
+                  isLoading = false;
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.naveBar,
                     (Route<dynamic> route) => false,
                   );
                 } else if (state is LoginErrorState) {
+                  isLoading = false;
                   if (kDebugMode) {
                     print(state.error);
                   }
                   AppMsg.showErrorMsg(context, msg: state.error.toString());
+                } else if (state is LoginLoadingState) {
+                  isLoading = true;
                 }
               },
               builder: (context, state) {
-                if (state is LoginLoadingState) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [CircularProgressIndicator()],
-                  );
-                } else {
-                  return AppButton(
-                    text: 'Login',
-                    onTap: () async {
-                      final form = _formKey.currentState;
-                      if (form!.validate()) {
-                        context.read<LoginBloc>().add(
-                          LoginEvents(
-                            email: emailController.text,
-                            password: passwordController.text,
-                          ),
-                        );
-
-
-
-                        // isLoading = true;
-                        // setState(() {});
-                        // await ApiServices.loginApi(
-                        //   context,
-                        //   email: email.toString(),
-                        //   password: password.toString(),
-                        // );
-                        // isLoading = false;
-                        // setState(() {});
-                      }
-                    },
-                  );
-                }
+                return isLoading == true
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [CircularProgressIndicator()],
+                      )
+                    : AppButton(
+                        text: 'Login',
+                        onTap: () async {
+                          final form = _formKey.currentState;
+                          if (form!.validate()) {
+                            context.read<LoginBloc>().add(
+                              LoginSignInEvent(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              ),
+                            );
+                          }
+                        },
+                      );
               },
             ),
           ],

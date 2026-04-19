@@ -11,6 +11,7 @@ import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,15 +65,27 @@ class _MyAppState extends State<MyApp> {
       api: apiImpl,
       localRepo: profileLocalRepo,
     );
-
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => LoginBloc(authRepo: authRepoBase)),
-        BlocProvider(create: (context) =>NaveBarBloc(profileLocalRepo: profileLocalRepo)),
+        BlocProvider(
+          create: (context) => LoginBloc(
+            authRepo: authRepoBase,
+            profileLocalRepo: profileLocalRepo,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => NaveBarBloc(profileLocalRepo: profileLocalRepo),
+        ),
+        BlocProvider(
+          create: (context) => ProfileBloc(
+            profileLocalRepo: profileLocalRepo,
+            patientLocalRepo: patientLocalRepo,
+          ),
+        ),
         BlocProvider(
           create: (context) => DashboardBloc(
             profileLocalRepo: profileLocalRepo,

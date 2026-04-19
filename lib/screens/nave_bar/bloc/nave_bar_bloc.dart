@@ -12,7 +12,6 @@ class NaveBarBloc extends Bloc<NaveBarEvent, NaveBarState> {
   }
   _onNavBarIndexEvent(NaveBarEvent event, Emitter<NaveBarState> emit) async {
     String? token = await profileLocalRepo.getToken();
-    print(token);
-    emit(NaveBarState(index: event.index, token: token));
+    emit(NaveBarState(index: event.index, token: token ?? ''));
   }
 }

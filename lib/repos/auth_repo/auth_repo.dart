@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/app_exceptions/app_exceptions.dart';
 import '../../../core/app_exceptions/base_exceptions.dart';
+import '../../core/app_keys/api_keys.dart';
 import '../../data/api_service/base_api/base_api.dart';
 import 'auth_repo_base.dart';
 
@@ -15,17 +16,23 @@ class AuthRepoImpl implements AuthRepoBase {
   BaseApi api;
   ProfileLocalRepo localRepo;
   PatientLocalRepo patientLocalRepo;
+
   AuthRepoImpl({
     required this.api,
     required this.localRepo,
     required this.patientLocalRepo,
   });
+
   @override
   Future<LoginModel1> userLogin({
     required String email,
     required String password,
   }) async {
-    var jsonResponse = await api.postApi(email: email, password: password);
+    var jsonResponse = await api.postApi(
+      url: ApiKeys.loginKey,
+      email: email,
+      password: password,
+    );
     print(jsonResponse);
     if (jsonResponse == null) {
       throw AppExceptions(
@@ -48,6 +55,27 @@ class AuthRepoImpl implements AuthRepoBase {
         print("AuthRepo Impl Error: $e");
       }
       throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+    }
+  }
+
+  @override
+  Future logoutUser({required String token, required url}) async {
+    try {
+      if (token.isNotEmpty) {
+        await api.postApi(url: ApiKeys.logoutKey, token: token).then((_) {
+          if (kDebugMode) {
+            print('User Log out');
+          }
+        });
+        await localRepo.deleteToken();
+        await localRepo.deleteProfile();
+        await patientLocalRepo.deletePatientData();
+      }
+    } catch (e) {
+      throw AppExceptions(
+        debugMessage: e.toString(),
+        message: 'Error in logout user${e.toString()}',
+      );
     }
   }
 }

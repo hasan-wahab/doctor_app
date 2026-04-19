@@ -13,14 +13,17 @@ import 'base_api.dart';
 
 class BaseApiImpl implements BaseApi {
   @override
-  Future postApi({required String email, required String password}) async {
-    var url = Uri.parse(ApiKeys.loginKey);
+  Future postApi({required String url,String? token, String? email, String? password}) async {
+    var urL = Uri.parse(url);
     try {
       http.Response response = await http
           .post(
-            url,
+            urL,
             body: jsonEncode({"email": email, "password": password}),
-            headers: {"Content-Type": "application/json"},
+            headers: {
+              "Content-Type": "application/json",
+              if (token != null) "Authorization": "Bearer $token",
+            },
           )
           .timeout(const Duration(seconds: 10));
 

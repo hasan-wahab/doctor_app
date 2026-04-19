@@ -60,7 +60,10 @@ class PatientRepoImpl implements PatientRepoBase {
     try {
       await curdBase.deleteData(tableName: TableName.patientData);
     } catch (e) {
-      throw AppExceptions(message:'Delete Patient Data Error Repo', debugMessage: e.toString());
+      throw AppExceptions(
+        message: 'Delete Patient Data Error Repo',
+        debugMessage: e.toString(),
+      );
     }
   }
 

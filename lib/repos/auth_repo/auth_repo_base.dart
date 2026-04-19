@@ -5,4 +5,6 @@ abstract class AuthRepoBase {
     required String email,
     required String password,
   });
+
+  Future logoutUser({required String token, required url});
 }

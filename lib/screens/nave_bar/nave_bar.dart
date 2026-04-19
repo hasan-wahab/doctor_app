@@ -27,7 +27,7 @@ class NaveBar extends StatefulWidget {
 }
 
 class _NaveBarState extends State<NaveBar> {
-  String? token;
+
   final List<String> iconText = ['Home', 'My card', 'Records', 'Account'];
   final List<IconData> icons = [
     Icons.home,
@@ -58,7 +58,7 @@ class _NaveBarState extends State<NaveBar> {
     return BlocBuilder<NaveBarBloc, NaveBarState>(
       builder: (context, state) {
         return Scaffold(
-          body: state.token == null
+          body: state.token == ''
               ? screenList.elementAt(state.index)
               : screenList2.elementAt(state.index),
           bottomNavigationBar: Container(
@@ -72,7 +72,7 @@ class _NaveBarState extends State<NaveBar> {
                 children: List.generate((iconText.length), (index) {
                   return InkWell(
                     onTap: () {
-                      if (state.token == null) {
+                      if (state.token == '') {
                         context.read<NaveBarBloc>().add(
                           NaveBarEvent(index: index == 0 ? index : 3),
                         );

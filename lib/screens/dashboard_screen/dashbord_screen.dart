@@ -1,11 +1,16 @@
 import 'dart:convert';
 
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
+import 'package:doctor_app/screens/auth_screen/bloc/login_states.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboad_states.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
@@ -311,7 +316,16 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         isColor: false,
                                         height: 34,
                                         textSize: 11,
-                                        onTap: () async {},
+                                        onTap: () async {
+                                          await Future.delayed(
+                                            Duration(seconds: 3),
+                                          );
+                                          Navigator.pushNamedAndRemoveUntil(
+                                            context,
+                                            AppRoutes.naveBar,
+                                            (Route route) => false,
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),

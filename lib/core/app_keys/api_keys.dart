@@ -13,4 +13,7 @@ class ApiKeys {
 
   /// Get Patient Api Key
  static String getPatientKey = '$baseUrl/patient/apipatients';
+
+ /// Logout Api Key
+ static String logoutKey = '$baseUrl/patient/logout';
 }

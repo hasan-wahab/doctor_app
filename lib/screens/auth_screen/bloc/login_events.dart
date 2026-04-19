@@ -1,5 +1,9 @@
-class LoginEvents {
+abstract class LoginEvents {}
+
+class LoginSignInEvent extends LoginEvents {
   final String email;
   final String password;
-  LoginEvents({required this.email, required this.password});
+  LoginSignInEvent({required this.email, required this.password});
 }
+
+class LoginLogoutEvent extends LoginEvents {}
