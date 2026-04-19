@@ -369,7 +369,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     context,
                                     CupertinoPageRoute(
                                       builder: (context) =>
-                                          NaveBar(currentIndex: 3),
+                                          NaveBar(),
                                     ),
                                     (Route<dynamic> route) => false,
                                   );
@@ -387,7 +387,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                   context,
                                   CupertinoPageRoute(
                                     builder: (context) =>
-                                        NaveBar(currentIndex: 3),
+                                        NaveBar(),
                                   ),
                                   (Route<dynamic> route) => false,
                                 );

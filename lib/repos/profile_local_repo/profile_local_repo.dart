@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/core/app_exceptions/base_exceptions.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:flutter/foundation.dart';
@@ -19,10 +20,10 @@ class ProfileLocalRepo {
         data: loginModel.toJson(),
       );
     } catch (e) {
-      if (kDebugMode) {
-        print("Local Repo Error: $e");
-      }
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+      throw AppExceptions(
+        message: 'Save Profile Error Local Repo ',
+        debugMessage: e.toString(),
+      );
     }
   }
 
@@ -40,8 +41,8 @@ class ProfileLocalRepo {
         throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
       }
     } else {
-      throw BaseExceptions(
-        message: 'No data found',
+      throw AppExceptions(
+        message: 'Error in getting profile Local Repo',
         debugMessage: 'No data found',
       );
     }
@@ -50,6 +51,48 @@ class ProfileLocalRepo {
   Future deleteProfile() async {
     try {
       await curdBase.deleteData(tableName: TableName.profile);
+    } catch (e) {
+      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+    }
+  }
+
+  Future saveToken({required String token}) async {
+    try {
+      await curdBase.saveData(
+        tableName: TableName.token,
+        key: LocalKeys.token,
+        data: token,
+      );
+    } catch (e) {
+      throw AppExceptions(
+        message: 'Save Token Error Local Repo ${e.toString()}',
+        debugMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<String?> getToken() async {
+    try {
+      var result = await curdBase.getData(tableName: TableName.token);
+      if (result.isEmpty) {
+        return null;
+      }
+      var jsonResponseString = result.first[LocalKeys.token];
+      if (jsonResponseString == null) {
+        return null;
+      }
+      return jsonDecode(jsonResponseString as String);
+    } catch (e) {
+      throw AppExceptions(
+        message: 'Get Token Error Local Repo ${e.toString()}',
+        debugMessage: e.toString(),
+      );
+    }
+  }
+
+  Future deleteToken() async {
+    try {
+      await curdBase.deleteData(tableName: TableName.token);
     } catch (e) {
       throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
     }

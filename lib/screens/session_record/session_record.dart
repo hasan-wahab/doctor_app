@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
-
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/api_service/api_service.dart';
@@ -52,7 +50,7 @@ class _SessionRecordState extends State<SessionRecord> {
         if (!didPop) {
           Navigator.pushAndRemoveUntil(
             context,
-            CupertinoPageRoute(builder: (context) => NaveBar(currentIndex: 0)),
+            CupertinoPageRoute(builder: (context) => NaveBar()),
             (Route<dynamic> route) => false,
           );
         }

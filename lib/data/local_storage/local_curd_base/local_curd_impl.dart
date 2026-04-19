@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/core/app_exceptions/base_exceptions.dart';
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -14,14 +15,17 @@ class LocalCurdImpl implements LocalCurdBase {
   Future saveData({
     required String tableName,
     required String key,
-    required Map<String, dynamic> data,
+    required data,
   }) async {
     try {
       final db = await DBHelper.getDb();
 
       await db.insert(tableName, {key: jsonEncode(data)});
     } catch (e) {
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+      throw AppExceptions(
+        message: 'Save Data Error in Local Curd Impl',
+        debugMessage: e.toString(),
+      );
     }
   }
 
@@ -33,12 +37,13 @@ class LocalCurdImpl implements LocalCurdBase {
       final db = await DBHelper.getDb();
 
       final result = await db.query(tableName);
+      print(result);
       return result;
     } catch (e) {
-      if (kDebugMode) {
-        print("Curd Impl Error: $e");
-      }
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+      throw AppExceptions(
+        message: 'Get Data Error in Local Curd Impl',
+        debugMessage: e.toString(),
+      );
     }
   }
 
@@ -53,9 +58,14 @@ class LocalCurdImpl implements LocalCurdBase {
     try {
       final db = await DBHelper.getDb();
 
-      await db.delete(tableName);
+      await db.delete(tableName).then((_) {
+        print('Delete $tableName');
+      });
     } catch (e) {
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+      throw AppExceptions(
+        message: 'Delete Data Error in Local Curd Impl',
+        debugMessage: e.toString(),
+      );
     }
   }
 }

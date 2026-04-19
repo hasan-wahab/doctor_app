@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (!didPop) {
           Navigator.pushAndRemoveUntil(
             context,
-            CupertinoPageRoute(builder: (context) => NaveBar(currentIndex: 0)),
+            CupertinoPageRoute(builder: (context) => NaveBar()),
             (Route<dynamic> route) => false,
           );
         }

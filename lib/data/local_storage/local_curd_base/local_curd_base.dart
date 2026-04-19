@@ -2,7 +2,7 @@ abstract class LocalCurdBase {
   Future saveData({
     required String tableName,
     required String key,
-    required Map<String, dynamic> data,
+    required data,
   });
   Future getData({required String tableName});
   Future updateData({required String key, required Map<String, dynamic> data});

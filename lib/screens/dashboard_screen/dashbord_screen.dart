@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboad_states.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/api_service/api_service.dart';
+import '../../data/local_storage/local_curd_base/local_curd_impl.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/app_button.dart';
@@ -86,7 +88,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
         if (state is DashboardLoadedState) {
           currentPatientData = state.patientData;
-          print(currentPatientData);
+          profileData = state.profileData;
+          print(currentPatientData!.therapySessions.first.endTime);
+          print(profileData!.patientData!.patientInfo!.email.toString());
         }
       },
       builder: (context, state) {
@@ -307,7 +311,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         isColor: false,
                                         height: 34,
                                         textSize: 11,
-                                        onTap: () {},
+                                        onTap: () async {},
                                       ),
                                     ],
                                   ),

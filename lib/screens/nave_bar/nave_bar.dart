@@ -3,28 +3,30 @@ import 'dart:io';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/dashboard_screen/dashbord_screen.dart';
 import 'package:doctor_app/screens/home/home_screen.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/local_storage/local_storage.dart';
-
+import 'bloc/nave_bar_state.dart';
 
 class NaveBar extends StatefulWidget {
-  int? currentIndex;
-  NaveBar({super.key, this.currentIndex = 0});
+  NaveBar({super.key});
 
   @override
   State<NaveBar> createState() => _NaveBarState();
 }
 
 class _NaveBarState extends State<NaveBar> {
-  int currentIndex = 0;
   String? token;
   final List<String> iconText = ['Home', 'My card', 'Records', 'Account'];
   final List<IconData> icons = [
@@ -36,7 +38,6 @@ class _NaveBarState extends State<NaveBar> {
   List<Widget> screenList = [
     HomeScreen(),
     NfcCardPage(),
-
     SessionRecord(),
     LoginScreen(),
   ];
@@ -46,83 +47,67 @@ class _NaveBarState extends State<NaveBar> {
     SessionRecord(),
     ProfileScreen(),
   ];
-
   @override
   void initState() {
-    getToken();
-    if (widget.currentIndex == null) {
-      currentIndex = 0;
-    } else {
-      currentIndex = widget.currentIndex!;
-    }
+    context.read<NaveBarBloc>().add(NaveBarEvent(index: 0));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: token == null
-          ? screenList.elementAt(currentIndex != 0 ? 3 : currentIndex)
-          : screenList2.elementAt(currentIndex),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
-        height: Platform.isIOS ? 701.h : 100.h,
-        color: AppColors.secondaryColor,
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate((iconText.length), (index) {
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    if (token == null) {
-                      if (index == 1) {
-                        currentIndex = 3;
-                      } else if (index == 2) {
-                        currentIndex = 3;
-                      } else if (index == 3) {
-                        currentIndex = 3;
+    return BlocBuilder<NaveBarBloc, NaveBarState>(
+      builder: (context, state) {
+        return Scaffold(
+          body: state.token == null
+              ? screenList.elementAt(state.index)
+              : screenList2.elementAt(state.index),
+          bottomNavigationBar: Container(
+            padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
+            height: Platform.isIOS ? 701.h : 100.h,
+            color: AppColors.secondaryColor,
+            child: SafeArea(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate((iconText.length), (index) {
+                  return InkWell(
+                    onTap: () {
+                      if (state.token == null) {
+                        context.read<NaveBarBloc>().add(
+                          NaveBarEvent(index: index == 0 ? index : 3),
+                        );
                       } else {
-                        currentIndex = index;
+                        context.read<NaveBarBloc>().add(
+                          NaveBarEvent(index: index),
+                        );
                       }
-                    } else {
-                      currentIndex = index;
-                    }
-                  });
-                },
+                    },
 
-                child: Column(
-                  children: [
-                    Icon(
-                      icons[index],
-                      color: currentIndex == index
-                          ? AppColors.primaryColor
-                          : AppColors.blackIconColor,
+                    child: Column(
+                      children: [
+                        Icon(
+                          icons[index],
+                          color: state.index == index
+                              ? AppColors.primaryColor
+                              : AppColors.blackIconColor,
+                        ),
+                        CustomText(
+                          text: iconText[index],
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: state.index == index
+                              ? AppColors.primaryColor
+                              : AppColors.blackIconColor,
+                        ),
+                      ],
                     ),
-                    CustomText(
-                      text: iconText[index],
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: currentIndex == index
-                          ? AppColors.primaryColor
-                          : AppColors.blackIconColor,
-                    ),
-                  ],
-                ),
-              );
-            }),
+                  );
+                }),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
-  }
-
-  void getToken() async {
-    token = await LocalStorage.getUserToken('token');
-    setState(() {});
-    if (kDebugMode) {
-      print(token);
-    }
   }
 }
