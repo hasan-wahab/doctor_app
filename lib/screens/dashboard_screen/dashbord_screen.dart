@@ -81,6 +81,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<DashboardBloc, DashboardStates>(
       listener: (context, state) {
+        print(state);
         if (state is DashboardLoadingState) {
           isLoading = true;
         } else {
@@ -94,8 +95,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
         if (state is DashboardLoadedState) {
           currentPatientData = state.patientData;
           profileData = state.profileData;
-          print(currentPatientData!.therapySessions.first.endTime);
-          print(profileData!.patientData!.patientInfo!.email.toString());
         }
       },
       builder: (context, state) {
@@ -316,16 +315,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         isColor: false,
                                         height: 34,
                                         textSize: 11,
-                                        onTap: () async {
-                                          await Future.delayed(
-                                            Duration(seconds: 3),
-                                          );
-                                          Navigator.pushNamedAndRemoveUntil(
-                                            context,
-                                            AppRoutes.naveBar,
-                                            (Route route) => false,
-                                          );
-                                        },
+                                        onTap: () async {},
                                       ),
                                     ],
                                   ),
@@ -341,7 +331,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       children: [
                                         CustomText(
                                           text:
-                                              'Total:  ${int.parse(currentPatientData!.stats!.totalAmount.toString())}',
+                                              'Total:  ${double.parse(currentPatientData!.stats!.totalAmount.toString())}',
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.textWhiteColor,
@@ -423,9 +413,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
                             children: [
                               ...List.generate((6), (index) {
                                 List cardSecondText = [
-                                  currentPatientData!.patient!.visits.length
+                                  currentPatientData!.patient.visits.length
                                       .toString(),
-                                  currentPatientData!.patient!.packages.length
+                                  currentPatientData!.patient.packages.length
                                       .toString(),
                                   '',
                                   currentPatientData!.recentInvoices.length
@@ -508,14 +498,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         SizedBox(height: 10.h),
 
                         /// Session Progress
-                        currentPatientData!.patient!.packages.isNotEmpty
+                        currentPatientData!.patient.packages.isNotEmpty
                             ? CustomText(text: 'Session Progress')
                             : Container(),
                         SizedBox(height: 10.h),
                         ...List.generate(
-                          currentPatientData!.patient!.packages.isNotEmpty
-                              ? currentPatientData!.patient!.packages.length
-                              : 1,
+                          currentPatientData!.patient.packages.length,
 
                           (index) {
                             return Container(
@@ -543,12 +531,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       CustomText(
                                         text:
                                             currentPatientData!
-                                                .patient!
+                                                .patient
                                                 .packages
                                                 .isEmpty
                                             ? 'No data'
                                             : currentPatientData!
-                                                  .patient!
+                                                  .patient
                                                   .packages[index]
                                                   .name
                                                   .toString(),
@@ -567,7 +555,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           ),
                                           CustomText(
                                             text:
-                                                '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsTotal : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsUsed : 0}',
+                                                '${currentPatientData!.patient.packages[index].pivot['sessions_used']}/${currentPatientData!.patient.packages[index].pivot['sessions_total']}',
                                             fontSize: 10,
                                           ),
                                         ],
@@ -576,7 +564,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       LinearProgressIndicator(
                                         value:
                                             currentPatientData!
-                                                .patient!
+                                                .patient
                                                 .packages
                                                 .isEmpty
                                             ? 1.0
@@ -599,10 +587,11 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           CustomText(
                                             text:
                                                 currentPatientData!
-                                                    .patient!
-                                                    .packages
+                                                    .therapySessions[index]
+                                                    .nextSessionDate
                                                     .isNotEmpty
                                                 ? DateAndTimeFormater.dateFormat(
+                                                    // currentPatientData!
                                                     currentPatientData!
                                                         .therapySessions[index]
                                                         .nextSessionDate
@@ -708,9 +697,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
   double getSessionProgress(int index) {
     final total =
-        currentPatientData!.patient!.packages[index].pivot!.sessionsTotal;
+        currentPatientData!.patient.packages[index].pivot['sessions_total'];
     final used =
-        currentPatientData!.patient!.packages[index].pivot!.sessionsUsed;
+        currentPatientData!.patient.packages[index].pivot['sessions_used'];
 
     if (total == 0) return 0.0;
 

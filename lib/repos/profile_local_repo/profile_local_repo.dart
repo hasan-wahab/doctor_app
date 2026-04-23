@@ -13,18 +13,11 @@ class ProfileLocalRepo {
   ProfileLocalRepo({required this.curdBase});
 
   Future saveProfile({required LoginModel1 loginModel}) async {
-    try {
-      await curdBase.saveData(
-        tableName: TableName.profile,
-        key: LocalKeys.profile,
-        data: loginModel.toJson(),
-      );
-    } catch (e) {
-      throw AppExceptions(
-        message: 'Save Profile Error Local Repo ',
-        debugMessage: e.toString(),
-      );
-    }
+    await curdBase.saveData(
+      tableName: TableName.profile,
+      key: LocalKeys.profile,
+      data: loginModel.toJson(),
+    );
   }
 
   Future<LoginModel1> getProfile() async {
@@ -32,14 +25,10 @@ class ProfileLocalRepo {
       tableName: TableName.profile,
     );
     if (jsonData.isNotEmpty) {
-      try {
-        LoginModel1 model = LoginModel1.fromJson(
-          jsonDecode(jsonData[0][LocalKeys.profile] as String),
-        );
-        return model;
-      } catch (e) {
-        throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
-      }
+      LoginModel1 model = LoginModel1.fromJson(
+        jsonDecode(jsonData[0][LocalKeys.profile] as String),
+      );
+      return model;
     } else {
       throw AppExceptions(
         message: 'Error in getting profile Local Repo',
@@ -49,52 +38,30 @@ class ProfileLocalRepo {
   }
 
   Future deleteProfile() async {
-    try {
-      await curdBase.deleteData(tableName: TableName.profile);
-    } catch (e) {
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
-    }
+    await curdBase.deleteData(tableName: TableName.profile);
   }
 
   Future saveToken({required String token}) async {
-    try {
-      await curdBase.saveData(
-        tableName: TableName.token,
-        key: LocalKeys.token,
-        data: token,
-      );
-    } catch (e) {
-      throw AppExceptions(
-        message: 'Save Token Error Local Repo ${e.toString()}',
-        debugMessage: e.toString(),
-      );
-    }
+    await curdBase.saveData(
+      tableName: TableName.token,
+      key: LocalKeys.token,
+      data: token,
+    );
   }
 
   Future<String?> getToken() async {
-    try {
-      var result = await curdBase.getData(tableName: TableName.token);
-      if (result.isEmpty) {
-        return null;
-      }
-      var jsonResponseString = result.first[LocalKeys.token];
-      if (jsonResponseString == null) {
-        return null;
-      }
-      return jsonDecode(jsonResponseString as String);
-    } catch (e) {
-      throw AppExceptions(
-        message: 'Get Token Error Local Repo ${e.toString()}',
-        debugMessage: e.toString(),
-      );
+    var result = await curdBase.getData(tableName: TableName.token);
+    if (result.isEmpty) {
+      return null;
     }
+    var jsonResponseString = result.first[LocalKeys.token];
+    if (jsonResponseString == null) {
+      return null;
+    }
+    return jsonDecode(jsonResponseString as String);
   }
 
   Future deleteToken() async {
-    try {
-      await curdBase.deleteData(tableName: TableName.token);
-    } catch (e) {
-      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
-    }
+    await curdBase.deleteData(tableName: TableName.token);
   }
 }

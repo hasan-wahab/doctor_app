@@ -23,9 +23,6 @@ class LoginBloc extends Bloc<LoginEvents, LoginState> {
   LoginBloc({required this.profileLocalRepo, required this.authRepo})
     : super(LoginInitState()) {
     on<LoginSignInEvent>(userLogin);
-    on<LoginLogoutEvent>((event, emit) {
-      userLogout(event, emit);
-    });
   }
 
   Future userLogin(LoginSignInEvent event, Emitter<LoginState> emit) async {
@@ -38,19 +35,6 @@ class LoginBloc extends Bloc<LoginEvents, LoginState> {
       emit(LoginSuccessState());
     } catch (e) {
       emit(LoginErrorState(error: e.toString()));
-    }
-  }
-
-  FutureOr<void> userLogout(
-    LoginLogoutEvent event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(LoginLoadingState());
-    String? token = await profileLocalRepo.getToken();
-    if (token != '') {
-      await authRepo.logoutUser(token: token ?? '', url: ApiKeys.logoutKey);
-      if (emit.isDone) return;
-      emit(LoginUserLogoutSuccessState());
     }
   }
 }

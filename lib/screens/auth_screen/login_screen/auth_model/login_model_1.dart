@@ -287,10 +287,10 @@ class PatientInfo {
   });
 
   final int? id;
-  final String? name;
-  final String? email;
-  final String? phone;
-  final String? cnic;
+   String? name;
+   String? email;
+   String? phone;
+   String? cnic;
   final String? gender;
   final dynamic birthDate;
   final int? age;

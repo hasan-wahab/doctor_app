@@ -13,15 +13,30 @@ import 'base_api.dart';
 
 class BaseApiImpl implements BaseApi {
   @override
-  Future postApi({required String url,String? token, String? email, String? password}) async {
+  Future postApi({
+    required String url,
+    String? token,
+    String? email,
+    String? password,
+    String? name,
+    String? cnic,
+    String? phone,
+  }) async {
     var urL = Uri.parse(url);
     try {
       http.Response response = await http
           .post(
             urL,
-            body: jsonEncode({"email": email, "password": password}),
+            body: jsonEncode({
+              "email": email,
+              "password": password,
+              if (name != null) "name": name,
+              if (cnic != null) "cnic": cnic,
+              if (phone != null) "phone": phone,
+            }),
             headers: {
               "Content-Type": "application/json",
+              "Accept": "application/json",
               if (token != null) "Authorization": "Bearer $token",
             },
           )
@@ -64,6 +79,28 @@ class BaseApiImpl implements BaseApi {
       }
       throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
     }
+  }
+
+  @override
+  Future multiPartPostApi({
+    required String token,
+    required File file,
+    required String url,
+  }) async {
+    final urL = Uri.parse(url);
+
+    final request = http.MultipartRequest('POST', urL);
+
+    request.headers["Authorization"] = "Bearer $token";
+    request.headers["Accept"] = "application/json";
+    request.files.add(
+      await http.MultipartFile.fromPath('profile_picture', file.path),
+    );
+
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
+    return responseHandle(response);
   }
 }
 

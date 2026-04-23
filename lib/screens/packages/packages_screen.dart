@@ -29,7 +29,6 @@ class _PackagesScreenState extends State<PackagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: AppColors.bgColor,
         leading: IconButton(
@@ -57,8 +56,8 @@ class _PackagesScreenState extends State<PackagesScreen> {
               /// Session Progress
               SizedBox(height: 10.h),
               ...List.generate(
-                currentPatientData!.patient!.packages.isNotEmpty
-                    ? currentPatientData!.patient!.packages.length
+                currentPatientData!.patient.packages.isNotEmpty
+                    ? currentPatientData!.patient.packages.length
                     : 1,
 
                 (index) {
@@ -89,7 +88,8 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                   : currentPatientData!
                                         .patient!
                                         .packages[index]
-                                        .name.toString(),
+                                        .name
+                                        .toString(),
                               fontSize: 12,
                             ),
                             Row(
@@ -103,7 +103,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                 ),
                                 CustomText(
                                   text:
-                                      '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsTotal : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.sessionsUsed : 0}',
+                                      '${currentPatientData!.patient.packages.isNotEmpty ? currentPatientData!.patient.packages[index].pivot['sessions_used'] : 0}/${currentPatientData!.patient.packages.isNotEmpty ? currentPatientData!.patient.packages[index].pivot['sessions_total'] : 0}',
                                   fontSize: 10,
                                 ),
                               ],
@@ -111,7 +111,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
 
                             LinearProgressIndicator(
                               value:
-                                  currentPatientData!.patient!.packages.isEmpty
+                                  currentPatientData!.patient.packages.isEmpty
                                   ? 1.0
                                   : getSessionProgress(index),
                               valueColor: AlwaysStoppedAnimation(
@@ -128,19 +128,9 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                   fontSize: 15,
                                 ),
                                 CustomText(
-                                  text:
-                                      currentPatientData!
-                                          .patient!
-                                          .packages
-                                          .isNotEmpty
-                                      ? DateAndTimeFormater.dateFormat(
-                                          currentPatientData!
-                                              .therapySessions
-                                              .first
-                                              .nextSessionDate
-                                              .toString(),
-                                        )
-                                      : 'No data',
+                                  text: currentPatientData!
+                                      .therapySessions[index]
+                                      .nextSessionDate,
                                   fontSize: 12,
                                 ),
                               ],
@@ -198,9 +188,10 @@ class _PackagesScreenState extends State<PackagesScreen> {
 
   double getSessionProgress(int index) {
     final total =
-        currentPatientData!.patient!.packages[index].pivot!.sessionsTotal;
+        currentPatientData!.patient.packages[index].pivot['sessions_total'] ??
+        0;
     final used =
-        currentPatientData!.patient!.packages[index].pivot!.sessionsUsed;
+        currentPatientData!.patient.packages[index].pivot['sessions_used'] ?? 0;
 
     if (total == 0) return 0.0;
 

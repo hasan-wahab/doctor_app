@@ -1,11 +1,16 @@
+import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
+import '../../widgets/show_msg.dart';
 
 class SessionDetailScreen extends StatefulWidget {
   const SessionDetailScreen({super.key});
@@ -16,175 +21,141 @@ class SessionDetailScreen extends StatefulWidget {
 
 class _SessionDetailScreenState extends State<SessionDetailScreen> {
   CurrentPatientModel? currentPatientData;
-  var therapySession;
+
   @override
-  void didChangeDependencies() {
-    Map<String, dynamic> data =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    if (data != null) {
-      currentPatientData = data['data'];
-      therapySession = data['therapySession'];
-    }
-    super.didChangeDependencies();
+  void initState() {
+    context.read<ProfileBloc>().add(MyProfileEvent());
+    super.initState();
   }
 
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: false,
-      //   leading: InkWell(
-      //     onTap: () {
-      //       Navigator.pop(context);
-      //     },
-      //     child: Icon(Icons.arrow_back_ios_new, size: 30.sp),
-      //   ),
-      //   centerTitle: true,
-      //   title: Text('Sessions'),
-      // ),
-      appBar: AppBar(
-        backgroundColor: AppColors.bgColor,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios_new),
-        ),
-        centerTitle: true,
-        title: Text('Sessions'),
-        automaticallyImplyLeading: false,
-      ),
-      backgroundColor: AppColors.bgColor,
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-        children: [
-          CustomText(
-            text: 'Therapy Sessions',
-            fontSize: 20,
-            color: AppColors.primaryColor,
-          ),
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileLoadingState) {
+          isLoading = true;
+        } else if (state is MyProfileState) {
+          isLoading = false;
+          currentPatientData = state.currentPatientModel;
+        } else if (state is ProfileMessageState) {
+          isLoading = false;
 
-          if (therapySession == null)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: List.generate(
-                currentPatientData!.therapySessions.length,
-                (index) {
-                  var therapySessions =
-                      currentPatientData!.therapySessions[index];
-                  return Card(
-                    color: AppColors.secondaryColor,
-                    margin: EdgeInsets.only(top: 15.h),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15.w,
-                        vertical: 20.h,
-                      ),
-
-                      height: 178.h,
-                      width: 360.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.r),
-                        //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                      ),
-
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          AppMsg.showErrorMsg(context, msg: state.message.toString());
+        }
+      },
+      builder: (context, state) {
+        return isLoading != true
+            ? Scaffold(
+                appBar: AppBar(
+                  backgroundColor: AppColors.bgColor,
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new),
+                  ),
+                  centerTitle: true,
+                  title: Text('Sessions'),
+                  automaticallyImplyLeading: false,
+                ),
+                backgroundColor: AppColors.bgColor,
+                body: currentPatientData != null
+                    ? ListView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 10.h,
+                        ),
                         children: [
-                          _text(
-                            firstText: 'Sessions#',
-                            secondText: therapySessions.sessionNumber == null
-                                ? 'No data'
-                                : therapySessions.sessionNumber.toString(),
+                          CustomText(
+                            text: 'Therapy Sessions',
+                            fontSize: 20,
+                            color: AppColors.primaryColor,
                           ),
-                          _text(
-                            firstText: 'Next session date',
-                            secondText: DateAndTimeFormater.dateFormat(
-                              therapySessions.nextSessionDate.toString(),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: List.generate(
+                              currentPatientData!.therapySessions.length,
+                              (index) {
+                                return Card(
+                                  color: AppColors.secondaryColor,
+                                  margin: EdgeInsets.only(top: 15.h),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 15.w,
+                                      vertical: 20.h,
+                                    ),
+
+                                    height: 178.h,
+                                    width: 360.w,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                                    ),
+
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        _text(
+                                          firstText: 'Sessions#',
+                                          secondText: currentPatientData!
+                                              .therapySessions[index]
+                                              .sessionNumber
+                                              .toString(),
+                                        ),
+                                        _text(
+                                          firstText: 'Next session date',
+                                          secondText:
+                                              DateAndTimeFormater.dateFormat(
+                                                currentPatientData!
+                                                    .therapySessions[index]
+                                                    .nextSessionDate
+                                                    .toString(),
+                                              ),
+                                        ),
+                                        _text(
+                                          firstText: 'Therapist',
+                                          secondText: currentPatientData!
+                                              .therapySessions[index]
+                                              .therapist!
+                                              .name
+                                              .toString(),
+                                        ),
+
+                                        _text(
+                                          firstText: 'Duration',
+                                          secondText: currentPatientData!
+                                              .therapySessions[index]
+                                              .durationSeconds
+                                              .toString(),
+                                        ),
+                                        _text(
+                                          firstText: 'Notes',
+                                          secondText:
+                                              currentPatientData!
+                                                  .therapySessions[index]
+                                                  .notes
+                                                  .isEmpty
+                                              ? 'asd'
+                                              : currentPatientData!
+                                                    .therapySessions[index]
+                                                    .notes,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                          _text(
-                            firstText: 'Therapist',
-                            secondText: therapySessions.therapist!.name
-                                .toString(),
-                          ),
-
-                          _text(
-                            firstText: 'Duration',
-                            secondText: therapySessions.durationSeconds
-                                .toString(),
-                          ),
-                          _text(
-                            firstText: 'Notes',
-                            secondText: therapySessions.notes == ''
-                                ? 'asd'
-                                : therapySessions.notes,
-                          ),
                         ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            )
-          else
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  color: AppColors.secondaryColor,
-                  margin: EdgeInsets.only(top: 15.h),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15.w,
-                      vertical: 20.h,
-                    ),
-
-                    height: 178.h,
-                    width: 360.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                    ),
-
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _text(
-                          firstText: 'Sessions#',
-                          secondText: therapySession.sessionNumber == null
-                              ? 'No data'
-                              : therapySession.sessionNumber.toString(),
-                        ),
-                        _text(
-                          firstText: 'Next session date',
-                          secondText: DateAndTimeFormater.dateFormat(
-                            therapySession.nextSessionDate.toString(),
-                          ),
-                        ),
-                        _text(
-                          firstText: 'Therapist',
-                          secondText: therapySession.therapist!.name.toString(),
-                        ),
-
-                        _text(
-                          firstText: 'Duration',
-                          secondText: therapySession.durationSeconds.toString(),
-                        ),
-                        _text(
-                          firstText: 'Notes',
-                          secondText: therapySession.notes == ''
-                              ? 'no data'
-                              : therapySession.notes,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
+                      )
+                    : Center(child: CircularProgressIndicator()),
+              )
+            : Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
     );
   }
 

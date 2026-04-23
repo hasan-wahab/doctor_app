@@ -437,20 +437,29 @@
 // // }
 //
 
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../nave_bar/nave_bar.dart';
 
 class NfcCardPage extends StatelessWidget {
-  const NfcCardPage({super.key});
+  bool fromProfile;
+  NfcCardPage({super.key, this.fromProfile = false});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     return WillPopScope(
       onWillPop: () async {
+        if (fromProfile == false) {
+          context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
+        } else {
+          Navigator.pop(context);
+        }
         return false;
       },
       child: Scaffold(
@@ -458,10 +467,11 @@ class NfcCardPage extends StatelessWidget {
           backgroundColor: AppColors.bgColor,
           leading: IconButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => NaveBar()),
-              );
+              if (fromProfile == false) {
+                context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
+              } else {
+                Navigator.pop(context);
+              }
             },
             icon: Icon(Icons.arrow_back_ios_new),
           ),
@@ -575,10 +585,11 @@ class NfcCardPage extends StatelessWidget {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: Image.asset(
-                            "assets/logo.png", // apna logo path
-                            fit: BoxFit.contain,
-                          ),
+                          child: Container(),
+                          // child: Image.asset(
+                          //   "assets/logo.png", // apna logo path
+                          //   fit: BoxFit.contain,
+                          // ),
                         ),
                       ],
                     ),

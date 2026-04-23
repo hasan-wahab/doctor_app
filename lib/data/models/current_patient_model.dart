@@ -1,332 +1,365 @@
 class CurrentPatientModel {
-  CurrentPatientModel({
-    required this.patient,
-    required this.stats,
-    required this.recentInvoices,
-    required this.therapySessions,
-  });
-
-  final Patient? patient;
-  final Stats? stats;
-  final List<RecentInvoice> recentInvoices;
+  final Patient patient;
+  final Stats stats;
+  final List<InvoiceRecord> recentInvoices;
   final List<TherapySession> therapySessions;
 
-  factory CurrentPatientModel.fromJson(Map<String, dynamic> json){
+  const CurrentPatientModel({
+    this.patient = const Patient(),
+    this.stats = const Stats(),
+    this.recentInvoices = const [],
+    this.therapySessions = const [],
+  });
+
+  factory CurrentPatientModel.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
     return CurrentPatientModel(
-      patient: json["patient"] == null ? null : Patient.fromJson(json["patient"]),
-      stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
-      recentInvoices: json["recent_invoices"] == null ? [] : List<RecentInvoice>.from(json["recent_invoices"]!.map((x) => RecentInvoice.fromJson(x))),
-      therapySessions: json["therapy_sessions"] == null ? [] : List<TherapySession>.from(json["therapy_sessions"]!.map((x) => TherapySession.fromJson(x))),
+      patient: Patient.fromJson(_asMap(data['patient'])),
+      stats: Stats.fromJson(_asMap(data['stats'])),
+      recentInvoices: _asListMap(
+        data['recent_invoices'],
+      ).map(InvoiceRecord.fromJson).toList(),
+      therapySessions: _asListMap(
+        data['therapy_sessions'],
+      ).map(TherapySession.fromJson).toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "patient": patient?.toJson(),
-    "stats": stats?.toJson(),
-    "recent_invoices": recentInvoices.map((x) => x?.toJson()).toList(),
-    "therapy_sessions": therapySessions.map((x) => x?.toJson()).toList(),
+    'patient': patient.toJson(),
+    'stats': stats.toJson(),
+    'recent_invoices': recentInvoices.map((e) => e.toJson()).toList(),
+    'therapy_sessions': therapySessions.map((e) => e.toJson()).toList(),
   };
-
 }
 
 class Patient {
-  Patient({
-    required this.id,
-    required this.name,
-    required this.fatherHusbandName,
-    required this.email,
-    required this.address,
-    required this.city,
-    required this.cityOther,
-    required this.passportNo,
-    required this.phone,
-    required this.emergencyContactPhone,
-    required this.cnic,
-    required this.gender,
-    required this.maritalStatus,
-    required this.birthDate,
-    required this.age,
-    required this.bloodGroup,
-    required this.languages,
-    required this.languagesOther,
-    required this.referBy,
-    required this.insurance,
-    required this.image,
-    required this.status,
-    required this.cardUid,
-    required this.walletBalance,
-    required this.insurancePanel,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.deletedAt,
-    required this.userId,
-    required this.visits,
-    required this.packages,
-    required this.user,
-  });
-
   final int id;
   final String name;
-  final dynamic fatherHusbandName;
+  final String fatherHusbandName;
   final String email;
-  final dynamic address;
-  final dynamic city;
-  final dynamic cityOther;
-  final dynamic passportNo;
+  final String address;
+  final String city;
+  final String cityOther;
+  final String passportNo;
   final String phone;
-  final dynamic emergencyContactPhone;
+  final String occupation;
+  final String emergencyContactPhone;
   final String cnic;
   final String gender;
-  final dynamic maritalStatus;
-  final DateTime? birthDate;
+  final String maritalStatus;
+  final String birthDate;
   final int age;
   final String bloodGroup;
-  final dynamic languages;
-  final dynamic languagesOther;
+  final List<String> languages;
+  final String languagesOther;
   final String referBy;
   final String insurance;
   final String image;
   final String status;
-  final dynamic cardUid;
-  final int walletBalance;
-  final dynamic insurancePanel;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String cardUid;
+  final double walletBalance;
+  final String insurancePanel;
+  final String createdAt;
+  final String updatedAt;
   final int createdBy;
   final int updatedBy;
-  final dynamic deletedAt;
+  final String deletedAt;
   final int userId;
-  final List<LastVisitElement> visits;
-  final List<Package> packages;
-  final User? user;
+  final String imageUrl;
+  final String cityLabel;
+  final List<String> languagesLabels;
+  final String maritalStatusLabel;
+  final List<Visit> visits;
+  final List<PatientPackage> packages;
+  final AppUser user;
 
-  factory Patient.fromJson(Map<String, dynamic> json){
+  const Patient({
+    this.id = 0,
+    this.name = '',
+    this.fatherHusbandName = '',
+    this.email = '',
+    this.address = '',
+    this.city = '',
+    this.cityOther = '',
+    this.passportNo = '',
+    this.phone = '',
+    this.occupation = '',
+    this.emergencyContactPhone = '',
+    this.cnic = '',
+    this.gender = '',
+    this.maritalStatus = '',
+    this.birthDate = '',
+    this.age = 0,
+    this.bloodGroup = '',
+    this.languages = const [],
+    this.languagesOther = '',
+    this.referBy = '',
+    this.insurance = '',
+    this.image = '',
+    this.status = '',
+    this.cardUid = '',
+    this.walletBalance = 0,
+    this.insurancePanel = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.createdBy = 0,
+    this.updatedBy = 0,
+    this.deletedAt = '',
+    this.userId = 0,
+    this.imageUrl = '',
+    this.cityLabel = '',
+    this.languagesLabels = const [],
+    this.maritalStatusLabel = '',
+    this.visits = const [],
+    this.packages = const [],
+    this.user = const AppUser(),
+  });
+
+  factory Patient.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
     return Patient(
-      id: json["id"] ?? 0,
-      name: json["name"] ?? "",
-      fatherHusbandName: json["father_husband_name"],
-      email: json["email"] ?? "",
-      address: json["address"],
-      city: json["city"],
-      cityOther: json["city_other"],
-      passportNo: json["passport_no"],
-      phone: json["phone"] ?? "",
-      emergencyContactPhone: json["emergency_contact_phone"],
-      cnic: json["cnic"] ?? "",
-      gender: json["gender"] ?? "",
-      maritalStatus: json["marital_status"],
-      birthDate: DateTime.tryParse(json["birth_date"] ?? ""),
-      age: json["age"] ?? 0,
-      bloodGroup: json["blood_group"] ?? "",
-      languages: json["languages"],
-      languagesOther: json["languages_other"],
-      referBy: json["refer_by"] ?? "",
-      insurance: json["insurance"] ?? "",
-      image: json["image"] ?? "",
-      status: json["status"] ?? "",
-      cardUid: json["card_uid"],
-      walletBalance: json["wallet_balance"] ?? 0,
-      insurancePanel: json["insurance_panel"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      createdBy: json["created_by"] ?? 0,
-      updatedBy: json["updated_by"] ?? 0,
-      deletedAt: json["deleted_at"],
-      userId: json["user_id"] ?? 0,
-      visits: json["visits"] == null ? [] : List<LastVisitElement>.from(json["visits"]!.map((x) => LastVisitElement.fromJson(x))),
-      packages: json["packages"] == null ? [] : List<Package>.from(json["packages"]!.map((x) => Package.fromJson(x))),
-      user: json["user"] == null ? null : User.fromJson(json["user"]),
+      id: _asInt(data['id']),
+      name: _asString(data['name']),
+      fatherHusbandName: _asString(data['father_husband_name']),
+      email: _asString(data['email']),
+      address: _asString(data['address']),
+      city: _asString(data['city']),
+      cityOther: _asString(data['city_other']),
+      passportNo: _asString(data['passport_no']),
+      phone: _asString(data['phone']),
+      occupation: _asString(data['occupation']),
+      emergencyContactPhone: _asString(data['emergency_contact_phone']),
+      cnic: _asString(data['cnic']),
+      gender: _asString(data['gender']),
+      maritalStatus: _asString(data['marital_status']),
+      birthDate: _asString(data['birth_date']),
+      age: _asInt(data['age']),
+      bloodGroup: _asString(data['blood_group']),
+      languages: _asStringList(data['languages']),
+      languagesOther: _asString(data['languages_other']),
+      referBy: _asString(data['refer_by']),
+      insurance: _asString(data['insurance']),
+      image: _asString(data['image']),
+      status: _asString(data['status']),
+      cardUid: _asString(data['card_uid']),
+      walletBalance: _asDouble(data['wallet_balance']),
+      insurancePanel: _asString(data['insurance_panel']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      createdBy: _asInt(data['created_by']),
+      updatedBy: _asInt(data['updated_by']),
+      deletedAt: _asString(data['deleted_at']),
+      userId: _asInt(data['user_id']),
+      imageUrl: _asString(data['image_url']),
+      cityLabel: _asString(data['city_label']),
+      languagesLabels: _asStringList(data['languages_labels']),
+      maritalStatusLabel: _asString(data['marital_status_label']),
+      visits: _asListMap(data['visits']).map(Visit.fromJson).toList(),
+      packages: _asListMap(
+        data['packages'],
+      ).map(PatientPackage.fromJson).toList(),
+      user: AppUser.fromJson(_asMap(data['user'])),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "father_husband_name": fatherHusbandName,
-    "email": email,
-    "address": address,
-    "city": city,
-    "city_other": cityOther,
-    "passport_no": passportNo,
-    "phone": phone,
-    "emergency_contact_phone": emergencyContactPhone,
-    "cnic": cnic,
-    "gender": gender,
-    "marital_status": maritalStatus,
-    "birth_date": birthDate?.toIso8601String(),
-    "age": age,
-    "blood_group": bloodGroup,
-    "languages": languages,
-    "languages_other": languagesOther,
-    "refer_by": referBy,
-    "insurance": insurance,
-    "image": image,
-    "status": status,
-    "card_uid": cardUid,
-    "wallet_balance": walletBalance,
-    "insurance_panel": insurancePanel,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "deleted_at": deletedAt,
-    "user_id": userId,
-    "visits": visits.map((x) => x?.toJson()).toList(),
-    "packages": packages.map((x) => x?.toJson()).toList(),
-    "user": user?.toJson(),
+    'id': id,
+    'name': name,
+    'father_husband_name': fatherHusbandName,
+    'email': email,
+    'address': address,
+    'city': city,
+    'city_other': cityOther,
+    'passport_no': passportNo,
+    'phone': phone,
+    'occupation': occupation,
+    'emergency_contact_phone': emergencyContactPhone,
+    'cnic': cnic,
+    'gender': gender,
+    'marital_status': maritalStatus,
+    'birth_date': birthDate,
+    'age': age,
+    'blood_group': bloodGroup,
+    'languages': languages,
+    'languages_other': languagesOther,
+    'refer_by': referBy,
+    'insurance': insurance,
+    'image': image,
+    'status': status,
+    'card_uid': cardUid,
+    'wallet_balance': walletBalance,
+    'insurance_panel': insurancePanel,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'created_by': createdBy,
+    'updated_by': updatedBy,
+    'deleted_at': deletedAt,
+    'user_id': userId,
+    'image_url': imageUrl,
+    'city_label': cityLabel,
+    'languages_labels': languagesLabels,
+    'marital_status_label': maritalStatusLabel,
+    'visits': visits.map((e) => e.toJson()).toList(),
+    'packages': packages.map((e) => e.toJson()).toList(),
+    'user': user.toJson(),
   };
-
 }
 
-class Package {
-  Package({
-    required this.id,
-    required this.name,
-    required this.sessions,
-    required this.price,
-    required this.image,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.deletedAt,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.pivot,
-  });
-
+class Visit {
   final int id;
-  final String name;
-  final int sessions;
-  final String price;
-  final dynamic image;
-  final int createdBy;
-  final int updatedBy;
-  final dynamic deletedAt;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final Pivot? pivot;
-
-  factory Package.fromJson(Map<String, dynamic> json){
-    return Package(
-      id: json["id"] ?? 0,
-      name: json["name"] ?? "",
-      sessions: json["sessions"] ?? 0,
-      price: json["price"] ?? "",
-      image: json["image"],
-      createdBy: json["created_by"] ?? 0,
-      updatedBy: json["updated_by"] ?? 0,
-      deletedAt: json["deleted_at"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      pivot: json["pivot"] == null ? null : Pivot.fromJson(json["pivot"]),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "sessions": sessions,
-    "price": price,
-    "image": image,
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "deleted_at": deletedAt,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "pivot": pivot?.toJson(),
-  };
-
-}
-
-class Pivot {
-  Pivot({
-    required this.patientId,
-    required this.packageId,
-    required this.status,
-    required this.sessionsUsed,
-    required this.sessionsTotal,
-    required this.price,
-    required this.startsAt,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
+  final int parentVisitId;
   final int patientId;
-  final int packageId;
+  final int clinicId;
+  final int receptionistId;
+  final int assistantManagerId;
+  final int historyTakerId;
+  final int consultantId;
+  final int therapistId;
+  final int requestedTherapistId;
+  final int dryNeedlerId;
+  final bool pendingDryNeedling;
+  final String type;
   final String status;
-  final int sessionsUsed;
-  final int sessionsTotal;
-  final int price;
-  final dynamic startsAt;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final int invoiceId;
+  final double consultationFee;
+  final String currentStage;
+  final String requestType;
+  final String requestNote;
+  final String visitAt;
+  final String giftPicture;
+  final String createdAt;
+  final String updatedAt;
 
-  factory Pivot.fromJson(Map<String, dynamic> json){
-    return Pivot(
-      patientId: json["patient_id"] ?? 0,
-      packageId: json["package_id"] ?? 0,
-      status: json["status"] ?? "",
-      sessionsUsed: json["sessions_used"] ?? 0,
-      sessionsTotal: json["sessions_total"] ?? 0,
-      price: json["price"] ?? 0,
-      startsAt: json["starts_at"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
+  final AppUser receptionist;
+  final AppUser assistantManager;
+  final AppUser consultant;
+  final AppUser therapist;
+  final InvoiceRecord invoice;
+
+  final Map<String, dynamic> consultantAssessment;
+  final Map<String, dynamic> amAssessment;
+  final Map<String, dynamic> historyTaking;
+
+  const Visit({
+    this.id = 0,
+    this.parentVisitId = 0,
+    this.patientId = 0,
+    this.clinicId = 0,
+    this.receptionistId = 0,
+    this.assistantManagerId = 0,
+    this.historyTakerId = 0,
+    this.consultantId = 0,
+    this.therapistId = 0,
+    this.requestedTherapistId = 0,
+    this.dryNeedlerId = 0,
+    this.pendingDryNeedling = false,
+    this.type = '',
+    this.status = '',
+    this.invoiceId = 0,
+    this.consultationFee = 0,
+    this.currentStage = '',
+    this.requestType = '',
+    this.requestNote = '',
+    this.visitAt = '',
+    this.giftPicture = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.receptionist = const AppUser(),
+    this.assistantManager = const AppUser(),
+    this.consultant = const AppUser(),
+    this.therapist = const AppUser(),
+    this.invoice = const InvoiceRecord(),
+    this.consultantAssessment = const {},
+    this.amAssessment = const {},
+    this.historyTaking = const {},
+  });
+
+  factory Visit.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
+    return Visit(
+      id: _asInt(data['id']),
+      parentVisitId: _asInt(data['parent_visit_id']),
+      patientId: _asInt(data['patient_id']),
+      clinicId: _asInt(data['clinic_id']),
+      receptionistId: _asInt(data['receptionist_id']),
+      assistantManagerId: _asInt(data['assistant_manager_id']),
+      historyTakerId: _asInt(data['history_taker_id']),
+      consultantId: _asInt(data['consultant_id']),
+      therapistId: _asInt(data['therapist_id']),
+      requestedTherapistId: _asInt(data['requested_therapist_id']),
+      dryNeedlerId: _asInt(data['dry_needler_id']),
+      pendingDryNeedling: _asBool(data['pending_dry_needling']),
+      type: _asString(data['type']),
+      status: _asString(data['status']),
+      invoiceId: _asInt(data['invoice_id']),
+      consultationFee: _asDouble(data['consultation_fee']),
+      currentStage: _asString(data['current_stage']),
+      requestType: _asString(data['request_type']),
+      requestNote: _asString(data['request_note']),
+      visitAt: _asString(data['visit_at']),
+      giftPicture: _asString(data['gift_picture']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      receptionist: AppUser.fromJson(_asMap(data['receptionist'])),
+      assistantManager: AppUser.fromJson(_asMap(data['assistant_manager'])),
+      consultant: AppUser.fromJson(_asMap(data['consultant'])),
+      therapist: AppUser.fromJson(_asMap(data['therapist'])),
+      invoice: InvoiceRecord.fromJson(_asMap(data['invoice'])),
+      consultantAssessment: _asMap(data['consultant_assessment']),
+      amAssessment: _asMap(data['am_assessment']),
+      historyTaking: _asMap(data['history_taking']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "patient_id": patientId,
-    "package_id": packageId,
-    "status": status,
-    "sessions_used": sessionsUsed,
-    "sessions_total": sessionsTotal,
-    "price": price,
-    "starts_at": startsAt,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
+    'id': id,
+    'parent_visit_id': parentVisitId,
+    'patient_id': patientId,
+    'clinic_id': clinicId,
+    'receptionist_id': receptionistId,
+    'assistant_manager_id': assistantManagerId,
+    'history_taker_id': historyTakerId,
+    'consultant_id': consultantId,
+    'therapist_id': therapistId,
+    'requested_therapist_id': requestedTherapistId,
+    'dry_needler_id': dryNeedlerId,
+    'pending_dry_needling': pendingDryNeedling,
+    'type': type,
+    'status': status,
+    'invoice_id': invoiceId,
+    'consultation_fee': consultationFee,
+    'current_stage': currentStage,
+    'request_type': requestType,
+    'request_note': requestNote,
+    'visit_at': visitAt,
+    'gift_picture': giftPicture,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'receptionist': receptionist.toJson(),
+    'assistant_manager': assistantManager.toJson(),
+    'consultant': consultant.toJson(),
+    'therapist': therapist.toJson(),
+    'invoice': invoice.toJson(),
+    'consultant_assessment': consultantAssessment,
+    'am_assessment': amAssessment,
+    'history_taking': historyTaking,
   };
-
 }
 
-class User {
-  User({
-    required this.id,
-    required this.name,
-    required this.username,
-    required this.email,
-    required this.emailVerifiedAt,
-    required this.profilePicture,
-    required this.isLogin,
-    required this.userType,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.deletedAt,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.clinicId,
-    required this.roomId,
-    required this.departmentId,
-    required this.designationId,
-    required this.shiftId,
-    required this.phone,
-    required this.cnic,
-  });
-
+class AppUser {
   final int id;
   final String name;
   final String username;
   final String email;
-  final dynamic emailVerifiedAt;
   final String profilePicture;
   final int isLogin;
   final int userType;
   final int createdBy;
   final int updatedBy;
-  final dynamic deletedAt;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String deletedAt;
+  final String createdAt;
+  final String updatedAt;
   final int clinicId;
   final int roomId;
   final int departmentId;
@@ -334,880 +367,475 @@ class User {
   final int shiftId;
   final String phone;
   final String cnic;
+  final String deviceId;
+  final Map<String, dynamic> detail;
 
-  factory User.fromJson(Map<String, dynamic> json){
-    return User(
-      id: json["id"] ?? 0,
-      name: json["name"] ?? "",
-      username: json["username"] ?? "",
-      email: json["email"] ?? "",
-      emailVerifiedAt: json["email_verified_at"],
-      profilePicture: json["profile_picture"] ?? "",
-      isLogin: json["is_login"] ?? 0,
-      userType: json["user_type"] ?? 0,
-      createdBy: json["created_by"] ?? 0,
-      updatedBy: json["updated_by"] ?? 0,
-      deletedAt: json["deleted_at"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      clinicId: json["clinic_id"] ?? 0,
-      roomId: json["room_id"] ?? 0,
-      departmentId: json["department_id"] ?? 0,
-      designationId: json["designation_id"] ?? 0,
-      shiftId: json["shift_id"] ?? 0,
-      phone: json["phone"] ?? "",
-      cnic: json["cnic"] ?? "",
+  const AppUser({
+    this.id = 0,
+    this.name = '',
+    this.username = '',
+    this.email = '',
+    this.profilePicture = '',
+    this.isLogin = 0,
+    this.userType = 0,
+    this.createdBy = 0,
+    this.updatedBy = 0,
+    this.deletedAt = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.clinicId = 0,
+    this.roomId = 0,
+    this.departmentId = 0,
+    this.designationId = 0,
+    this.shiftId = 0,
+    this.phone = '',
+    this.cnic = '',
+    this.deviceId = '',
+    this.detail = const {},
+  });
+
+  factory AppUser.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
+    return AppUser(
+      id: _asInt(data['id']),
+      name: _asString(data['name']),
+      username: _asString(data['username']),
+      email: _asString(data['email']),
+      profilePicture: _asString(data['profile_picture']),
+      isLogin: _asInt(data['is_login']),
+      userType: _asInt(data['user_type']),
+      createdBy: _asInt(data['created_by']),
+      updatedBy: _asInt(data['updated_by']),
+      deletedAt: _asString(data['deleted_at']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      clinicId: _asInt(data['clinic_id']),
+      roomId: _asInt(data['room_id']),
+      departmentId: _asInt(data['department_id']),
+      designationId: _asInt(data['designation_id']),
+      shiftId: _asInt(data['shift_id']),
+      phone: _asString(data['phone']),
+      cnic: _asString(data['cnic']),
+      deviceId: _asString(data['device_id']),
+      detail: _asMap(data['detail']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "username": username,
-    "email": email,
-    "email_verified_at": emailVerifiedAt,
-    "profile_picture": profilePicture,
-    "is_login": isLogin,
-    "user_type": userType,
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "deleted_at": deletedAt,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "clinic_id": clinicId,
-    "room_id": roomId,
-    "department_id": departmentId,
-    "designation_id": designationId,
-    "shift_id": shiftId,
-    "phone": phone,
-    "cnic": cnic,
+    'id': id,
+    'name': name,
+    'username': username,
+    'email': email,
+    'profile_picture': profilePicture,
+    'is_login': isLogin,
+    'user_type': userType,
+    'created_by': createdBy,
+    'updated_by': updatedBy,
+    'deleted_at': deletedAt,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'clinic_id': clinicId,
+    'room_id': roomId,
+    'department_id': departmentId,
+    'designation_id': designationId,
+    'shift_id': shiftId,
+    'phone': phone,
+    'cnic': cnic,
+    'device_id': deviceId,
+    'detail': detail,
   };
-
 }
 
-class LastVisitElement {
-  LastVisitElement({
-    required this.id,
-    required this.parentVisitId,
-    required this.patientId,
-    required this.clinicId,
-    required this.receptionistId,
-    required this.assistantManagerId,
-    required this.historyTakerId,
-    required this.consultantId,
-    required this.therapistId,
-    required this.type,
-    required this.status,
-    required this.invoiceId,
-    required this.consultationFee,
-    required this.currentStage,
-    required this.visitAt,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.receptionist,
-    required this.assistantManager,
-    required this.consultant,
-    required this.therapist,
-    required this.invoice,
-    required this.consultantAssessment,
-    required this.amAssessment,
-    required this.historyTaker,
-  });
-
+class PatientPackage {
   final int id;
-  final int parentVisitId;
-  final int patientId;
-  final int clinicId;
-  final int receptionistId;
-  final int assistantManagerId;
-  final dynamic historyTakerId;
-  final int consultantId;
-  final int therapistId;
-  final String type;
-  final dynamic status;
-  final dynamic invoiceId;
-  final int consultationFee;
-  final String currentStage;
-  final DateTime? visitAt;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final User? receptionist;
-  final User? assistantManager;
-  final User? consultant;
-  final User? therapist;
-  final Invoice? invoice;
-  final ConsultantAssessment? consultantAssessment;
-  final AmAssessment? amAssessment;
-  final dynamic historyTaker;
-
-  factory LastVisitElement.fromJson(Map<String, dynamic> json){
-    return LastVisitElement(
-      id: json["id"] ?? 0,
-      parentVisitId: json["parent_visit_id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      clinicId: json["clinic_id"] ?? 0,
-      receptionistId: json["receptionist_id"] ?? 0,
-      assistantManagerId: json["assistant_manager_id"] ?? 0,
-      historyTakerId: json["history_taker_id"],
-      consultantId: json["consultant_id"] ?? 0,
-      therapistId: json["therapist_id"] ?? 0,
-      type: json["type"] ?? "",
-      status: json["status"],
-      invoiceId: json["invoice_id"],
-      consultationFee: json["consultation_fee"] ?? 0,
-      currentStage: json["current_stage"] ?? "",
-      visitAt: DateTime.tryParse(json["visit_at"] ?? ""),
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      receptionist: json["receptionist"] == null ? null : User.fromJson(json["receptionist"]),
-      assistantManager: json["assistant_manager"] == null ? null : User.fromJson(json["assistant_manager"]),
-      consultant: json["consultant"] == null ? null : User.fromJson(json["consultant"]),
-      therapist: json["therapist"] == null ? null : User.fromJson(json["therapist"]),
-      invoice: json["invoice"] == null ? null : Invoice.fromJson(json["invoice"]),
-      consultantAssessment: json["consultant_assessment"] == null ? null : ConsultantAssessment.fromJson(json["consultant_assessment"]),
-      amAssessment: json["am_assessment"] == null ? null : AmAssessment.fromJson(json["am_assessment"]),
-      historyTaker: json["history_taker"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "parent_visit_id": parentVisitId,
-    "patient_id": patientId,
-    "clinic_id": clinicId,
-    "receptionist_id": receptionistId,
-    "assistant_manager_id": assistantManagerId,
-    "history_taker_id": historyTakerId,
-    "consultant_id": consultantId,
-    "therapist_id": therapistId,
-    "type": type,
-    "status": status,
-    "invoice_id": invoiceId,
-    "consultation_fee": consultationFee,
-    "current_stage": currentStage,
-    "visit_at": visitAt?.toIso8601String(),
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "receptionist": receptionist?.toJson(),
-    "assistant_manager": assistantManager?.toJson(),
-    "consultant": consultant?.toJson(),
-    "therapist": therapist?.toJson(),
-    "invoice": invoice?.toJson(),
-    "consultant_assessment": consultantAssessment?.toJson(),
-    "am_assessment": amAssessment?.toJson(),
-    "history_taker": historyTaker,
-  };
-
-}
-
-class AmAssessment {
-  AmAssessment({
-    required this.id,
-    required this.visitId,
-    required this.assistantManagerId,
-    required this.occupation,
-    required this.dailyActivities,
-    required this.chiefComplaint,
-    required this.complaintOnset,
-    required this.onsetType,
-    required this.painLocation,
-    required this.painType,
-    required this.painSeverity,
-    required this.painRadiation,
-    required this.aggravatingFactors,
-    required this.relievingFactors,
-    required this.symptomPattern,
-    required this.symptomProgression,
-    required this.functionalLimitations,
-    required this.functionalImpact,
-    required this.activitiesUnable,
-    required this.pastSimilarSymptoms,
-    required this.pastInjuriesSurgeries,
-    required this.chronicConditions,
-    required this.currentMedications,
-    required this.jobDetails,
-    required this.exerciseHabits,
-    required this.smokingStatus,
-    required this.alcoholStatus,
-    required this.redFlags,
-    required this.nightPain,
-    required this.sleepPosition,
-    required this.sleepSupports,
-    required this.patientGoals,
-    required this.additionalNotes,
-    required this.consentGiven,
-    required this.consultantId,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  final int id;
-  final int visitId;
-  final int assistantManagerId;
-  final dynamic occupation;
-  final dynamic dailyActivities;
-  final String chiefComplaint;
-  final dynamic complaintOnset;
-  final dynamic onsetType;
-  final dynamic painLocation;
-  final dynamic painType;
-  final dynamic painSeverity;
-  final dynamic painRadiation;
-  final dynamic aggravatingFactors;
-  final dynamic relievingFactors;
-  final dynamic symptomPattern;
-  final dynamic symptomProgression;
-  final List<String> functionalLimitations;
-  final dynamic functionalImpact;
-  final dynamic activitiesUnable;
-  final dynamic pastSimilarSymptoms;
-  final dynamic pastInjuriesSurgeries;
-  final dynamic chronicConditions;
-  final dynamic currentMedications;
-  final dynamic jobDetails;
-  final dynamic exerciseHabits;
-  final dynamic smokingStatus;
-  final dynamic alcoholStatus;
-  final List<String> redFlags;
-  final dynamic nightPain;
-  final dynamic sleepPosition;
-  final dynamic sleepSupports;
-  final String patientGoals;
-  final dynamic additionalNotes;
-  final bool consentGiven;
-  final int consultantId;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  factory AmAssessment.fromJson(Map<String, dynamic> json){
-    return AmAssessment(
-      id: json["id"] ?? 0,
-      visitId: json["visit_id"] ?? 0,
-      assistantManagerId: json["assistant_manager_id"] ?? 0,
-      occupation: json["occupation"],
-      dailyActivities: json["daily_activities"],
-      chiefComplaint: json["chief_complaint"] ?? "",
-      complaintOnset: json["complaint_onset"],
-      onsetType: json["onset_type"],
-      painLocation: json["pain_location"],
-      painType: json["pain_type"],
-      painSeverity: json["pain_severity"],
-      painRadiation: json["pain_radiation"],
-      aggravatingFactors: json["aggravating_factors"],
-      relievingFactors: json["relieving_factors"],
-      symptomPattern: json["symptom_pattern"],
-      symptomProgression: json["symptom_progression"],
-      functionalLimitations: json["functional_limitations"] == null ? [] : List<String>.from(json["functional_limitations"]!.map((x) => x)),
-      functionalImpact: json["functional_impact"],
-      activitiesUnable: json["activities_unable"],
-      pastSimilarSymptoms: json["past_similar_symptoms"],
-      pastInjuriesSurgeries: json["past_injuries_surgeries"],
-      chronicConditions: json["chronic_conditions"],
-      currentMedications: json["current_medications"],
-      jobDetails: json["job_details"],
-      exerciseHabits: json["exercise_habits"],
-      smokingStatus: json["smoking_status"],
-      alcoholStatus: json["alcohol_status"],
-      redFlags: json["red_flags"] == null ? [] : List<String>.from(json["red_flags"]!.map((x) => x)),
-      nightPain: json["night_pain"],
-      sleepPosition: json["sleep_position"],
-      sleepSupports: json["sleep_supports"],
-      patientGoals: json["patient_goals"] ?? "",
-      additionalNotes: json["additional_notes"],
-      consentGiven: json["consent_given"] ?? false,
-      consultantId: json["consultant_id"] ?? 0,
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "visit_id": visitId,
-    "assistant_manager_id": assistantManagerId,
-    "occupation": occupation,
-    "daily_activities": dailyActivities,
-    "chief_complaint": chiefComplaint,
-    "complaint_onset": complaintOnset,
-    "onset_type": onsetType,
-    "pain_location": painLocation,
-    "pain_type": painType,
-    "pain_severity": painSeverity,
-    "pain_radiation": painRadiation,
-    "aggravating_factors": aggravatingFactors,
-    "relieving_factors": relievingFactors,
-    "symptom_pattern": symptomPattern,
-    "symptom_progression": symptomProgression,
-    "functional_limitations": functionalLimitations.map((x) => x).toList(),
-    "functional_impact": functionalImpact,
-    "activities_unable": activitiesUnable,
-    "past_similar_symptoms": pastSimilarSymptoms,
-    "past_injuries_surgeries": pastInjuriesSurgeries,
-    "chronic_conditions": chronicConditions,
-    "current_medications": currentMedications,
-    "job_details": jobDetails,
-    "exercise_habits": exerciseHabits,
-    "smoking_status": smokingStatus,
-    "alcohol_status": alcoholStatus,
-    "red_flags": redFlags.map((x) => x).toList(),
-    "night_pain": nightPain,
-    "sleep_position": sleepPosition,
-    "sleep_supports": sleepSupports,
-    "patient_goals": patientGoals,
-    "additional_notes": additionalNotes,
-    "consent_given": consentGiven,
-    "consultant_id": consultantId,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-  };
-
-}
-
-class ConsultantAssessment {
-  ConsultantAssessment({
-    required this.id,
-    required this.patientId,
-    required this.visitId,
-    required this.consultantId,
-    required this.observationFindings,
-    required this.palpationResults,
-    required this.romAssessment,
-    required this.neuroSpecialTests,
-    required this.differentialDiagnoses,
-    required this.finalDiagnosis,
-    required this.freqPerWeek,
-    required this.durationWeeks,
-    required this.treatments,
-    required this.medPainReliever,
-    required this.medMuscleRelaxant,
-    required this.medSupplements,
-    required this.invXray,
-    required this.invMri,
-    required this.invBloodTests,
-    required this.adviceActivity,
-    required this.adviceErgonomics,
-    required this.adviceHomeEx,
-    required this.nextReviewDate,
-    required this.rehabGoals,
-    required this.skinIssues,
-    required this.skinIssuesOther,
-    required this.skipMmt,
-    required this.mmt,
-    required this.specialTests,
-    required this.muscleAssessments,
-    required this.treatment,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  final int id;
-  final int patientId;
-  final int visitId;
-  final int consultantId;
-  final String observationFindings;
-  final String palpationResults;
-  final String romAssessment;
-  final String neuroSpecialTests;
-  final String differentialDiagnoses;
-  final String finalDiagnosis;
-  final int freqPerWeek;
-  final int durationWeeks;
-  final List<String> treatments;
-  final String medPainReliever;
-  final String medMuscleRelaxant;
-  final String medSupplements;
-  final String invXray;
-  final String invMri;
-  final String invBloodTests;
-  final String adviceActivity;
-  final String adviceErgonomics;
-  final String adviceHomeEx;
-  final DateTime? nextReviewDate;
-  final String rehabGoals;
-  final dynamic skinIssues;
-  final dynamic skinIssuesOther;
-  final bool skipMmt;
-  final dynamic mmt;
-  final dynamic specialTests;
-  final dynamic muscleAssessments;
-  final dynamic treatment;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  factory ConsultantAssessment.fromJson(Map<String, dynamic> json){
-    return ConsultantAssessment(
-      id: json["id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      visitId: json["visit_id"] ?? 0,
-      consultantId: json["consultant_id"] ?? 0,
-      observationFindings: json["observation_findings"] ?? "",
-      palpationResults: json["palpation_results"] ?? "",
-      romAssessment: json["rom_assessment"] ?? "",
-      neuroSpecialTests: json["neuro_special_tests"] ?? "",
-      differentialDiagnoses: json["differential_diagnoses"] ?? "",
-      finalDiagnosis: json["final_diagnosis"] ?? "",
-      freqPerWeek: json["freq_per_week"] ?? 0,
-      durationWeeks: json["duration_weeks"] ?? 0,
-      treatments: json["treatments"] == null ? [] : List<String>.from(json["treatments"]!.map((x) => x)),
-      medPainReliever: json["med_pain_reliever"] ?? "",
-      medMuscleRelaxant: json["med_muscle_relaxant"] ?? "",
-      medSupplements: json["med_supplements"] ?? "",
-      invXray: json["inv_xray"] ?? "",
-      invMri: json["inv_mri"] ?? "",
-      invBloodTests: json["inv_blood_tests"] ?? "",
-      adviceActivity: json["advice_activity"] ?? "",
-      adviceErgonomics: json["advice_ergonomics"] ?? "",
-      adviceHomeEx: json["advice_home_ex"] ?? "",
-      nextReviewDate: DateTime.tryParse(json["next_review_date"] ?? ""),
-      rehabGoals: json["rehab_goals"] ?? "",
-      skinIssues: json["skin_issues"],
-      skinIssuesOther: json["skin_issues_other"],
-      skipMmt: json["skip_mmt"] ?? false,
-      mmt: json["mmt"],
-      specialTests: json["special_tests"],
-      muscleAssessments: json["muscle_assessments"],
-      treatment: json["treatment"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "patient_id": patientId,
-    "visit_id": visitId,
-    "consultant_id": consultantId,
-    "observation_findings": observationFindings,
-    "palpation_results": palpationResults,
-    "rom_assessment": romAssessment,
-    "neuro_special_tests": neuroSpecialTests,
-    "differential_diagnoses": differentialDiagnoses,
-    "final_diagnosis": finalDiagnosis,
-    "freq_per_week": freqPerWeek,
-    "duration_weeks": durationWeeks,
-    "treatments": treatments.map((x) => x).toList(),
-    "med_pain_reliever": medPainReliever,
-    "med_muscle_relaxant": medMuscleRelaxant,
-    "med_supplements": medSupplements,
-    "inv_xray": invXray,
-    "inv_mri": invMri,
-    "inv_blood_tests": invBloodTests,
-    "advice_activity": adviceActivity,
-    "advice_ergonomics": adviceErgonomics,
-    "advice_home_ex": adviceHomeEx,
-    "next_review_date": nextReviewDate?.toIso8601String(),
-    "rehab_goals": rehabGoals,
-    "skin_issues": skinIssues,
-    "skin_issues_other": skinIssuesOther,
-    "skip_mmt": skipMmt,
-    "mmt": mmt,
-    "special_tests": specialTests,
-    "muscle_assessments": muscleAssessments,
-    "treatment": treatment,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-  };
-
-}
-
-class Invoice {
-  Invoice({
-    required this.id,
-    required this.patientId,
-    required this.visitId,
-    required this.therapySessionId,
-    required this.type,
-    required this.amount,
-    required this.status,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  final int id;
-  final int patientId;
-  final int visitId;
-  final dynamic therapySessionId;
-  final String type;
-  final String amount;
-  final String status;
+  final String name;
+  final int sessions;
+  final String price;
+  final String image;
   final int createdBy;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final int updatedBy;
+  final String deletedAt;
+  final String createdAt;
+  final String updatedAt;
+  final Map<String, dynamic> pivot;
 
-  factory Invoice.fromJson(Map<String, dynamic> json){
-    return Invoice(
-      id: json["id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      visitId: json["visit_id"] ?? 0,
-      therapySessionId: json["therapy_session_id"],
-      type: json["type"] ?? "",
-      amount: json["amount"] ?? "",
-      status: json["status"] ?? "",
-      createdBy: json["created_by"] ?? 0,
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "patient_id": patientId,
-    "visit_id": visitId,
-    "therapy_session_id": therapySessionId,
-    "type": type,
-    "amount": amount,
-    "status": status,
-    "created_by": createdBy,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-  };
-
-}
-
-class RecentInvoice {
-  RecentInvoice({
-    required this.id,
-    required this.patientId,
-    required this.visitId,
-    required this.therapySessionId,
-    required this.type,
-    required this.amount,
-    required this.status,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.paidAmount,
-    required this.balance,
-    required this.computedStatus,
-    required this.visit,
-    required this.payments,
+  const PatientPackage({
+    this.id = 0,
+    this.name = '',
+    this.sessions = 0,
+    this.price = '',
+    this.image = '',
+    this.createdBy = 0,
+    this.updatedBy = 0,
+    this.deletedAt = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.pivot = const {},
   });
 
-  final int id;
-  final int patientId;
-  final int visitId;
-  final dynamic therapySessionId;
-  final String type;
-  final String amount;
-  final String status;
-  final int createdBy;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final int paidAmount;
-  final int balance;
-  final String computedStatus;
-  final RecentInvoiceVisit? visit;
-  final List<Payment> payments;
-
-  factory RecentInvoice.fromJson(Map<String, dynamic> json){
-    return RecentInvoice(
-      id: json["id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      visitId: json["visit_id"] ?? 0,
-      therapySessionId: json["therapy_session_id"],
-      type: json["type"] ?? "",
-      amount: json["amount"] ?? "",
-      status: json["status"] ?? "",
-      createdBy: json["created_by"] ?? 0,
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      paidAmount: json["paid_amount"] ?? 0,
-      balance: json["balance"] ?? 0,
-      computedStatus: json["computed_status"] ?? "",
-      visit: json["visit"] == null ? null : RecentInvoiceVisit.fromJson(json["visit"]),
-      payments: json["payments"] == null ? [] : List<Payment>.from(json["payments"]!.map((x) => Payment.fromJson(x))),
+  factory PatientPackage.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
+    return PatientPackage(
+      id: _asInt(data['id']),
+      name: _asString(data['name']),
+      sessions: _asInt(data['sessions']),
+      price: _asString(data['price']),
+      image: _asString(data['image']),
+      createdBy: _asInt(data['created_by']),
+      updatedBy: _asInt(data['updated_by']),
+      deletedAt: _asString(data['deleted_at']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      pivot: _asMap(data['pivot']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "patient_id": patientId,
-    "visit_id": visitId,
-    "therapy_session_id": therapySessionId,
-    "type": type,
-    "amount": amount,
-    "status": status,
-    "created_by": createdBy,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "paid_amount": paidAmount,
-    "balance": balance,
-    "computed_status": computedStatus,
-    "visit": visit?.toJson(),
-    "payments": payments.map((x) => x?.toJson()).toList(),
+    'id': id,
+    'name': name,
+    'sessions': sessions,
+    'price': price,
+    'image': image,
+    'created_by': createdBy,
+    'updated_by': updatedBy,
+    'deleted_at': deletedAt,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'pivot': pivot,
   };
-
-}
-
-class Payment {
-  Payment({
-    required this.id,
-    required this.invoiceId,
-    required this.patientId,
-    required this.clinicId,
-    required this.createdBy,
-    required this.amount,
-    required this.method,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.type,
-  });
-
-  final int id;
-  final int invoiceId;
-  final int patientId;
-  final dynamic clinicId;
-  final int createdBy;
-  final String amount;
-  final String method;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final String type;
-
-  factory Payment.fromJson(Map<String, dynamic> json){
-    return Payment(
-      id: json["id"] ?? 0,
-      invoiceId: json["invoice_id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      clinicId: json["clinic_id"],
-      createdBy: json["created_by"] ?? 0,
-      amount: json["amount"] ?? "",
-      method: json["method"] ?? "",
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      type: json["type"] ?? "",
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "invoice_id": invoiceId,
-    "patient_id": patientId,
-    "clinic_id": clinicId,
-    "created_by": createdBy,
-    "amount": amount,
-    "method": method,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "type": type,
-  };
-
-}
-
-class RecentInvoiceVisit {
-  RecentInvoiceVisit({
-    required this.id,
-    required this.parentVisitId,
-    required this.patientId,
-    required this.clinicId,
-    required this.receptionistId,
-    required this.assistantManagerId,
-    required this.historyTakerId,
-    required this.consultantId,
-    required this.therapistId,
-    required this.type,
-    required this.status,
-    required this.invoiceId,
-    required this.consultationFee,
-    required this.currentStage,
-    required this.visitAt,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  final int id;
-  final int parentVisitId;
-  final int patientId;
-  final int clinicId;
-  final int receptionistId;
-  final int assistantManagerId;
-  final dynamic historyTakerId;
-  final int consultantId;
-  final int therapistId;
-  final String type;
-  final dynamic status;
-  final dynamic invoiceId;
-  final int consultationFee;
-  final String currentStage;
-  final DateTime? visitAt;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  factory RecentInvoiceVisit.fromJson(Map<String, dynamic> json){
-    return RecentInvoiceVisit(
-      id: json["id"] ?? 0,
-      parentVisitId: json["parent_visit_id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      clinicId: json["clinic_id"] ?? 0,
-      receptionistId: json["receptionist_id"] ?? 0,
-      assistantManagerId: json["assistant_manager_id"] ?? 0,
-      historyTakerId: json["history_taker_id"],
-      consultantId: json["consultant_id"] ?? 0,
-      therapistId: json["therapist_id"] ?? 0,
-      type: json["type"] ?? "",
-      status: json["status"],
-      invoiceId: json["invoice_id"],
-      consultationFee: json["consultation_fee"] ?? 0,
-      currentStage: json["current_stage"] ?? "",
-      visitAt: DateTime.tryParse(json["visit_at"] ?? ""),
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "parent_visit_id": parentVisitId,
-    "patient_id": patientId,
-    "clinic_id": clinicId,
-    "receptionist_id": receptionistId,
-    "assistant_manager_id": assistantManagerId,
-    "history_taker_id": historyTakerId,
-    "consultant_id": consultantId,
-    "therapist_id": therapistId,
-    "type": type,
-    "status": status,
-    "invoice_id": invoiceId,
-    "consultation_fee": consultationFee,
-    "current_stage": currentStage,
-    "visit_at": visitAt?.toIso8601String(),
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-  };
-
 }
 
 class Stats {
-  Stats({
-    required this.totalVisits,
-    required this.consultationVisits,
-    required this.therapyVisits,
-    required this.activePackages,
-    required this.completedPackages,
-    required this.totalSpend,
-    required this.totalAmount,
-    required this.totalSpent,
-    required this.lastVisit,
-    required this.nextAppointment,
-  });
-
   final int totalVisits;
   final int consultationVisits;
   final int therapyVisits;
   final int activePackages;
   final int completedPackages;
   final String totalSpend;
-  final int totalAmount;
-  final int totalSpent;
-  final LastVisitElement? lastVisit;
-  final dynamic nextAppointment;
+  final double totalAmount;
+  final double totalSpent;
+  final Visit lastVisit;
+  final Map<String, dynamic> nextAppointment;
 
-  factory Stats.fromJson(Map<String, dynamic> json){
+  const Stats({
+    this.totalVisits = 0,
+    this.consultationVisits = 0,
+    this.therapyVisits = 0,
+    this.activePackages = 0,
+    this.completedPackages = 0,
+    this.totalSpend = '',
+    this.totalAmount = 0,
+    this.totalSpent = 0,
+    this.lastVisit = const Visit(),
+    this.nextAppointment = const {},
+  });
+
+  factory Stats.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
     return Stats(
-      totalVisits: json["total_visits"] ?? 0,
-      consultationVisits: json["consultation_visits"] ?? 0,
-      therapyVisits: json["therapy_visits"] ?? 0,
-      activePackages: json["active_packages"] ?? 0,
-      completedPackages: json["completed_packages"] ?? 0,
-      totalSpend: json["total_spend"] ?? "",
-      totalAmount: json["total_amount"] ?? 0,
-      totalSpent: json["total_spent"] ?? 0,
-      lastVisit: json["last_visit"] == null ? null : LastVisitElement.fromJson(json["last_visit"]),
-      nextAppointment: json["next_appointment"],
+      totalVisits: _asInt(data['total_visits']),
+      consultationVisits: _asInt(data['consultation_visits']),
+      therapyVisits: _asInt(data['therapy_visits']),
+      activePackages: _asInt(data['active_packages']),
+      completedPackages: _asInt(data['completed_packages']),
+      totalSpend: _asString(data['total_spend']),
+      totalAmount: _asDouble(data['total_amount']),
+      totalSpent: _asDouble(data['total_spent']),
+      lastVisit: Visit.fromJson(_asMap(data['last_visit'])),
+      nextAppointment: _asMap(data['next_appointment']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "total_visits": totalVisits,
-    "consultation_visits": consultationVisits,
-    "therapy_visits": therapyVisits,
-    "active_packages": activePackages,
-    "completed_packages": completedPackages,
-    "total_spend": totalSpend,
-    "total_amount": totalAmount,
-    "total_spent": totalSpent,
-    "last_visit": lastVisit?.toJson(),
-    "next_appointment": nextAppointment,
+    'total_visits': totalVisits,
+    'consultation_visits': consultationVisits,
+    'therapy_visits': therapyVisits,
+    'active_packages': activePackages,
+    'completed_packages': completedPackages,
+    'total_spend': totalSpend,
+    'total_amount': totalAmount,
+    'total_spent': totalSpent,
+    'last_visit': lastVisit.toJson(),
+    'next_appointment': nextAppointment,
   };
+}
 
+class InvoiceRecord {
+  final int id;
+  final int patientId;
+  final int visitId;
+  final int therapySessionId;
+  final String type;
+  final String amount;
+  final String status;
+  final int createdBy;
+  final int insurancePanelId;
+  final String insurancePolicy;
+  final double insuranceDiscountAmount;
+  final String createdAt;
+  final String updatedAt;
+  final double paidAmount;
+  final double balance;
+  final String computedStatus;
+  final Map<String, dynamic> visit;
+  final List<PaymentRecord> payments;
+
+  const InvoiceRecord({
+    this.id = 0,
+    this.patientId = 0,
+    this.visitId = 0,
+    this.therapySessionId = 0,
+    this.type = '',
+    this.amount = '',
+    this.status = '',
+    this.createdBy = 0,
+    this.insurancePanelId = 0,
+    this.insurancePolicy = '',
+    this.insuranceDiscountAmount = 0,
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.paidAmount = 0,
+    this.balance = 0,
+    this.computedStatus = '',
+    this.visit = const {},
+    this.payments = const [],
+  });
+
+  factory InvoiceRecord.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
+    return InvoiceRecord(
+      id: _asInt(data['id']),
+      patientId: _asInt(data['patient_id']),
+      visitId: _asInt(data['visit_id']),
+      therapySessionId: _asInt(data['therapy_session_id']),
+      type: _asString(data['type']),
+      amount: _asString(data['amount']),
+      status: _asString(data['status']),
+      createdBy: _asInt(data['created_by']),
+      insurancePanelId: _asInt(data['insurance_panel_id']),
+      insurancePolicy: _asString(data['insurance_policy']),
+      insuranceDiscountAmount: _asDouble(data['insurance_discount_amount']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      paidAmount: _asDouble(data['paid_amount']),
+      balance: _asDouble(data['balance']),
+      computedStatus: _asString(data['computed_status']),
+      visit: _asMap(data['visit']),
+      payments: _asListMap(
+        data['payments'],
+      ).map(PaymentRecord.fromJson).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'patient_id': patientId,
+    'visit_id': visitId,
+    'therapy_session_id': therapySessionId,
+    'type': type,
+    'amount': amount,
+    'status': status,
+    'created_by': createdBy,
+    'insurance_panel_id': insurancePanelId,
+    'insurance_policy': insurancePolicy,
+    'insurance_discount_amount': insuranceDiscountAmount,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'paid_amount': paidAmount,
+    'balance': balance,
+    'computed_status': computedStatus,
+    'visit': visit,
+    'payments': payments.map((e) => e.toJson()).toList(),
+  };
+}
+
+class PaymentRecord {
+  final int id;
+  final int invoiceId;
+  final int patientId;
+  final int clinicId;
+  final int createdBy;
+  final String amount;
+  final String method;
+  final String tid;
+  final String createdAt;
+  final String updatedAt;
+  final String type;
+
+  const PaymentRecord({
+    this.id = 0,
+    this.invoiceId = 0,
+    this.patientId = 0,
+    this.clinicId = 0,
+    this.createdBy = 0,
+    this.amount = '',
+    this.method = '',
+    this.tid = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.type = '',
+  });
+
+  factory PaymentRecord.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
+    return PaymentRecord(
+      id: _asInt(data['id']),
+      invoiceId: _asInt(data['invoice_id']),
+      patientId: _asInt(data['patient_id']),
+      clinicId: _asInt(data['clinic_id']),
+      createdBy: _asInt(data['created_by']),
+      amount: _asString(data['amount']),
+      method: _asString(data['method']),
+      tid: _asString(data['tid']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      type: _asString(data['type']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'invoice_id': invoiceId,
+    'patient_id': patientId,
+    'clinic_id': clinicId,
+    'created_by': createdBy,
+    'amount': amount,
+    'method': method,
+    'tid': tid,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'type': type,
+  };
 }
 
 class TherapySession {
-  TherapySession({
-    required this.id,
-    required this.patientId,
-    required this.visitId,
-    required this.therapistId,
-    required this.patientPackageId,
-    required this.startTime,
-    required this.endTime,
-    required this.durationSeconds,
-    required this.nextSessionDate,
-    required this.notes,
-    required this.sessionNumber,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.billedInvoiceId,
-    required this.therapist,
-    required this.visit,
-  });
-
   final int id;
   final int patientId;
   final int visitId;
   final int therapistId;
   final int patientPackageId;
-  final DateTime? startTime;
-  final DateTime? endTime;
+  final String startTime;
+  final String endTime;
   final int durationSeconds;
-  final DateTime? nextSessionDate;
+  final Map<String, dynamic> modalitiesData;
+  final String nextSessionDate;
   final String notes;
-  final dynamic sessionNumber;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final dynamic billedInvoiceId;
-  final User? therapist;
-  final RecentInvoiceVisit? visit;
+  final String sessionDuration;
+  final String visitDuration;
+  final int sessionNumber;
+  final String createdAt;
+  final String updatedAt;
+  final int billedInvoiceId;
+  final AppUser therapist;
+  final Map<String, dynamic> visit;
 
-  factory TherapySession.fromJson(Map<String, dynamic> json){
+  const TherapySession({
+    this.id = 0,
+    this.patientId = 0,
+    this.visitId = 0,
+    this.therapistId = 0,
+    this.patientPackageId = 0,
+    this.startTime = '',
+    this.endTime = '',
+    this.durationSeconds = 0,
+    this.modalitiesData = const {},
+    this.nextSessionDate = '',
+    this.notes = '',
+    this.sessionDuration = '',
+    this.visitDuration = '',
+    this.sessionNumber = 0,
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.billedInvoiceId = 0,
+    this.therapist = const AppUser(),
+    this.visit = const {},
+  });
+
+  factory TherapySession.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? {};
     return TherapySession(
-      id: json["id"] ?? 0,
-      patientId: json["patient_id"] ?? 0,
-      visitId: json["visit_id"] ?? 0,
-      therapistId: json["therapist_id"] ?? 0,
-      patientPackageId: json["patient_package_id"] ?? 0,
-      startTime: DateTime.tryParse(json["start_time"] ?? ""),
-      endTime: DateTime.tryParse(json["end_time"] ?? ""),
-      durationSeconds: json["duration_seconds"] ?? 0,
-      nextSessionDate: DateTime.tryParse(json["next_session_date"] ?? ""),
-      notes: json["notes"] ?? "",
-      sessionNumber: json["session_number"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-      billedInvoiceId: json["billed_invoice_id"],
-      therapist: json["therapist"] == null ? null : User.fromJson(json["therapist"]),
-      visit: json["visit"] == null ? null : RecentInvoiceVisit.fromJson(json["visit"]),
+      id: _asInt(data['id']),
+      patientId: _asInt(data['patient_id']),
+      visitId: _asInt(data['visit_id']),
+      therapistId: _asInt(data['therapist_id']),
+      patientPackageId: _asInt(data['patient_package_id']),
+      startTime: _asString(data['start_time']),
+      endTime: _asString(data['end_time']),
+      durationSeconds: _asInt(data['duration_seconds']),
+      modalitiesData: _asMap(data['modalities_data']),
+      nextSessionDate: _asString(data['next_session_date']),
+      notes: _asString(data['notes']),
+      sessionDuration: _asString(data['session_duration']),
+      visitDuration: _asString(data['visit_duration']),
+      sessionNumber: _asInt(data['session_number']),
+      createdAt: _asString(data['created_at']),
+      updatedAt: _asString(data['updated_at']),
+      billedInvoiceId: _asInt(data['billed_invoice_id']),
+      therapist: AppUser.fromJson(_asMap(data['therapist'])),
+      visit: _asMap(data['visit']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "patient_id": patientId,
-    "visit_id": visitId,
-    "therapist_id": therapistId,
-    "patient_package_id": patientPackageId,
-    "start_time": startTime?.toIso8601String(),
-    "end_time": endTime?.toIso8601String(),
-    "duration_seconds": durationSeconds,
-    "next_session_date": nextSessionDate?.toIso8601String(),
-    "notes": notes,
-    "session_number": sessionNumber,
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "billed_invoice_id": billedInvoiceId,
-    "therapist": therapist?.toJson(),
-    "visit": visit?.toJson(),
+    'id': id,
+    'patient_id': patientId,
+    'visit_id': visitId,
+    'therapist_id': therapistId,
+    'patient_package_id': patientPackageId,
+    'start_time': startTime,
+    'end_time': endTime,
+    'duration_seconds': durationSeconds,
+    'modalities_data': modalitiesData,
+    'next_session_date': nextSessionDate,
+    'notes': notes,
+    'session_duration': sessionDuration,
+    'visit_duration': visitDuration,
+    'session_number': sessionNumber,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+    'billed_invoice_id': billedInvoiceId,
+    'therapist': therapist.toJson(),
+    'visit': visit,
   };
+}
 
+// ---------- Null-safe helpers ----------
+String _asString(dynamic v) => v?.toString() ?? '';
+int _asInt(dynamic v) {
+  if (v == null) return 0;
+  if (v is int) return v;
+  return int.tryParse(v.toString()) ?? 0;
+}
+
+double _asDouble(dynamic v) {
+  if (v == null) return 0;
+  if (v is double) return v;
+  if (v is int) return v.toDouble();
+  return double.tryParse(v.toString()) ?? 0;
+}
+
+bool _asBool(dynamic v) {
+  if (v is bool) return v;
+  if (v is num) return v != 0;
+  if (v is String) return v.toLowerCase() == 'true' || v == '1';
+  return false;
+}
+
+List<String> _asStringList(dynamic v) {
+  if (v is List) return v.map((e) => e?.toString() ?? '').toList();
+  return const [];
+}
+
+List<Map<String, dynamic>> _asListMap(dynamic v) {
+  if (v is List) {
+    return v
+        .map((e) => e is Map<String, dynamic> ? e : <String, dynamic>{})
+        .toList();
+  }
+  return const [];
+}
+
+Map<String, dynamic> _asMap(dynamic v) {
+  if (v is Map<String, dynamic>) return v;
+  return <String, dynamic>{};
 }

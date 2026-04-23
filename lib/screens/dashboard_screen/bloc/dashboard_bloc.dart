@@ -11,6 +11,7 @@ import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/app_exceptions/base_exceptions.dart';
 import '../../../core/app_keys/local_keys.dart';
 import '../../../repos/patient_local_repo/patient_local_repo.dart';
 import 'dashboad_states.dart';
@@ -35,58 +36,62 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardStates> {
     DashboardLoadDataEvent event,
     Emitter<DashboardStates> emit,
   ) async {
-    emit(DashboardLoadingState());
-
     // First We have try if exist data in local storage
     // to get patient data and profile data from local storage
-    try {
-      patientData = await patientLocalRepo.getPatientDataLocal();
+    // try {
+    emit(DashboardLoadingState());
+    patientData = await patientLocalRepo.getPatientDataLocal();
+    profileData = await profileLocalRepo.getProfile();
+
+    if (patientData != null && profileData != null) {
+      emit(
+        DashboardLoadedState(
+          patientData: patientData!,
+          profileData: profileData!,
+        ),
+      );
+      print('From Local Storage');
+    } else {
+      emit(DashboardLoadingState());
+      // if local storage is empty we will get data from server for patient
+      patientData = await patientRepoBase.getPatientData();
       profileData = await profileLocalRepo.getProfile();
 
-      if (patientData != null && profileData != null) {
-        emit(
-          DashboardLoadedState(
-            patientData: patientData!,
-            profileData: profileData!,
-          ),
-        );
-        print('From Local Storage');
-      } else {
-        emit(DashboardLoadingState());
-        // if local storage is empty we will get data from server for patient
-        patientData = await patientRepoBase.getPatientData();
-        profileData = await profileLocalRepo.getProfile();
+      print('From Api');
 
-        print('From Api');
-
-        emit(
-          DashboardLoadedState(
-            patientData: patientData!,
-            profileData: profileData!,
-          ),
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Dashboard Bloc Error: $e");
-      }
+      emit(
+        DashboardLoadedState(
+          patientData: patientData!,
+          profileData: profileData!,
+        ),
+      );
     }
+    // } catch (e) {
+    //   if (kDebugMode) {
+    //     print("Dashboard Bloc Error: $e");
+    //   }
+    //}
   }
 
   Future<void> _onDashboardRefreshData(
     DashboardRefreshDataEvent event,
     Emitter<DashboardStates> emit,
   ) async {
-    emit(DashboardLoadingState());
-    // Refresh Data from server for patient
-    patientData = await patientRepoBase.getPatientData();
-    profileData = await profileLocalRepo.getProfile();
-    print('From Api');
-    emit(
-      DashboardLoadedState(
-        patientData: patientData!,
-        profileData: profileData!,
-      ),
-    );
+    try {
+      emit(DashboardLoadingState());
+
+      // Refresh Data from server for patient
+      patientData = await patientRepoBase.getPatientData();
+      profileData = await profileLocalRepo.getProfile();
+      print('From Api');
+      emit(
+        DashboardLoadedState(
+          patientData: patientData!,
+          profileData: profileData!,
+        ),
+      );
+    } on BaseExceptions catch (e) {
+      emit(DashboardMessageState(massage: e.toString()));
+    }
   }
 }

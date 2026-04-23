@@ -25,51 +25,44 @@ class PatientRepoImpl implements PatientRepoBase {
   });
   @override
   Future<CurrentPatientModel> getPatientData() async {
-    try {
-      LoginModel1 userData = await profileLocalRepo.getProfile();
 
-      dynamic jsonData = await api.getApi(
-        url: ApiKeys.getPatientKey,
-        patientId: userData.patientData!.patientInfo!.id.toString(),
-        token: userData.accessToken.toString(),
+    LoginModel1 userData = await profileLocalRepo.getProfile();
+
+    dynamic jsonData = await api.getApi(
+      url: ApiKeys.getPatientKey,
+      patientId: userData.patientData!.patientInfo!.id.toString(),
+      token: userData.accessToken.toString(),
+    );
+
+    if (jsonData != null) {
+      CurrentPatientModel model = CurrentPatientModel.fromJson(
+        jsonData['data'],
       );
+      print(model);
+      await patientLocalRepo.deletePatientData();
+      await patientLocalRepo.savePatientDataLocal(model);
 
-      if (jsonData != null) {
-        CurrentPatientModel model = CurrentPatientModel.fromJson(
-          jsonData['data'],
-        );
-        print(model);
-        await patientLocalRepo.deletePatientData();
-
-        await patientLocalRepo.savePatientDataLocal(model);
-
-        return model;
-      } else {
-        throw AppExceptions(
-          message: 'Empty response from server Patient Api Repo',
-          debugMessage: 'jsonResponse is null',
-        );
-      }
-    } catch (e) {
-      throw AppExceptions(message: e.toString(), debugMessage: e.toString());
+      return model;
+    } else {
+      throw AppExceptions(
+        message: 'Empty response from server Patient Api Repo',
+        debugMessage: 'jsonResponse is null',
+      );
     }
+
   }
 
   @override
   Future deletePatientData() async {
-    try {
+
       await curdBase.deleteData(tableName: TableName.patientData);
-    } catch (e) {
-      throw AppExceptions(
-        message: 'Delete Patient Data Error Repo',
-        debugMessage: e.toString(),
-      );
-    }
+
   }
 
   @override
-  Future updatePatientData() {
-    // TODO: implement updatePatientData
-    throw UnimplementedError();
+  Future updatePatientData() async {
+    // try{
+    //   await api.postApi(url: ApiKeys.updateProfileKey, );
+    // }
   }
 }

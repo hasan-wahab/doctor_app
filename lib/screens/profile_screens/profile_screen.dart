@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_state.dart';
+import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
@@ -50,11 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            CupertinoPageRoute(builder: (context) => NaveBar()),
-            (Route<dynamic> route) => false,
-          );
+          context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
         }
       },
       child: BlocConsumer<ProfileBloc, ProfileState>(
@@ -77,11 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: 'Profile',
               isLeading: true,
               leadingOnTap: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.naveBar,
-                  (Route<dynamic> route) => false,
-                );
+                context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
               },
             ),
             body: isLoading == false
@@ -151,29 +144,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ],
                                     ),
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      ApiServices.getPatientData(
-                                        patientId: profileData!
-                                            .patientData!
-                                            .patientInfo!
-                                            .id
-                                            .toString(),
-                                        currentUserToken: profileData!
-                                            .accessToken
-                                            .toString(),
-                                        context: context,
-                                      );
-                                    },
-                                    child: CustomText(
-                                      text: currentPatientData!
-                                          .patient!
-                                          .user!
-                                          .name
-                                          .toString(),
-                                      fontSize: 20,
-                                    ),
+                                  CustomText(
+                                    text: currentPatientData!.patient.user!.name
+                                        .toString(),
+                                    fontSize: 20,
                                   ),
+
                                   CustomText(
                                     text:
                                         'Patient ID: ${profileData!.user!.id.toString()}',
@@ -231,9 +207,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      Navigator.pushNamed(
+                                      Navigator.push(
                                         context,
-                                        AppRoutes.myNFCCardScreen,
+                                        CupertinoPageRoute(
+                                          builder: (context) =>
+                                              NfcCardPage(fromProfile: true),
+                                        ),
                                       );
                                     },
                                     child: Card(
@@ -321,10 +300,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         actionText2: 'Yes',
                                         action2: () async {
                                           Navigator.pop(context);
-                                          context.read<LoginBloc>().add(
-                                            LoginLogoutEvent(),
+                                          context.read<NaveBarBloc>().add(
+                                            NaveBarLogoutEvent(),
                                           );
-                                          context.read<NaveBarBloc>().add(NaveBarEvent(index: 3));
                                         },
                                       );
                                     },

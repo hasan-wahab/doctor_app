@@ -6,4 +6,4 @@ class LoginSignInEvent extends LoginEvents {
   LoginSignInEvent({required this.email, required this.password});
 }
 
-class LoginLogoutEvent extends LoginEvents {}
+

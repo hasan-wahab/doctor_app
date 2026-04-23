@@ -29,7 +29,6 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: AppColors.bgColor,
         leading: IconButton(
@@ -59,10 +58,10 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: List.generate(
-                          currentPatientData!.patient!.visits.length,
+                          currentPatientData!.patient.visits.length,
                           (index) {
                             final currentPatient =
-                                currentPatientData!.patient!.visits;
+                                currentPatientData!.patient.visits;
                             return Container(
                               margin: EdgeInsets.only(top: 10.h),
                               height: 178.h,
@@ -98,13 +97,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                       ),
                                       _text(
                                         firstText: 'Doctor',
-                                        secondText:
-                                            currentPatient[index].consultant ==
-                                                null
-                                            ? 'no data'
-                                            : currentPatient[index]
-                                                  .consultant!
-                                                  .name,
+                                        secondText: currentPatient[index]
+                                            .therapist
+                                            .name,
                                       ),
                                       _text(
                                         firstText: 'Stage',
@@ -113,19 +108,14 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                       ),
                                       _text(
                                         firstText: 'Amount',
-                                        secondText:
-                                            currentPatient[index]
-                                                .consultationFee
-                                                .isNaN
-                                            ? 'no data'
-                                            : currentPatient[index]
-                                                  .consultationFee
-                                                  .toString(),
+                                        secondText: currentPatient[index]
+                                            .consultationFee
+                                            .toString(),
                                       ),
                                       _text(
                                         firstText: 'Status',
                                         buttonText:
-                                            currentPatient[index].status ?? 'No data',
+                                            currentPatient[index].status,
                                       ),
                                     ],
                                   ),

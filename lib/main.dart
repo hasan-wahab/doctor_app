@@ -9,6 +9,7 @@ import 'package:doctor_app/repos/patient_repo/patient_repo_impl.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
+import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
@@ -78,10 +79,15 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         BlocProvider(
-          create: (context) => NaveBarBloc(profileLocalRepo: profileLocalRepo),
+          create: (context) => NaveBarBloc(
+            profileLocalRepo: profileLocalRepo,
+            authRepo: authRepoBase,
+          ),
         ),
         BlocProvider(
           create: (context) => ProfileBloc(
+            patientRepoBase: patientRepoImpl,
+            authRepoBase: authRepoBase,
             profileLocalRepo: profileLocalRepo,
             patientLocalRepo: patientLocalRepo,
           ),
@@ -91,7 +97,7 @@ class _MyAppState extends State<MyApp> {
             profileLocalRepo: profileLocalRepo,
             patientRepoBase: patientRepoImpl,
             patientLocalRepo: patientLocalRepo,
-          ),
+          )..add(DashboardRefreshDataEvent()),
         ),
       ],
       child: ScreenUtilInit(

@@ -9,11 +9,15 @@ class ApiKeys {
   static String loginKey = '$baseUrl/patient/login';
 
   /// Sign Up Api Key
-  static String updateProfileKey = '$baseUrl/patient/update-profile';
+  static String updateProfileKey =
+      '$baseUrl/patient/update-profile/?t=${DateTime.now().millisecondsSinceEpoch}';
 
   /// Get Patient Api Key
- static String getPatientKey = '$baseUrl/patient/apipatients';
+  static String getPatientKey = '$baseUrl/patient/apipatients';
 
- /// Logout Api Key
- static String logoutKey = '$baseUrl/patient/logout';
+  /// Logout Api Key
+  static String logoutKey = '$baseUrl/patient/logout';
+
+  /// Update Profile Api Key
+  static String updateProfileImageKey = "$baseUrl/patient/profile-picture";
 }
