@@ -20,4 +20,10 @@ class ApiKeys {
 
   /// Update Profile Api Key
   static String updateProfileImageKey = "$baseUrl/patient/profile-picture";
+
+  /// History Tracker Key
+  static String historyTrackerKey = "$baseUrl/patient/history";
+
+  /// Consultant Assessment Key
+  static String consultantAssessmentKey = "$baseUrl/patient/consultant";
 }

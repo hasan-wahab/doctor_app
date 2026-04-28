@@ -43,6 +43,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileBloc, ProfileState>(
+
       listener: (context, state) {
         if (state is ProfileLoadingState) {
           // isLoading = true;
@@ -50,9 +51,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           // isLoading = false;
           profileData = state.profileData;
           currentPatientData = state.currentPatientModel;
-        } else {
-          //  isLoading = false;
-          AppMsg.showErrorMsg(context, msg: state.toString());
+        } else if (state is ProfileMessageState) {
+          AppMsg.showSnackBar(context, message: state.message!);
         }
       },
       builder: (context, state) {
@@ -127,41 +127,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                             Navigator.pushNamed(
                                               context,
                                               AppRoutes.updateProfile,
-                                              arguments: <String, List<String>>{
-                                                'data': [
-                                                  err == null
-                                                      ? 'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}'
-                                                      : profileData!
-                                                            .user!
-                                                            .profilePicture
-                                                            .toString(),
-                                                  currentPatientData!
-                                                      .patient!
-                                                      .name
-                                                      .toString(),
-                                                  currentPatientData!
-                                                      .patient!
-                                                      .phone
-                                                      .toString(),
-                                                  'Male',
-                                                  DateAndTimeFormater.dateFormat(
-                                                    currentPatientData!
-                                                        .patient!
-                                                        .birthDate
-                                                        .toString(),
-                                                  ),
-                                                  currentPatientData!
-                                                      .patient!
-                                                      .email
-                                                      .toString(),
-                                                  currentPatientData!
-                                                      .patient!
-                                                      .cnic
-                                                      .toString(),
-                                                  profileData!.accessToken
-                                                      .toString(),
-                                                ],
-                                              },
                                             );
                                           },
                                           child: Container(
@@ -345,22 +310,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                               fontSize: 12,
                                               color: AppColors.primaryColor,
                                             ),
-                                            currentPatientData!
-                                                        .patient!
-                                                        .birthDate !=
-                                                    null
-                                                ? CustomText(
-                                                    text:
-                                                        DateAndTimeFormater.dateFormat(
-                                                          currentPatientData!
-                                                              .patient!
-                                                              .birthDate
-                                                              .toString(),
-                                                        ),
+                                            CustomText(
+                                              text:
+                                                  DateAndTimeFormater.dateFormat(
+                                                    currentPatientData!
+                                                        .patient
+                                                        .birthDate
+                                                        .toString(),
+                                                  ),
 
-                                                    fontSize: 15,
-                                                  )
-                                                : CustomText(text: "No data"),
+                                              fontSize: 15,
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -454,35 +414,5 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         );
       },
     );
-  }
-
-  void getUserToken() async {
-    userToken = await LocalStorage.getUserToken('token');
-    if (userToken != null) {
-      getCurrentUserData(userToken!);
-    }
-  }
-
-  void getCurrentUserData(String token) async {
-    String? data = await LocalStorage.getProfileData(userToken!);
-
-    if (data != null) {
-      Map<String, dynamic> jsonData = jsonDecode(data);
-
-      profileData = LoginModel1.fromJson(jsonData);
-      setState(() {});
-      getPatientData();
-    }
-  }
-
-  void getPatientData() async {
-    if (profileData != null) {
-      currentPatientData = await ApiServices.getPatientData(
-        patientId: profileData!.patientData!.patientInfo!.id.toString(),
-        currentUserToken: profileData!.accessToken.toString(),
-        context: context,
-      );
-      setState(() {});
-    }
   }
 }

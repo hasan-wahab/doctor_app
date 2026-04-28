@@ -10,6 +10,7 @@ import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,6 +53,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
       listener: (context, state) {
         if (state is ProfileLoadingState) {
           isLoading = true;
+        } else if (state is ProfileMessageState) {
+          isLoading = false;
+          if (kDebugMode) {
+            print(state.message);
+          }
+          AppMsg.showSnackBar(context, message: state.message!);
+
+          print("From update profile ${state.toString()}");
         } else if (state is MyProfileState) {
           isLoading = false;
           currentPatientModel = state.currentPatientModel;
@@ -60,9 +69,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
           email = currentPatientModel!.patient.email.toString();
           cnic = currentPatientModel!.patient.cnic.toString();
           phone = currentPatientModel!.patient.phone.toString();
-        } else if (state is ProfileMessageState) {
-          isLoading = false;
-          AppMsg.showErrorMsg(context, msg: state.message.toString());
         }
       },
       builder: (context, state) {
@@ -304,15 +310,20 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                             ? DateFormat(
                                                 "MM/dd/yyyy",
                                               ).format(pickedData!)
-                                            : DateFormat("MM/dd/yyyy").format(
+                                            : profileData
+                                                      ?.patientData
+                                                      ?.patientInfo
+                                                      ?.birthDate !=
+                                                  null
+                                            ? DateFormat("MM/dd/yyyy").format(
                                                 DateTime.parse(
                                                   profileData!
                                                       .patientData!
                                                       .patientInfo!
-                                                      .birthDate
-                                                      .toString(),
+                                                      .birthDate,
                                                 ),
-                                              ),
+                                              )
+                                            : 'No data',
                                       ),
                                     ),
                                   ),

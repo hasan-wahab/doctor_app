@@ -73,162 +73,165 @@ class ApiServices {
 
   /// Update current user profile
 
-  static Future<void> updateApiCall({
-    required String name,
-    required String email,
-    required String cnic,
-    required String phone,
-    required String currentUserToken,
-  }) async {
-    final updateUrl = Uri.parse(
-      "${ApiKeys.updateProfileKey}?t=${DateTime.now().millisecondsSinceEpoch}",
-    );
+  // static Future<void> updateApiCall({
+  //   required String name,
+  //   required String email,
+  //   required String cnic,
+  //   required String phone,
+  //   required String currentUserToken,
+  // })
+  // async {
+  //   final updateUrl = Uri.parse(
+  //     "${ApiKeys.updateProfileKey}?t=${DateTime.now().millisecondsSinceEpoch}",
+  //   );
+  //
+  //   http.Response response = await http.post(
+  //     updateUrl,
+  //     body: jsonEncode({
+  //       "name": name,
+  //       "email": email,
+  //       "cnic": cnic,
+  //       "phone": phone,
+  //     }),
+  //     headers: {
+  //       "Authorization": "Bearer $currentUserToken",
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json",
+  //       "Cache-Control": "no-cache, no-store, must-revalidate",
+  //       "Pragma": "no-cache",
+  //       "Expires": "0",
+  //     },
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     final currentUserToken = await LocalStorage.getUserToken('token');
+  //     final getOldUserData = await LocalStorage.getProfileData(
+  //       currentUserToken!,
+  //     );
+  //
+  //     /// Convert to json
+  //     final updatedData = jsonDecode(response.body);
+  //
+  //     /// Convert string to json
+  //
+  //     final data = jsonDecode(getOldUserData!);
+  //
+  //     /// Update data in our Local Storage
+  //
+  //     data['user']['name'] = updatedData['data']['name'];
+  //     data['user']['profile_picture'] = updatedData['data']['profile_picture'];
+  //     data['user']['email'] = updatedData['data']['email'];
+  //     data['user']['cnic'] = updatedData['data']['cnic'];
+  //     data['patient_data']['patient_info']['cnic'] =
+  //         updatedData['data']['cnic'];
+  //     data['patient_data']['patient_info']['email'] =
+  //         updatedData['data']['email'];
+  //     data['patient_data']['patient_info']['phone'] =
+  //         updatedData['data']['phone'];
+  //     data['patient_data']['patient_info']['image'] =
+  //         updatedData['data']['profile_picture'];
+  //     final updateData = data;
+  //     await LocalStorage.saveProfileData(
+  //       currentUserToken,
+  //       jsonEncode(updateData),
+  //     );
+  //
+  //     print(updateData);
+  //   } else {
+  //     print("Status: ${response.statusCode}");
+  //   }
+  // }
 
-    http.Response response = await http.post(
-      updateUrl,
-      body: jsonEncode({
-        "name": name,
-        "email": email,
-        "cnic": cnic,
-        "phone": phone,
-      }),
-      headers: {
-        "Authorization": "Bearer $currentUserToken",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final currentUserToken = await LocalStorage.getUserToken('token');
-      final getOldUserData = await LocalStorage.getProfileData(
-        currentUserToken!,
-      );
-
-      /// Convert to json
-      final updatedData = jsonDecode(response.body);
-
-      /// Convert string to json
-
-      final data = jsonDecode(getOldUserData!);
-
-      /// Update data in our Local Storage
-
-      data['user']['name'] = updatedData['data']['name'];
-      data['user']['profile_picture'] = updatedData['data']['profile_picture'];
-      data['user']['email'] = updatedData['data']['email'];
-      data['user']['cnic'] = updatedData['data']['cnic'];
-      data['patient_data']['patient_info']['cnic'] =
-          updatedData['data']['cnic'];
-      data['patient_data']['patient_info']['email'] =
-          updatedData['data']['email'];
-      data['patient_data']['patient_info']['phone'] =
-          updatedData['data']['phone'];
-      data['patient_data']['patient_info']['image'] =
-          updatedData['data']['profile_picture'];
-      final updateData = data;
-      await LocalStorage.saveProfileData(
-        currentUserToken,
-        jsonEncode(updateData),
-      );
-
-      print(updateData);
-    } else {
-      print("Status: ${response.statusCode}");
-    }
-  }
-
-  /// Update current user profile image
-
-  static Future<bool> updateProfileImage(
-    File path,
-    currentUserToken,
-    BuildContext context,
-  ) async {
-    final url = Uri.parse('${ApiKeys.baseUrl}/patient/profile-picture');
-    final request = await http.MultipartRequest('Post', url);
-
-    request.headers["Authorization"] = "Bearer $currentUserToken";
-    request.headers["Accept"] = "application/json";
-    request.files.add(
-      await http.MultipartFile.fromPath('profile_picture', path.path),
-    );
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      print("Image updated!");
-      print(response.request!.url);
-      return true;
-    } else {
-      AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
-      return false;
-    }
-  }
+  // /// Update current user profile image
+  //
+  // static Future<bool> updateProfileImage(
+  //   File path,
+  //   currentUserToken,
+  //   BuildContext context,
+  // )
+  // async {
+  //   final url = Uri.parse('${ApiKeys.baseUrl}/patient/profile-picture');
+  //   final request = await http.MultipartRequest('Post', url);
+  //
+  //   request.headers["Authorization"] = "Bearer $currentUserToken";
+  //   request.headers["Accept"] = "application/json";
+  //   request.files.add(
+  //     await http.MultipartFile.fromPath('profile_picture', path.path),
+  //   );
+  //
+  //   var response = await request.send();
+  //
+  //   if (response.statusCode == 200) {
+  //     print("Image updated!");
+  //     print(response.request!.url);
+  //     return true;
+  //   } else {
+  //     AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
+  //     return false;
+  //   }
+  // }
 
   /// Logout Api Call
 
-  static Future<void> logoutUser(currentUserToken) async {
-    final url = Uri.parse('${ApiKeys.baseUrl}/patient/logout');
-    final http.Response response = await http.post(
-      url,
-      headers: {
-        "Authorization": "Bearer $currentUserToken",
-        "Accept": "application/json",
-      },
-    );
-
-    print(response.body);
-  }
+  // static Future<void> logoutUser(currentUserToken) async {
+  //   final url = Uri.parse('${ApiKeys.baseUrl}/patient/logout');
+  //   final http.Response response = await http.post(
+  //     url,
+  //     headers: {
+  //       "Authorization": "Bearer $currentUserToken",
+  //       "Accept": "application/json",
+  //     },
+  //   );
+  //
+  //   print(response.body);
+  // }
 
   /// Get api | Current patient appointment data
 
-  static Future getPatientData({
-    required String patientId,
-    required String currentUserToken,
-    required BuildContext context,
-  }) async {
-    try {
-      final url = Uri.parse(
-        '${ApiKeys.baseUrl}/patient/apipatients/$patientId',
-      );
-
-      http.Response response = await http.get(
-        url,
-        headers: {
-          "Authorization": "Bearer $currentUserToken",
-          "Accept": "application/json",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        print(jsonData['data']);
-
-        CurrentPatientModel currentPatientData = CurrentPatientModel.fromJson(
-          jsonData['data'],
-        );
-        return currentPatientData;
-      } else {
-        if (response.statusCode == 401) {
-          await LocalStorage.clearAllData();
-
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.naveBar,
-            (Route<dynamic> route) => false,
-          );
-        } else {
-          AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
-        }
-      }
-    } on Exception catch (e) {
-      print(e.toString());
-    }
-  }
+  // static Future getPatientData({
+  //   required String patientId,
+  //   required String currentUserToken,
+  //   required BuildContext context,
+  // })
+  // async {
+  //   try {
+  //     final url = Uri.parse(
+  //       '${ApiKeys.baseUrl}/patient/apipatients/$patientId',
+  //     );
+  //
+  //     http.Response response = await http.get(
+  //       url,
+  //       headers: {
+  //         "Authorization": "Bearer $currentUserToken",
+  //         "Accept": "application/json",
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonData = jsonDecode(response.body);
+  //       print(jsonData['data']);
+  //
+  //       CurrentPatientModel currentPatientData = CurrentPatientModel.fromJson(
+  //         jsonData['data'],
+  //       );
+  //       return currentPatientData;
+  //     } else {
+  //       if (response.statusCode == 401) {
+  //         await LocalStorage.clearAllData();
+  //
+  //         Navigator.pushNamedAndRemoveUntil(
+  //           context,
+  //           AppRoutes.naveBar,
+  //           (Route<dynamic> route) => false,
+  //         );
+  //       } else {
+  //         AppMsg.showErrorMsg(context, msg: response.statusCode.toString());
+  //       }
+  //     }
+  //   } on Exception catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
 
   /// Get Api | Before login all packages api
 

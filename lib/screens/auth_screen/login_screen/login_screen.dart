@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (kDebugMode) {
                     print(state.error);
                   }
-                  AppMsg.showErrorMsg(context, msg: state.error.toString());
+                  AppMsg.showSnackBar(context, message: state.error!);
                 } else if (state is LoginLoadingState) {
                   isLoading = true;
                 }

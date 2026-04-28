@@ -89,7 +89,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
         }
 
         if (state is DashboardMessageState) {
-          AppMsg.showErrorMsg(context, msg: state.massage);
+          AppMsg.showSnackBar(context, message: state.massage);
         }
 
         if (state is DashboardLoadedState) {
@@ -431,9 +431,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                     Navigator.pushNamed(
                                       context,
                                       screenNameList[index],
-                                      arguments: <String, CurrentPatientModel>{
-                                        "data": currentPatientData!,
-                                      },
                                     );
                                   },
                                   child: Card(
@@ -618,32 +615,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
       },
     );
   }
-
-  // getCurrentUserDataFromApi() async {
-  //   if (!mounted) return;
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   final token = await LocalStorage.getUserToken('token');
-  //   final currentUserData = await LocalStorage.getProfileData(token!);
-  //
-  //   final jsonData = jsonDecode(currentUserData!);
-  //
-  //   profileData = LoginModel1.fromJson(jsonData);
-  //   if (!mounted) return;
-  //
-  //   currentPatientData = await ApiServices.getPatientData(
-  //     patientId: profileData!.patientData!.patientInfo!.id.toString(),
-  //     currentUserToken: profileData!.accessToken.toString(),
-  //     context: context,
-  //   );
-  //   if (!mounted) return;
-  //
-  //   setState(() {
-  //     isLoading = false;
-  //   });
-  // }
 
   Widget _text({
     required String firstText,

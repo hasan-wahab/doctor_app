@@ -60,7 +60,7 @@ class _NaveBarState extends State<NaveBar> {
       listener: (context, state) {
         if (state is NaveBarMessageState) {
           isLoading = false;
-          AppMsg.showErrorMsg(context, msg: state.message.toString());
+          AppMsg.showSnackBar(context, message: state.message!);
         }
         if (state is NaveBarLoadingState) {
           isLoading = true;

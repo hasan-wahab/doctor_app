@@ -1,6 +1,12 @@
 import 'dart:convert';
 
+import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
+import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_impl.dart';
+import 'package:doctor_app/data/models/history_traker_model.dart';
+import 'package:doctor_app/repos/history_tracker_repo/history_tracker_repo_Impl.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
+import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_bloc.dart';
+import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_event.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
@@ -33,29 +39,24 @@ class SessionRecord extends StatefulWidget {
 class _SessionRecordState extends State<SessionRecord> {
   bool isLoading = false;
   CurrentPatientModel? currentPatientData;
+  LoginModel1? profileData;
   bool isVisitDetail = false;
 
   @override
   void initState() {
     super.initState();
-    // getPatientData();
     context.read<ProfileBloc>().add(MyProfileEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    /// loader
-    // if (isLoading || currentPatientData == null) {
-    //   return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    // }
-
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
         if (state is ProfileLoadingState) {
           isLoading = true;
         } else if (state is MyProfileState) {
           isLoading = false;
-          // profileData = state.profileData;
+          profileData = state.profileData;
           currentPatientData = state.currentPatientModel;
         } else {
           isLoading = false;
@@ -223,12 +224,9 @@ class _SessionRecordState extends State<SessionRecord> {
                                                                 .packages
                                                                 .isEmpty
                                                             ? 1.0
-                                                            : 0,
-                                                        // getSessionProgress(
-                                                        //         latestData
-                                                        //             .patient,
-                                                        //         index,
-                                                        //       ),
+                                                            : getSessionProgress(
+                                                                index,
+                                                              ),
                                                         valueColor:
                                                             AlwaysStoppedAnimation(
                                                               AppColors
@@ -404,14 +402,15 @@ class _SessionRecordState extends State<SessionRecord> {
                                                         BorderRadius.circular(
                                                           8.r,
                                                         ),
-                                                    onTap: () =>
-                                                        Navigator.pushNamed(
-                                                          context,
-                                                          AppRoutes.notesScreen,
-                                                          arguments: {
-                                                            'index': index,
-                                                          },
-                                                        ),
+                                                    onTap: () async {
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        AppRoutes.notesScreen,
+                                                        arguments: visits[index]
+                                                            .id
+                                                            .toString(),
+                                                      );
+                                                    },
                                                     height: 33,
                                                     text: 'Visit Details',
                                                     width: 96,
@@ -593,36 +592,15 @@ class _SessionRecordState extends State<SessionRecord> {
     );
   }
 
-  // /// 🔥 API CALL
-  // Future<void> getPatientData() async {
-  //   setState(() => isLoading = true);
-  //
-  //   final currentUserToken = await LocalStorage.getUserToken('token');
-  //   final currentUserData = await LocalStorage.getUserToken(currentUserToken!);
-  //
-  //   final jsonData = jsonDecode(currentUserData!);
-  //   LoginModel1 data = LoginModel1.fromJson(jsonData);
-  //
-  //   final patientId = data.patientData!.patientInfo!.id;
-  //   if (!mounted) return;
-  //   currentPatientData = await ApiServices.getPatientData(
-  //     patientId: patientId.toString(),
-  //     currentUserToken: currentUserToken,
-  //     context: context,
-  //   );
-  //   if (!mounted) return;
-  //   setState(() => isLoading = false);
-  // }
-
-  double getSessionProgress(Patient patient, int index) {
-    final pivot = patient.packages[index].pivot;
-    if (pivot == null) return 0.0;
-    final total = pivot[index].sessionsTotal;
-    final used = pivot[index].sessionsUsed;
+  double getSessionProgress(int index) {
+    final total =
+        currentPatientData!.patient.packages[index].pivot['sessions_total'];
+    final used =
+        currentPatientData!.patient.packages[index].pivot['sessions_used'];
 
     if (total == 0) return 0.0;
 
-    final progress = used / total;
+    final progress = used! / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

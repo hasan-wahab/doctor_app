@@ -73,24 +73,17 @@ class ProfileBloc extends Bloc<ProfileEvents, ProfileState> {
           phone: event.phone,
           token: token,
         );
-        //await Future.delayed(Duration(seconds: 2));
         profileData = await profileLocalRepo.getProfile();
         patientData = await patientRepoBase.getPatientData();
-
-        print("$profileData   +    $patientData");
         emit(
           MyProfileState(
             profileData: profileData,
             currentPatientModel: patientData,
           ),
         );
-      } else {
-        if (kDebugMode) {
-          print('Token null');
-        }
       }
     } catch (e) {
-      print(e.toString());
+      // print(e.toString());
       emit(ProfileMessageState(message: e.toString()));
     }
   }

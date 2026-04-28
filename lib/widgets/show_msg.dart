@@ -61,10 +61,16 @@ class AppMsg {
                     actionText2,
                     style: TextStyle(color: AppColors.linkTextColor),
                   ),
-                )              : Container(),
-
+                )
+              : Container(),
         ],
       ),
     );
+  }
+
+  static showSnackBar(BuildContext context, {required String message}) {
+    return ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

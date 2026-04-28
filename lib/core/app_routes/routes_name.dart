@@ -76,4 +76,7 @@ class AppRoutes {
   static const String assistantManagerScreen = 'assistantManagerScreen';
   // Search Screen
   static const String searchScreen = 'searchScreen';
+
+  // History Tracker Screen
+  static const String historyTrackerScreen = 'historyTrackerScreen';
 }

@@ -62,9 +62,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             isLoading = false;
             profileData = state.profileData;
             currentPatientData = state.currentPatientModel;
-          } else {
+          } else if (state is ProfileMessageState) {
             isLoading = false;
-            AppMsg.showErrorMsg(context, msg: state.toString());
+            AppMsg.showSnackBar(context, message: state.message!);
           }
         },
         builder: (context, state) {

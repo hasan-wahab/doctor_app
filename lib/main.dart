@@ -3,13 +3,17 @@ import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:doctor_app/repos/auth_repo/auth_repo.dart';
+import 'package:doctor_app/repos/consultant_assasment_repo/consultant_assesment_repo.dart';
+import 'package:doctor_app/repos/history_tracker_repo/history_tracker_repo_Impl.dart';
 import 'package:doctor_app/repos/patient_local_repo/patient_local_repo.dart';
 import 'package:doctor_app/repos/patient_repo/patient_repo_impl.dart';
 
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
+import 'package:doctor_app/screens/assessments/bloc/consultant_assesmant_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
+import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
@@ -43,6 +47,8 @@ class _MyAppState extends State<MyApp> {
   late PatientLocalRepo patientLocalRepo;
   late PatientRepoImpl patientRepoImpl;
   late AuthRepoBase authRepoBase;
+  late HistoryTrackerRepoImpl historyTrackerRepoImpl;
+  late ConsultantAssessmentRepo consultantAssessmentRepo;
   @override
   void initState() {
     super.initState();
@@ -66,6 +72,11 @@ class _MyAppState extends State<MyApp> {
       api: apiImpl,
       localRepo: profileLocalRepo,
     );
+    historyTrackerRepoImpl = HistoryTrackerRepoImpl(
+      api: apiImpl,
+      curdBase: curdImpl,
+    );
+    consultantAssessmentRepo = ConsultantAssessmentRepo(api: apiImpl);
   }
 
   @override
@@ -98,6 +109,19 @@ class _MyAppState extends State<MyApp> {
             patientRepoBase: patientRepoImpl,
             patientLocalRepo: patientLocalRepo,
           )..add(DashboardRefreshDataEvent()),
+        ),
+        BlocProvider(
+          create: (context) => HistoryTrackerBloc(
+            historyTrackerRepoImpl: historyTrackerRepoImpl,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => ConsultantAssessmentBloc(
+            patientLocalRepo: patientLocalRepo,
+
+            profileLocalRepo: profileLocalRepo,
+            consultantRepo: consultantAssessmentRepo,
+          ),
         ),
       ],
       child: ScreenUtilInit(

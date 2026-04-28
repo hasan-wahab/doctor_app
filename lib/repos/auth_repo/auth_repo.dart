@@ -120,17 +120,10 @@ class AuthRepoImpl implements AuthRepoBase {
           print(" ${"$name  $phone  $email  $cnic"}");
           await localRepo.deleteProfile();
           await localRepo.saveProfile(loginModel: profileData);
-          print(
-            " ${profileData.patientData!.patientInfo!.name.toString() + profileData.patientData!.patientInfo!.phone.toString() + profileData.patientData!.patientInfo!.email.toString() + profileData.patientData!.patientInfo!.cnic.toString()}",
-          );
         }
       }
     }
   }
 
-  Future updateProfilePicture({
-    required String token,
-    required String patientId,
-    required String url,
-  }) async {}
+
 }

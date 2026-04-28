@@ -1,3 +1,4 @@
+import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
@@ -9,6 +10,8 @@ import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/show_msg.dart';
+import '../history_tracker_screen/bloc/history_tracker_bloc.dart';
+import '../history_tracker_screen/bloc/history_tracker_event.dart';
 import '../profile_screens/bloc/profile_state.dart';
 
 class SessionNotes extends StatefulWidget {
@@ -21,14 +24,15 @@ class SessionNotes extends StatefulWidget {
 class _SessionNotesState extends State<SessionNotes> {
   bool isLoading = false;
   CurrentPatientModel? currentPatientData;
+  LoginModel1? profileData;
   bool isVisitDetail = false;
-  Map<String, int>? index;
+  String? visitID;
 
   @override
   void didChangeDependencies() {
-    context.read<ProfileBloc>().add(MyProfileEvent());
-    index = ModalRoute.of(context)!.settings.arguments as Map<String, int>;
     super.didChangeDependencies();
+    visitID = ModalRoute.of(context)!.settings.arguments as String;
+    context.read<ProfileBloc>().add(MyProfileEvent());
   }
 
   @override
@@ -45,6 +49,7 @@ class _SessionNotesState extends State<SessionNotes> {
         }
         if (state is MyProfileState) {
           currentPatientData = state.currentPatientModel;
+          profileData = state.profileData;
         }
       },
       builder: (context, state) {
@@ -72,182 +77,133 @@ class _SessionNotesState extends State<SessionNotes> {
                       ? currentPatientData!.patient.visits.isEmpty
                             ? Center(child: Text('No data'))
                             : Column(
-                                spacing:
-                                    currentPatientData!
-                                            .patient
-                                            .visits[index!['index'] ?? 0]
-                                            .consultantAssessment !=
-                                        null
-                                    ? 20.h
-                                    : 0,
+                                spacing: 20.h,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  currentPatientData!
+                                  InkWell(
+                                    onTap: () {
+                                      context.read<HistoryTrackerBloc>().add(
+                                        HistoryTrackerEvent(
+                                          visitId: currentPatientData!
                                               .patient
-                                              .visits![index!['index'] ?? 0]
-                                              .historyTaking !=
-                                          null
-                                      ? InkWell(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              AppRoutes.assessmentScreen,
-                                              arguments: {
-                                                "consultant":
-                                                    currentPatientData!
-                                                        .patient
-                                                        .visits[index!['index'] ??
-                                                        0],
-                                              },
-                                            );
-                                          },
-                                          child: SizedBox(
-                                            width: double.infinity,
-                                            height: 55.h,
-                                            child: Card(
-                                              margin: EdgeInsets.zero,
-                                              color: AppColors.secondaryColor,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10.r),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    CustomText(
-                                                      text: 'History Tracker',
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                    Icon(
-                                                      Icons
-                                                          .arrow_forward_ios_outlined,
-                                                      size: 14.r,
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                  ],
-                                                ),
+                                              .visits[0]
+                                              .id
+                                              .toString(),
+                                          token: profileData!.accessToken
+                                              .toString(),
+                                        ),
+                                      );
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.historyTrackerScreen,
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 55.h,
+                                      child: Card(
+                                        margin: EdgeInsets.zero,
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10.r),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText(
+                                                text: 'History Tracker',
+                                                color: AppColors.primaryColor,
                                               ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                  currentPatientData!
-                                              .patient
-                                              .visits[index!['index'] ?? 0]
-                                              .consultantAssessment !=
-                                          null
-                                      ? InkWell(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              AppRoutes.assistantManagerScreen,
-                                              arguments: {
-                                                "amAssessments":
-                                                    currentPatientData!
-                                                        .patient
-                                                        .visits![index!['index'] ??
-                                                        0],
-                                              },
-                                            );
-                                          },
-                                          child: SizedBox(
-                                            width: double.infinity,
-                                            height: 55.h,
-                                            child: Card(
-                                              margin: EdgeInsets.zero,
-                                              color: AppColors.secondaryColor,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10.r),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    CustomText(
-                                                      text:
-                                                          'Assistant Manager Assessment',
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                    Icon(
-                                                      Icons
-                                                          .arrow_forward_ios_outlined,
-                                                      size: 14.r,
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                  ],
-                                                ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 14.r,
+                                                color: AppColors.primaryColor,
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        )
-                                      : Container(),
-                                  currentPatientData!
-                                              .patient
-                                              .visits![index!['index'] ?? 0]
-                                              .consultantAssessment !=
-                                          null
-                                      ? InkWell(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              AppRoutes.assessmentScreen,
-                                              arguments: {
-                                                "consultant":
-                                                    currentPatientData!
-                                                        .patient
-                                                        .visits![index!['index'] ??
-                                                        0],
-                                              },
-                                            );
-                                          },
-                                          child: SizedBox(
-                                            width: double.infinity,
-                                            height: 55.h,
-                                            child: Card(
-                                              margin: EdgeInsets.zero,
-                                              color: AppColors.secondaryColor,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(10.r),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    CustomText(
-                                                      text:
-                                                          'Consultant Assessment',
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                    Icon(
-                                                      Icons
-                                                          .arrow_forward_ios_outlined,
-                                                      size: 14.r,
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                  ],
-                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.assistantManagerScreen,
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 55.h,
+                                      child: Card(
+                                        margin: EdgeInsets.zero,
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10.r),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText(
+                                                text:
+                                                    'Assistant Manager Assessment',
+                                                color: AppColors.primaryColor,
                                               ),
-                                            ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 14.r,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ],
                                           ),
-                                        )
-                                      : Container(),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.assessmentScreen,
+                                        arguments: visitID ?? '',
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 55.h,
+                                      child: Card(
+                                        margin: EdgeInsets.zero,
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10.r),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CustomText(
+                                                text: 'Consultant Assessment',
+                                                color: AppColors.primaryColor,
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 14.r,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
 
                                   InkWell(
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,
                                         AppRoutes.sessionsDetailScreen,
-                                        arguments: {
-                                          "therapySession": currentPatientData!
-                                              .patient
-                                              .visits![index!['index'] ?? 0],
-                                        },
                                       );
                                     },
                                     child: SizedBox(

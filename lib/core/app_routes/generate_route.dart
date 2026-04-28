@@ -4,6 +4,7 @@ import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
 import 'package:doctor_app/screens/assestent_manager/assistent_manager.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/auth_screen/reset_password_screen.dart';
+import 'package:doctor_app/screens/history_tracker_screen/history_tracker_screen.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/packages/packages_screen.dart';
 
@@ -136,6 +137,10 @@ class AppGenerateRoute {
     AppGenerateRoute(
       routeName: AppRoutes.sessionsDetailScreen,
       screen: SessionDetailScreen(),
+    ),
+    AppGenerateRoute(
+      routeName: AppRoutes.historyTrackerScreen,
+      screen: HistoryTrackerScreen(),
     ),
   ];
 
