@@ -26,4 +26,7 @@ class ApiKeys {
 
   /// Consultant Assessment Key
   static String consultantAssessmentKey = "$baseUrl/patient/consultant";
+
+  /// Session detail key
+  static String sessionDetailKey = "$baseUrl/patient/therapist";
 }

@@ -40,7 +40,7 @@ class ProfileBloc extends Bloc<ProfileEvents, ProfileState> {
       emit(ProfileMessageState(message: e.toString()));
     }
     if (patientData != null && profileData != null) {
-      var visits = List.from(patientData!.patient.visits);
+      var visits = List.from(patientData!.patient!.visits);
       var therapySessions = List.from(patientData!.therapySessions);
 
       visits.sort((a, b) => a.visitAt.compareTo(b.visitAt));

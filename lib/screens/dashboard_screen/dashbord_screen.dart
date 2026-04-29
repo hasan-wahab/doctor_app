@@ -142,7 +142,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                               null
                                           ? Image.network(
                                               fit: BoxFit.cover,
-                                              'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+                                              'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
 
                                               headers: {
                                                 "Authorization":
@@ -339,14 +339,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
                                         CustomText(
                                           text:
-                                              'Paid: ${double.parse(currentPatientData!.stats!.totalSpend)}',
+                                              'Paid: ${currentPatientData!.stats!.totalSpend.toString()}',
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.textWhiteColor,
                                         ),
                                         CustomText(
                                           text:
-                                              'Remaining: ${currentPatientData!.stats!.totalAmount - double.parse(currentPatientData!.stats!.totalSpend)}',
+                                              'Remaining: ${currentPatientData!.stats!.totalAmount! - currentPatientData!.stats!.totalSpend!.toDouble()}',
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.textWhiteColor,
@@ -413,9 +413,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
                             children: [
                               ...List.generate((6), (index) {
                                 List cardSecondText = [
-                                  currentPatientData!.patient.visits.length
+                                  currentPatientData!.patient!.visits.length
                                       .toString(),
-                                  currentPatientData!.patient.packages.length
+                                  currentPatientData!.patient!.packages.length
                                       .toString(),
                                   '',
                                   currentPatientData!.recentInvoices.length
@@ -495,12 +495,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         SizedBox(height: 10.h),
 
                         /// Session Progress
-                        currentPatientData!.patient.packages.isNotEmpty
+                        currentPatientData!.patient!.packages.isNotEmpty
                             ? CustomText(text: 'Session Progress')
                             : Container(),
                         SizedBox(height: 10.h),
                         ...List.generate(
-                          currentPatientData!.patient.packages.length,
+                          currentPatientData!.patient!.packages.length,
 
                           (index) {
                             return Container(
@@ -528,12 +528,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       CustomText(
                                         text:
                                             currentPatientData!
-                                                .patient
+                                                .patient!
                                                 .packages
                                                 .isEmpty
                                             ? 'No data'
                                             : currentPatientData!
-                                                  .patient
+                                                  .patient!
                                                   .packages[index]
                                                   .name
                                                   .toString(),
@@ -552,7 +552,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           ),
                                           CustomText(
                                             text:
-                                                '${currentPatientData!.patient.packages[index].pivot['sessions_used']}/${currentPatientData!.patient.packages[index].pivot['sessions_total']}',
+                                                '${currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed}/${currentPatientData!.patient!.packages[index].pivot!.sessionsTotal}',
                                             fontSize: 10,
                                           ),
                                         ],
@@ -561,7 +561,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       LinearProgressIndicator(
                                         value:
                                             currentPatientData!
-                                                .patient
+                                                .patient!
                                                 .packages
                                                 .isEmpty
                                             ? 1.0
@@ -585,13 +585,13 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                             text:
                                                 currentPatientData!
                                                     .therapySessions[index]
-                                                    .nextSessionDate
+                                                    .displayNextSessionDate!
                                                     .isNotEmpty
                                                 ? DateAndTimeFormater.dateFormat(
                                                     // currentPatientData!
                                                     currentPatientData!
                                                         .therapySessions[index]
-                                                        .nextSessionDate
+                                                        .displayNextSessionDate
                                                         .toString(),
                                                   )
                                                 : 'No data',
@@ -610,7 +610,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                     ),
                   ),
                 )
-              : Center(child: Text('No Data Found')),
+              : Center(child: CircularProgressIndicator()),
         );
       },
     );
@@ -667,14 +667,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
   }
 
   double getSessionProgress(int index) {
-    final total =
-        currentPatientData!.patient.packages[index].pivot['sessions_total'];
+    final total = currentPatientData!
+        .patient!
+        .packages[index]
+        .pivot!
+        .displaySessionsTotal;
     final used =
-        currentPatientData!.patient.packages[index].pivot['sessions_used'];
+        currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed;
 
     if (total == 0) return 0.0;
 
-    final progress = used! / total!;
+    final progress = double.parse(used) / double.parse(total);
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

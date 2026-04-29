@@ -78,8 +78,8 @@ class _PackagesScreenState extends State<PackagesScreen> {
                         /// Session Progress
                         SizedBox(height: 10.h),
                         ...List.generate(
-                          currentPatientData!.patient.packages.isNotEmpty
-                              ? currentPatientData!.patient.packages.length
+                          currentPatientData!.patient!.packages.isNotEmpty
+                              ? currentPatientData!.patient!.packages.length
                               : 1,
 
                           (index) {
@@ -132,7 +132,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                           ),
                                           CustomText(
                                             text:
-                                                '${currentPatientData!.patient.packages.isNotEmpty ? currentPatientData!.patient.packages[index].pivot['sessions_used'] : 0}/${currentPatientData!.patient.packages.isNotEmpty ? currentPatientData!.patient.packages[index].pivot['sessions_total'] : 0}',
+                                                '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.displaySessionsTotal : 0}',
                                             fontSize: 10,
                                           ),
                                         ],
@@ -141,7 +141,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                       LinearProgressIndicator(
                                         value:
                                             currentPatientData!
-                                                .patient
+                                                .patient!
                                                 .packages
                                                 .isEmpty
                                             ? 1.0
@@ -164,7 +164,7 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                           CustomText(
                                             text: currentPatientData!
                                                 .therapySessions[index]
-                                                .nextSessionDate,
+                                                .displayNextSessionDate,
                                             fontSize: 12,
                                           ),
                                         ],
@@ -224,15 +224,22 @@ class _PackagesScreenState extends State<PackagesScreen> {
   }
 
   double getSessionProgress(int index) {
-    final total =
-        currentPatientData!.patient.packages[index].pivot['sessions_total'] ??
-        0;
-    final used =
-        currentPatientData!.patient.packages[index].pivot['sessions_used'] ?? 0;
+    final total = currentPatientData!
+        .patient!
+        .packages[index]
+        .pivot!
+        .displaySessionsUsed
+        .toString();
+    final used = currentPatientData!
+        .patient!
+        .packages[index]
+        .pivot!
+        .displaySessionsTotal
+        .toString();
 
     if (total == 0) return 0.0;
 
-    final progress = used! / total!;
+    final progress = double.parse(used) / double.parse(total);
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

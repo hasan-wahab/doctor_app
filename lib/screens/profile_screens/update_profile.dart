@@ -65,10 +65,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
           isLoading = false;
           currentPatientModel = state.currentPatientModel;
           profileData = state.profileData;
-          name = currentPatientModel!.patient.name.toString();
-          email = currentPatientModel!.patient.email.toString();
-          cnic = currentPatientModel!.patient.cnic.toString();
-          phone = currentPatientModel!.patient.phone.toString();
+          name = currentPatientModel!.patient!.displayName.toString();
+          email = currentPatientModel!.patient!.displayEmail.toString();
+          cnic = currentPatientModel!.patient!.displayCnic.toString();
+          phone = currentPatientModel!.patient!.displayPhone.toString();
         }
       },
       builder: (context, state) {
@@ -110,8 +110,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                                         child: Image.network(
                                                           fit: BoxFit.cover,
                                                           currentPatientModel!
-                                                              .patient
-                                                              .imageUrl
+                                                              .patient!
+                                                              .displayImageUrl
                                                               .toString(),
                                                           headers: {
                                                             "Authorization":
@@ -191,8 +191,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                         name = value;
                                       },
                                       initialValue: currentPatientModel!
-                                          .patient
-                                          .name
+                                          .patient!
+                                          .displayName
                                           .toString(),
                                       //  controller: nameController,
                                       decoration: InputDecoration(
@@ -235,8 +235,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                         phone = value;
                                       },
                                       initialValue: currentPatientModel!
-                                          .patient
-                                          .phone
+                                          .patient!
+                                          .displayPhone
                                           .toString(),
 
                                       // controller: phoneController,
@@ -347,8 +347,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                         email = value;
                                       },
                                       initialValue: currentPatientModel!
-                                          .patient
-                                          .email
+                                          .patient!
+                                          .displayEmail
                                           .toString(),
                                       //    controller: emailController,
                                       decoration: InputDecoration(

@@ -1,4 +1,3 @@
-import 'package:doctor_app/data/models/consultant_assesment_model.dart';
 import 'package:doctor_app/screens/assessments/bloc/consultant_assesmant_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
@@ -9,7 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
-import '../../data/models/current_patient_model.dart';
+import '../../data/models/consultant_assesment_model.dart';
+import '../../data/models/current_patient_model.dart'
+    hide ConsultantAssessmentModel;
+import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
 import 'bloc/consultant_assesment_event.dart';
 import 'bloc/consultant_assesment_state.dart';
@@ -30,12 +32,13 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
   bool isLoading = false;
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
+    id = ModalRoute.of(context)!.settings.arguments as String?;
     super.didChangeDependencies();
-    id = ModalRoute.of(context)?.settings.arguments as String?;
     context.read<ConsultantAssessmentBloc>().add(
       ConsultantAssessmentEvent(id: id),
     );
+    print("Id was ${id}");
   }
 
   @override
@@ -44,13 +47,15 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
       listener: (context, state) {
         if (state is ConsultantMessageState) {
           isLoading = false;
-          AppMsg.showErrorMsg(context, msg: state.message.toString());
+          AppMsg.showSnackBar(context, message: state.message.toString());
         }
         print(state);
       },
+
       builder: (context, state) {
         if (state is ConsultantFromHomeLoaded) {
           currentPatientData = state.patientData;
+          final consultantAssessmentData = currentPatientData!.patient!.visits;
           return Scaffold(
             appBar: AppBar(
               backgroundColor: AppColors.bgColor,
@@ -65,234 +70,259 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
               automaticallyImplyLeading: false,
             ),
             backgroundColor: AppColors.bgColor,
-            body: ListView(
-              padding: EdgeInsets.only(
-                left: 20.w,
-                right: 20.w,
-                top: 10.h,
-                bottom: 60.h,
-              ),
-              children: [
-                CustomText(
-                  text: 'Consultant Assessments',
-                  fontSize: 20,
-                  color: AppColors.primaryColor,
-                ),
-                SizedBox(height: 30.h),
+            body: consultantAssessmentData.isNotEmpty
+                ? ListView(
+                    padding: EdgeInsets.only(
+                      left: 20.w,
+                      right: 20.w,
+                      top: 10.h,
+                      bottom: 60.h,
+                    ),
+                    children: [
+                      CustomText(
+                        text: 'Consultant Assessments',
+                        fontSize: 20,
+                        color: AppColors.primaryColor,
+                      ),
+                      SizedBox(height: 30.h),
 
-                ...List.generate(
-                  (currentPatientData!.patient.visits.isNotEmpty
-                      ? 1
-                      : currentPatientData!.patient.visits.length),
-                  (index) {
-                    return Card(
-                      color: AppColors.secondaryColor,
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        height: 404.h,
-                        width: 350.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
-                              height: 40.h,
+                      ...List.generate(
+                        (consultantAssessmentData.isNotEmpty
+                            ? consultantAssessmentData.length
+                            : 1),
+                        (index) {
+                          return Card(
+                            color: AppColors.secondaryColor,
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 20.h),
+                              // height: 404.h,
                               width: 350.w,
                               decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide()),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.sizeOf(context).width / 1.3 -
-                                        15,
-                                    child: Stack(
-                                      alignment: Alignment.centerLeft,
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                    ),
+                                    height: 40.h,
+                                    width: 350.w,
+                                    decoration: BoxDecoration(
+                                      border: Border(bottom: BorderSide()),
+                                    ),
+                                    child: Row(
                                       children: [
-                                        CustomText(
-                                          text: currentPatientData!
-                                              .patient
-                                              .visits[index]
-                                              .consultant
-                                              .name
-                                              .toString(),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.topRight,
-
-                                          child: Container(
-                                            margin: EdgeInsets.only(top: 5.h),
-                                            alignment: Alignment.center,
-                                            height: 16.h,
-                                            width: 31.w,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(3.r),
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            child: CustomText(
-                                              text: 'abds',
-                                              fontSize: 12,
-                                              color: AppColors.textWhiteColor,
-                                            ),
+                                        SizedBox(
+                                          width:
+                                              MediaQuery.sizeOf(context).width /
+                                                  1.3 -
+                                              15,
+                                          child: Stack(
+                                            alignment: Alignment.centerLeft,
+                                            children: [
+                                              CustomText(
+                                                text:
+                                                    consultantAssessmentData[index]
+                                                            .consultant !=
+                                                        null
+                                                    ? consultantAssessmentData[index]
+                                                          .consultant!
+                                                          .displayName
+                                                          .toString()
+                                                    : '',
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
+                                  SizedBox(height: 10.h),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: CustomText(
+                                      text: 'Assessment Finding',
+                                      fontSize: 14,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  ),
+                                  RowText(
+                                    firstText: 'Observation',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayObservationFindings
+                                        : 'No data',
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Final Diagnosis',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayFinalDiagnosis
+                                        : 'No data',
+                                  ),
+                                  RowText(
+                                    firstText: 'DifferentialDiagnoses',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayDifferentialDiagnoses
+                                        : 'No data',
+                                  ),
+                                  RowText(
+                                    firstText: 'Final Diagnosis Other',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayFinalDiagnosisOther
+                                        : 'No data',
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Palpation',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayPalpationResults
+                                        : '',
+                                  ),
+                                  RowText(
+                                    firstText: 'Next Review Date',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayNextReviewDate
+                                        : 'No data',
+                                  ),
+                                  RowText(
+                                    firstText: 'ROM',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayRomAssessment
+                                        : 'No data',
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Neuro Test:',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displaySpecialTests
+                                        : 'No data',
+                                  ),
+                                  Divider(thickness: 1, color: Colors.black),
+
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: CustomText(
+                                      text: 'Medications',
+                                      fontSize: 14,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Muscle Relaxant',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? List.generate(
+                                            consultantAssessmentData[index]
+                                                .consultantAssessment!
+                                                .muscleAssessments
+                                                .length,
+                                            (index2) =>
+                                                consultantAssessmentData[index]
+                                                    .consultantAssessment!
+                                                    .muscleAssessments[index2]
+                                                    .displayConditions
+                                                    .toString(),
+                                          ).toString()
+                                        : 'No data',
+                                  ),
+
+                                  Divider(thickness: 1, color: Colors.black),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0,
+                                    ),
+                                    child: CustomText(
+                                      text: 'Diagnosis & Treament',
+                                      fontSize: 14,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Final Diagnosis',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .displayFinalDiagnosis
+                                        : 'No data',
+                                  ),
+
+                                  RowText(
+                                    firstText: 'Duration',
+                                    secondText:
+                                        consultantAssessmentData[index]
+                                                .consultantAssessment !=
+                                            null
+                                        ? consultantAssessmentData[index]
+                                              .consultantAssessment!
+                                              .sessionDuration
+                                              .toString()
+                                        : 'No data',
+                                  ),
                                 ],
                               ),
                             ),
-                            SizedBox(height: 10.h),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                              ),
-                              child: CustomText(
-                                text: 'Assessment Finding',
-                                fontSize: 14,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-
-                            _text(
-                              firstText: 'Observation',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['observation_findings']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Palpation',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['palpation_results']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'ROM',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['rom_assessment']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Neuro Test:',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['neuro_special_tests']
-                                  .toString(),
-                            ),
-                            Divider(thickness: 1, color: Colors.black),
-
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                              ),
-                              child: CustomText(
-                                text: 'Medications',
-                                fontSize: 14,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-
-                            _text(
-                              firstText: 'Pain Relieve',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['med_pain_reliever']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Muscle Relaxant',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['med_muscle_relaxant']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Supplements',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['med_supplements']
-                                  .toString(),
-                            ),
-
-                            Divider(thickness: 1, color: Colors.black),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
-                              ),
-                              child: CustomText(
-                                text: 'Diagnosis & Treament',
-                                fontSize: 14,
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-
-                            _text(
-                              firstText: 'Final Diagnosis',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['final_diagnosis']
-                                  .toString(),
-                            ),
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Frequency',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['freq_per_week']
-                                  .toString(),
-                            ),
-
-                            SizedBox(height: 7.h),
-
-                            _text(
-                              firstText: 'Duration',
-                              secondText: currentPatientData!
-                                  .patient
-                                  .visits[index]
-                                  .consultantAssessment['duration_weeks']
-                                  .toString(),
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
+                    ],
+                  )
+                : Center(child: CustomText(text: 'text')),
           );
-        } else if (state is ConsultantLoadedState) {
+        }
+        if (state is ConsultantLoadedFromRecordsState) {
           consultantAssessments = state.model;
           return Scaffold(
             appBar: AppBar(
@@ -345,7 +375,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 10.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Diagnosis',
                           secondText: consultantAssessments!
                               .clinicalFindings!
@@ -354,7 +384,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 7.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Note',
                           secondText: consultantAssessments!
                               .clinicalFindings!
@@ -373,7 +403,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 10.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Investigations Done',
                           secondText: consultantAssessments!
                               .advice!
@@ -382,7 +412,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 7.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Other Investigations Advice',
                           secondText: consultantAssessments!
                               .advice!
@@ -401,7 +431,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 10.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Advanced Techniques',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
@@ -410,7 +440,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         SizedBox(height: 7.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Anti Inflammatory Modalities',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
@@ -420,28 +450,28 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
 
                         SizedBox(height: 7.h),
 
-                        _text(
+                        RowText(
                           firstText: 'Electrotherapy',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
                               .displayElectrotherapy
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Medications',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
                               .displayMedications
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Thermo Cryotherapy',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
                               .displayThermoCryotherapy
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Topicals',
                           secondText: consultantAssessments!
                               .generalTherapeuticPrescription!
@@ -462,28 +492,28 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                           (index) {
                             return Column(
                               children: [
-                                _text(
+                                RowText(
                                   firstText: 'Other Treatment',
                                   secondText: consultantAssessments!
                                       .muscleAssessments[index]
                                       .displayOtherTreatment
                                       .toString(),
                                 ),
-                                _text(
+                                RowText(
                                   firstText: 'Muscle',
                                   secondText: consultantAssessments!
                                       .muscleAssessments[index]
                                       .displayMuscle
                                       .toString(),
                                 ),
-                                _text(
+                                RowText(
                                   firstText: 'Manual Treatment',
                                   secondText: consultantAssessments!
                                       .muscleAssessments[index]
                                       .displayManualTreatment
                                       .toString(),
                                 ),
-                                _text(
+                                RowText(
                                   firstText: 'Condition Status',
                                   secondText: consultantAssessments!
                                       .muscleAssessments[index]
@@ -491,7 +521,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                                       .toString(),
                                 ),
 
-                                _text(
+                                RowText(
                                   firstText: 'ByDefaultExercise',
                                   secondText: consultantAssessments!
                                       .muscleAssessments[index]
@@ -511,14 +541,14 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                             color: AppColors.primaryColor,
                           ),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'PrescribedSessionDuration',
                           secondText: consultantAssessments!
                               .sessionSettings!
                               .displayPrescribedSessionDuration!
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Session Settings',
                           secondText: consultantAssessments!
                               .sessionSettings!
@@ -527,18 +557,18 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         ),
                         Divider(thickness: 1, color: Colors.black),
 
-                        _text(
+                        RowText(
                           firstText: 'Manual Muscle Testing',
                           secondText: consultantAssessments!
                               .manualMuscleTesting!
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Selected Packages',
                           secondText: consultantAssessments!.selectedPackages!
                               .toString(),
                         ),
-                        _text(
+                        RowText(
                           firstText: 'Special Examination',
                           secondText: consultantAssessments!
                               .specialTestsExamination!
@@ -560,71 +590,5 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
         }
       },
     );
-  }
-
-  Widget _text({
-    required String firstText,
-    String? secondText,
-    String? buttonText,
-  }) {
-    if (secondText.toString().isNotEmpty &&
-        secondText != 'No data' &&
-        secondText != 'null' &&
-        secondText != null &&
-        secondText.contains("[]") == false) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: CustomText(text: firstText, fontSize: 12)),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: CustomText(
-                text: secondText,
-                align: TextAlign.start,
-                fontSize: 12,
-                maxLines: 5,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else if (buttonText.toString().isNotEmpty &&
-        buttonText != 'No data' &&
-        buttonText != 'No data' &&
-        buttonText != null &&
-        buttonText.contains("[]") == false) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: CustomText(
-                text: firstText,
-                fontSize: 12,
-                color: firstText == 'Red Flags' ? Colors.red : Colors.black,
-              ),
-            ),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: CustomText(
-                text: buttonText,
-                align: TextAlign.start,
-                fontSize: 12,
-                maxLines: 5,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      return Container();
-    }
   }
 }

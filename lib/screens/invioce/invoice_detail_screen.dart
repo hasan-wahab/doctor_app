@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
+import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
 import '../profile_screens/bloc/profile_state.dart' show ProfileState;
 
@@ -119,27 +120,27 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      _text(
+                                      RowText(
                                         firstText: 'Invoice #',
                                         secondText: invoice.id.toString(),
                                       ),
 
-                                      _text(
+                                      RowText(
                                         firstText: 'Date',
                                         secondText:
                                             DateAndTimeFormater.dateFormat(
                                               invoice.createdAt.toString(),
                                             ),
                                       ),
-                                      _text(
+                                      RowText(
                                         firstText: 'Type',
                                         buttonText: invoice.type,
                                       ),
-                                      _text(
+                                      RowText(
                                         firstText: 'Total amount',
                                         secondText: invoice.amount!.toString(),
                                       ),
-                                      _text(
+                                      RowText(
                                         firstText: 'Status',
                                         buttonText: invoice.status,
                                       ),
@@ -188,8 +189,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                                         .amount
                                                                         .toString(),
                                                                   ) -
-                                                                  invoice
-                                                                      .paidAmount!;
+                                                                double.parse(  invoice
+                                                                    .displayAmount);
                                                               return CustomText(
                                                                 text: double.parse(
                                                                   invoice
@@ -273,43 +274,5 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  Widget _text({
-    required String firstText,
-    String? secondText,
-    String? buttonText,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: CustomText(text: firstText, color: AppColors.primaryColor),
-        ),
-        Expanded(
-          child: secondText != null
-              ? CustomText(text: secondText, align: TextAlign.start)
-              : Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 5.w,
-                        vertical: 1.h,
-                      ),
-                      alignment: Alignment.center,
 
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(5.r),
-                      ),
-                      child: CustomText(
-                        text: buttonText!,
-                        color: AppColors.textWhiteColor,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ],
-    );
-  }
 }

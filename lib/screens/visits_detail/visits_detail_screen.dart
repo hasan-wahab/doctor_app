@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
+import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
 import '../profile_screens/bloc/profile_bloc.dart';
 import '../profile_screens/bloc/profile_state.dart';
@@ -76,10 +77,10 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: List.generate(
-                              currentPatientData!.patient.visits.length,
+                              currentPatientData!.patient!.visits.length,
                               (index) {
                                 final currentPatient =
-                                    currentPatientData!.patient.visits;
+                                    currentPatientData!.patient!.visits;
                                 return Container(
                                   margin: EdgeInsets.only(top: 10.h),
                                   height: 178.h,
@@ -100,7 +101,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          _text(
+                                          RowText(
                                             firstText: 'Date',
                                             secondText:
                                                 DateAndTimeFormater.dateFormat(
@@ -108,33 +109,33 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                                       .toString(),
                                                 ),
                                           ),
-                                          _text(
+                                          RowText(
                                             firstText: 'Type',
                                             buttonText: currentPatient[index]
                                                 .type
                                                 .toString(),
                                           ),
-                                          _text(
+                                          RowText(
                                             firstText: 'Doctor',
                                             secondText: currentPatient[index]
-                                                .therapist
+                                                .therapist!
                                                 .name,
                                           ),
-                                          _text(
+                                          RowText(
                                             firstText: 'Stage',
                                             secondText: currentPatient[index]
                                                 .currentStage,
                                           ),
-                                          _text(
+                                          RowText(
                                             firstText: 'Amount',
                                             secondText: currentPatient[index]
                                                 .consultationFee
                                                 .toString(),
                                           ),
-                                          _text(
+                                          RowText(
                                             firstText: 'Status',
-                                            buttonText:
-                                                currentPatient[index].status,
+                                            buttonText: currentPatient[index]
+                                                .displayStatus,
                                           ),
                                         ],
                                       ),
@@ -153,42 +154,4 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     );
   }
 
-  Widget _text({
-    required String firstText,
-    String? secondText,
-    String? buttonText,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(flex: 1, child: CustomText(text: firstText)),
-        Expanded(
-          flex: 2,
-          child: secondText != null
-              ? CustomText(text: secondText, align: TextAlign.start)
-              : Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 5.w,
-                        vertical: 1.h,
-                      ),
-                      alignment: Alignment.center,
-
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(5.r),
-                      ),
-                      child: CustomText(
-                        text: buttonText!,
-                        color: AppColors.textWhiteColor,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ],
-    );
-  }
 }

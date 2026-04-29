@@ -74,7 +74,7 @@ class _SessionNotesState extends State<SessionNotes> {
                     vertical: 20.h,
                   ),
                   child: currentPatientData != null
-                      ? currentPatientData!.patient.visits.isEmpty
+                      ? currentPatientData!.patient!.visits.isEmpty
                             ? Center(child: Text('No data'))
                             : Column(
                                 spacing: 20.h,
@@ -85,7 +85,7 @@ class _SessionNotesState extends State<SessionNotes> {
                                       context.read<HistoryTrackerBloc>().add(
                                         HistoryTrackerEvent(
                                           visitId: currentPatientData!
-                                              .patient
+                                              .patient!
                                               .visits[0]
                                               .id
                                               .toString(),
@@ -204,6 +204,7 @@ class _SessionNotesState extends State<SessionNotes> {
                                       Navigator.pushNamed(
                                         context,
                                         AppRoutes.sessionsDetailScreen,
+                                        arguments: visitID ?? '',
                                       );
                                     },
                                     child: SizedBox(

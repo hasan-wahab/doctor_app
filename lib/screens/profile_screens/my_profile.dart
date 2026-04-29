@@ -89,7 +89,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                             ? ClipOval(
                                                 child: Image.network(
                                                   fit: BoxFit.cover,
-                                                  'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+                                                  'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
 
                                                   headers: {
                                                     "Authorization":
@@ -314,8 +314,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                               text:
                                                   DateAndTimeFormater.dateFormat(
                                                     currentPatientData!
-                                                        .patient
-                                                        .birthDate
+                                                        .patient!
+                                                        .displayBirthDate
                                                         .toString(),
                                                   ),
 

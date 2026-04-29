@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       //    ?
                                                       Image.network(
                                                         fit: BoxFit.cover,
-                                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.image.toString()}',
+                                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
 
                                                         headers: {
                                                           "Authorization":
@@ -145,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   CustomText(
-                                    text: currentPatientData!.patient.user!.name
+                                    text: currentPatientData!.patient!.user!.displayName
                                         .toString(),
                                     fontSize: 20,
                                   ),

@@ -6,44 +6,47 @@ import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_impl.da
 import 'package:doctor_app/data/models/consultant_assesment_model.dart';
 import 'package:doctor_app/data/models/current_patient_model.dart'
     hide ConsultantAssessmentModel;
+import 'package:doctor_app/data/models/therapay_session_model.dart';
 import 'package:doctor_app/repos/consultant_assasment_repo/consultant_assesment_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
+import 'package:doctor_app/repos/session_detail_repo/sessions_detail_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
+import 'package:doctor_app/screens/seesion/bloc/session_event.dart';
 
 import '../../../repos/patient_local_repo/patient_local_repo.dart';
-import 'consultant_assesment_event.dart';
-import 'consultant_assesment_state.dart';
 
-class ConsultantAssessmentBloc
-    extends Bloc<ConsultantAssessmentEvent, ConsultantAssessmentState> {
-  ConsultantAssessmentRepo consultantRepo;
+import 'session_state.dart';
+
+class TherapySessionBloc
+    extends Bloc<TherapySessionEvent, TherapySessionState> {
+  SessionsDetailRepo sessionsDetailRepo;
   ProfileLocalRepo profileLocalRepo;
   PatientLocalRepo patientLocalRepo;
-  ConsultantAssessmentBloc({
-    required this.consultantRepo,
+  TherapySessionBloc({
+    required this.sessionsDetailRepo,
     required this.profileLocalRepo,
     required this.patientLocalRepo,
-  }) : super(ConsultantAssessmentState()) {
-    on<ConsultantAssessmentEvent>(_onConsultantAssessmentEvent);
+  }) : super(TherapySessionState()) {
+    on<TherapySessionEvent>(_onConsultantAssessmentEvent);
   }
-  ConsultantAssessmentModel? consultantAssessmentModel;
+  TherapySessionsResponseModel? therapySessionsResponseModel;
   CurrentPatientModel? patientData;
   LoginModel1? profileData;
   FutureOr _onConsultantAssessmentEvent(
-    ConsultantAssessmentEvent event,
-    Emitter<ConsultantAssessmentState> emit,
+    TherapySessionEvent event,
+    Emitter<TherapySessionState> emit,
   ) async {
     try {
-      emit(ConsultantLoadingState());
+      emit(SessionLoadingState());
       String token = await profileLocalRepo.getToken() ?? '';
       if (token != '' && event.id != null) {
-        consultantAssessmentModel = await consultantRepo
+        therapySessionsResponseModel = await sessionsDetailRepo
             .getConsultantsAssessmentByVisitId(
               visitId: event.id!,
               token: token,
             );
         emit(
-          ConsultantLoadedFromRecordsState(model: consultantAssessmentModel),
+          SessionLoadedFromRecordsState(model: therapySessionsResponseModel),
         );
         print(event.id);
       } else {
@@ -52,17 +55,17 @@ class ConsultantAssessmentBloc
 
         if (patientData != null && profileData != null) {
           emit(
-            ConsultantFromHomeLoaded(
+            SessionFromHomeLoaded(
               patientData: patientData,
               profileData: profileData,
             ),
           );
         } else {
-          emit(ConsultantMessageState(message: "Something went wrong"));
+          emit(SessionMessageState(message: "Something went wrong"));
         }
       }
     } catch (e) {
-      emit(ConsultantMessageState(message: e.toString()));
+      emit(SessionMessageState(message: e.toString()));
     }
   }
 }

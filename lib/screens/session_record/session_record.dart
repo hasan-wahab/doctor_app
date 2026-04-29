@@ -76,7 +76,7 @@ class _SessionRecordState extends State<SessionRecord> {
         }
 
         currentPatientData = latestData;
-        final visits = List.from(latestData.patient.visits);
+        final visits = List.from(latestData.patient!.visits);
 
         visits.sort(
           (a, b) => (a.visitAt ?? DateTime.fromMillisecondsSinceEpoch(0))
@@ -136,11 +136,11 @@ class _SessionRecordState extends State<SessionRecord> {
                                       children: [
                                         ...List.generate(
                                           currentPatientData!
-                                                  .patient
+                                                  .patient!
                                                   .packages
                                                   .isNotEmpty
                                               ? currentPatientData!
-                                                    .patient
+                                                    .patient!
                                                     .packages
                                                     .length
                                               : 1,
@@ -154,8 +154,8 @@ class _SessionRecordState extends State<SessionRecord> {
                                               height: 110.h,
                                               width:
                                                   currentPatientData!
-                                                          .patient
-                                                          .packages
+                                                          .patient!
+                                                          .packages!
                                                           .length ==
                                                       1
                                                   ? 350.w
@@ -183,14 +183,14 @@ class _SessionRecordState extends State<SessionRecord> {
                                                       CustomText(
                                                         text:
                                                             currentPatientData!
-                                                                .patient
+                                                                .patient!
                                                                 .packages
                                                                 .isEmpty
                                                             ? 'No data'
                                                             : currentPatientData!
-                                                                  .patient
+                                                                  .patient!
                                                                   .packages[index]
-                                                                  .name
+                                                                  .displayName
                                                                   .toString(),
                                                         fontSize: 12,
                                                       ),
@@ -220,7 +220,7 @@ class _SessionRecordState extends State<SessionRecord> {
                                                       LinearProgressIndicator(
                                                         value:
                                                             currentPatientData!
-                                                                .patient
+                                                                .patient!
                                                                 .packages
                                                                 .isEmpty
                                                             ? 1.0
@@ -593,14 +593,17 @@ class _SessionRecordState extends State<SessionRecord> {
   }
 
   double getSessionProgress(int index) {
-    final total =
-        currentPatientData!.patient.packages[index].pivot['sessions_total'];
+    final total = currentPatientData!
+        .patient!
+        .packages[index]
+        .pivot!
+        .displaySessionsTotal;
     final used =
-        currentPatientData!.patient.packages[index].pivot['sessions_used'];
+        currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed;
 
     if (total == 0) return 0.0;
 
-    final progress = used! / total!;
+    final progress = double.parse(used) / double.parse(total);
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

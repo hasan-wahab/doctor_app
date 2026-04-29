@@ -40,444 +40,460 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.bgColor,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back_ios_new),
-            ),
-            centerTitle: true,
-            title: Text('History Tracker'),
-            automaticallyImplyLeading: false,
-          ),
-          backgroundColor: AppColors.bgColor,
-
-          body: isLoading != true && historyTrackerModel != null
-              ? ListView(
-                  padding: EdgeInsets.only(
-                    left: 20.w,
-                    right: 20.w,
-                    top: 10.h,
-                    bottom: 60.h,
+        return isLoading == false
+            ? Scaffold(
+                appBar: AppBar(
+                  backgroundColor: AppColors.bgColor,
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new),
                   ),
-                  children: [
-                    CustomText(
-                      text: 'History Tracker',
-                      fontSize: 20,
-                      color: AppColors.primaryColor,
-                    ),
-                    SizedBox(height: 20.h),
+                  centerTitle: true,
+                  title: Text('History Tracker'),
+                  automaticallyImplyLeading: false,
+                ),
+                backgroundColor: AppColors.bgColor,
 
-                    ...List.generate((1), (index) {
-                      return Card(
-                        color: AppColors.secondaryColor,
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 20),
-                          //  height: 404.h,
-                          width: 350.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
+                body: historyTrackerModel != null
+                    ? ListView(
+                        padding: EdgeInsets.only(
+                          left: 20.w,
+                          right: 20.w,
+                          top: 10.h,
+                          bottom: 60.h,
+                        ),
+                        children: [
+                          CustomText(
+                            text: 'History Tracker',
+                            fontSize: 20,
+                            color: AppColors.primaryColor,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                height: 40.h,
+                          SizedBox(height: 20.h),
+
+                          ...List.generate((1), (index) {
+                            return Card(
+                              color: AppColors.secondaryColor,
+                              child: Container(
+                                margin: EdgeInsets.only(bottom: 20),
+                                //  height: 404.h,
                                 width: 350.w,
                                 decoration: BoxDecoration(
-                                  border: Border(bottom: BorderSide()),
+                                  borderRadius: BorderRadius.circular(12.r),
                                 ),
-                                child: Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(
-                                      width:
-                                          MediaQuery.sizeOf(context).width /
-                                              1.3 -
-                                          15,
-                                      child: Stack(
-                                        alignment: Alignment.centerLeft,
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                      ),
+                                      height: 40.h,
+                                      width: 350.w,
+                                      decoration: BoxDecoration(
+                                        border: Border(bottom: BorderSide()),
+                                      ),
+                                      child: Row(
                                         children: [
-                                          CustomText(text: ''),
-                                          Align(
-                                            alignment: Alignment.topRight,
+                                          SizedBox(
+                                            width:
+                                                MediaQuery.sizeOf(
+                                                      context,
+                                                    ).width /
+                                                    1.3 -
+                                                15,
+                                            child: Stack(
+                                              alignment: Alignment.centerLeft,
+                                              children: [
+                                                CustomText(text: ''),
+                                                Align(
+                                                  alignment: Alignment.topRight,
 
-                                            child: Container(
-                                              margin: EdgeInsets.only(top: 5.h),
-                                              alignment: Alignment.center,
-                                              height: 16.h,
-                                              width: 31.w,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(3.r),
-                                                color: AppColors.primaryColor,
-                                              ),
-                                              child: CustomText(
-                                                text: 'abds',
-                                                fontSize: 12,
-                                                color: AppColors.textWhiteColor,
-                                              ),
+                                                  child: Container(
+                                                    margin: EdgeInsets.only(
+                                                      top: 5.h,
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    height: 16.h,
+                                                    width: 31.w,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            3.r,
+                                                          ),
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    child: CustomText(
+                                                      text: 'abds',
+                                                      fontSize: 12,
+                                                      color: AppColors
+                                                          .textWhiteColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
+                                    SizedBox(height: 10.h),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Patient Information',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Name',
+                                      secondText: historyTrackerModel!
+                                          .patientInformation!
+                                          .displayName,
+                                    ),
+
+                                    _text(
+                                      firstText: 'Age',
+                                      secondText: historyTrackerModel!
+                                          .patientInformation!
+                                          .displayAge,
+                                    ),
+
+                                    _text(
+                                      firstText: 'Occupation',
+                                      secondText: historyTrackerModel!
+                                          .patientInformation!
+                                          .displayOccupation,
+                                    ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Chief Complaint',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Deviation',
+                                      secondText: historyTrackerModel!
+                                          .chiefComplaint!
+                                          .displayDeviation,
+                                    ),
+
+                                    _text(
+                                      firstText: 'Complaints',
+                                      secondText: historyTrackerModel!
+                                          .chiefComplaint
+                                          ?.complaints
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Side Affected',
+                                      secondText: historyTrackerModel!
+                                          .chiefComplaint!
+                                          .sideAffected
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Pain Relieve',
+                                      secondText: historyTrackerModel!
+                                          .aggravatingFactors!
+                                          .factors
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Symptoms',
+                                      secondText: historyTrackerModel!
+                                          .associatedSymptoms!
+                                          .symptoms
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Bladder Or Sexual Worsening',
+                                      secondText: historyTrackerModel!
+                                          .forMenOnly!
+                                          .displayBladderOrSexualWorsening
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Genital Numbness',
+                                      secondText: historyTrackerModel!
+                                          .forMenOnly!
+                                          .displayGenitalNumbness
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Urine Leakage',
+                                      secondText: historyTrackerModel!
+                                          .forMenOnly!
+                                          .displayUrineLeakage
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Urination Pain',
+                                      secondText: historyTrackerModel!
+                                          .forMenOnly!
+                                          .displayUrinationPain
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Nocturia',
+                                      secondText: historyTrackerModel!
+                                          .forMenOnly!
+                                          .displayNocturia
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Limited Activities',
+                                      secondText: historyTrackerModel!
+                                          .functionalLimitations!
+                                          .limitedActivities
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Analysis',
+                                      secondText: historyTrackerModel!
+                                          .gaitAnalysis!
+                                          .displayAnalysis,
+                                    ),
+
+                                    _text(
+                                      firstText: 'Movements',
+                                      secondText: historyTrackerModel!
+                                          .movementRelatedPain!
+                                          .movements
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'How Did It Start',
+                                      secondText: historyTrackerModel!
+                                          .onsetAndCause!
+                                          .displayHowDidItStart
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Possible Cause',
+                                      secondText: historyTrackerModel!
+                                          .onsetAndCause!
+                                          .possibleCause
+                                          .toString(),
+                                    ),
+                                    Divider(thickness: 1, color: Colors.black),
+
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Pain Details',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Duration',
+                                      secondText: historyTrackerModel!
+                                          .painDetails!
+                                          .displayDuration
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Pain Intensity Vas',
+                                      secondText: historyTrackerModel!
+                                          .painDetails!
+                                          .displayPainIntensity
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Pain Timing',
+                                      secondText: historyTrackerModel!
+                                          .painDetails!
+                                          .painTiming
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Type Of Pain',
+                                      secondText: historyTrackerModel!
+                                          .painDetails!
+                                          .typeOfPain
+                                          .toString(),
+                                    ),
+                                    Divider(thickness: 1, color: Colors.black),
+
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Past Medical History',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Surgical History',
+                                      secondText: historyTrackerModel!
+                                          .pastMedicalHistory!
+                                          .displaySurgicalHistory
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Medical History',
+                                      secondText: historyTrackerModel!
+                                          .pastMedicalHistory!
+                                          .medicalHistory
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Medical History Details',
+                                      secondText: historyTrackerModel!
+                                          .pastMedicalHistory!
+                                          .medicalHistoryDetails
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Previous Treatments',
+                                      secondText: historyTrackerModel!
+                                          .pastMedicalHistory!
+                                          .previousTreatments
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Treatment Responses',
+                                      secondText: historyTrackerModel!
+                                          .pastMedicalHistory!
+                                          .treatmentResponses
+                                          .values
+                                          .toString(),
+                                    ),
+
+                                    _text(
+                                      firstText: 'Pain Location',
+                                      secondText: historyTrackerModel!
+                                          .painLocation!
+                                          .painLocation
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Investigations Done',
+                                      secondText: historyTrackerModel!
+                                          .previousInvestigations!
+                                          .investigationsDone
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Red Flags',
+                                      buttonText: historyTrackerModel!
+                                          .redFlags!
+                                          .flags
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Radiating Status',
+                                      buttonText: historyTrackerModel!
+                                          .radiatingPain!
+                                          .displayRadiatingStatus
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Radiating Side',
+                                      buttonText: historyTrackerModel!
+                                          .radiatingPain!
+                                          .displayRadiationSide
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Radiating Path',
+                                      buttonText: historyTrackerModel!
+                                          .radiatingPain!
+                                          .radiationPath
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Limited Activities',
+                                      buttonText: historyTrackerModel!
+                                          .functionalLimitations!
+                                          .limitedActivities
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'How Did It Start',
+                                      buttonText: historyTrackerModel!
+                                          .onsetAndCause!
+                                          .displayHowDidItStart
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Possible Cause',
+                                      buttonText: historyTrackerModel!
+                                          .onsetAndCause!
+                                          .possibleCause
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Investigations Done',
+                                      buttonText: historyTrackerModel!
+                                          .previousInvestigations!
+                                          .investigationsDone
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Display Analysis',
+                                      buttonText: historyTrackerModel!
+                                          .gaitAnalysis!
+                                          .displayAnalysis!
+                                          .toString(),
+                                    ),
+                                    _text(
+                                      firstText: 'Factors',
+                                      buttonText: historyTrackerModel!
+                                          .relievingFactors!
+                                          .factors
+                                          .toString(),
+                                    ),
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 10.h),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: CustomText(
-                                  text: 'Patient Information',
-                                  fontSize: 14,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-
-                              _text(
-                                firstText: 'Name',
-                                secondText: historyTrackerModel!
-                                    .patientInformation!
-                                    .displayName,
-                              ),
-
-                              _text(
-                                firstText: 'Age',
-                                secondText: historyTrackerModel!
-                                    .patientInformation!
-                                    .displayAge,
-                              ),
-
-                              _text(
-                                firstText: 'Occupation',
-                                secondText: historyTrackerModel!
-                                    .patientInformation!
-                                    .displayOccupation,
-                              ),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: CustomText(
-                                  text: 'Chief Complaint',
-                                  fontSize: 14,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-
-                              _text(
-                                firstText: 'Deviation',
-                                secondText: historyTrackerModel!
-                                    .chiefComplaint!
-                                    .displayDeviation,
-                              ),
-
-                              _text(
-                                firstText: 'Complaints',
-                                secondText: historyTrackerModel!
-                                    .chiefComplaint
-                                    ?.complaints
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Side Affected',
-                                secondText: historyTrackerModel!
-                                    .chiefComplaint!
-                                    .sideAffected
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Pain Relieve',
-                                secondText: historyTrackerModel!
-                                    .aggravatingFactors!
-                                    .factors
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Symptoms',
-                                secondText: historyTrackerModel!
-                                    .associatedSymptoms!
-                                    .symptoms
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Bladder Or Sexual Worsening',
-                                secondText: historyTrackerModel!
-                                    .forMenOnly!
-                                    .displayBladderOrSexualWorsening
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Genital Numbness',
-                                secondText: historyTrackerModel!
-                                    .forMenOnly!
-                                    .displayGenitalNumbness
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Urine Leakage',
-                                secondText: historyTrackerModel!
-                                    .forMenOnly!
-                                    .displayUrineLeakage
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Urination Pain',
-                                secondText: historyTrackerModel!
-                                    .forMenOnly!
-                                    .displayUrinationPain
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Nocturia',
-                                secondText: historyTrackerModel!
-                                    .forMenOnly!
-                                    .displayNocturia
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Limited Activities',
-                                secondText: historyTrackerModel!
-                                    .functionalLimitations!
-                                    .limitedActivities
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Analysis',
-                                secondText: historyTrackerModel!
-                                    .gaitAnalysis!
-                                    .displayAnalysis,
-                              ),
-
-                              _text(
-                                firstText: 'Movements',
-                                secondText: historyTrackerModel!
-                                    .movementRelatedPain!
-                                    .movements
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'How Did It Start',
-                                secondText: historyTrackerModel!
-                                    .onsetAndCause!
-                                    .displayHowDidItStart
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Possible Cause',
-                                secondText: historyTrackerModel!
-                                    .onsetAndCause!
-                                    .possibleCause
-                                    .toString(),
-                              ),
-                              Divider(thickness: 1, color: Colors.black),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: CustomText(
-                                  text: 'Pain Details',
-                                  fontSize: 14,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-
-                              _text(
-                                firstText: 'Duration',
-                                secondText: historyTrackerModel!
-                                    .painDetails!
-                                    .displayDuration
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Pain Intensity Vas',
-                                secondText: historyTrackerModel!
-                                    .painDetails!
-                                    .displayPainIntensity
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Pain Timing',
-                                secondText: historyTrackerModel!
-                                    .painDetails!
-                                    .painTiming
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Type Of Pain',
-                                secondText: historyTrackerModel!
-                                    .painDetails!
-                                    .typeOfPain
-                                    .toString(),
-                              ),
-                              Divider(thickness: 1, color: Colors.black),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0,
-                                ),
-                                child: CustomText(
-                                  text: 'Past Medical History',
-                                  fontSize: 14,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-
-                              _text(
-                                firstText: 'Surgical History',
-                                secondText: historyTrackerModel!
-                                    .pastMedicalHistory!
-                                    .displaySurgicalHistory
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Medical History',
-                                secondText: historyTrackerModel!
-                                    .pastMedicalHistory!
-                                    .medicalHistory
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Medical History Details',
-                                secondText: historyTrackerModel!
-                                    .pastMedicalHistory!
-                                    .medicalHistoryDetails
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Previous Treatments',
-                                secondText: historyTrackerModel!
-                                    .pastMedicalHistory!
-                                    .previousTreatments
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Treatment Responses',
-                                secondText: historyTrackerModel!
-                                    .pastMedicalHistory!
-                                    .treatmentResponses
-                                    .values
-                                    .toString(),
-                              ),
-
-                              _text(
-                                firstText: 'Pain Location',
-                                secondText: historyTrackerModel!
-                                    .painLocation!
-                                    .painLocation
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Investigations Done',
-                                secondText: historyTrackerModel!
-                                    .previousInvestigations!
-                                    .investigationsDone
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Red Flags',
-                                buttonText: historyTrackerModel!.redFlags!.flags
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Radiating Status',
-                                buttonText: historyTrackerModel!
-                                    .radiatingPain!
-                                    .displayRadiatingStatus
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Radiating Side',
-                                buttonText: historyTrackerModel!
-                                    .radiatingPain!
-                                    .displayRadiationSide
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Radiating Path',
-                                buttonText: historyTrackerModel!
-                                    .radiatingPain!
-                                    .radiationPath
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Limited Activities',
-                                buttonText: historyTrackerModel!
-                                    .functionalLimitations!
-                                    .limitedActivities
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'How Did It Start',
-                                buttonText: historyTrackerModel!
-                                    .onsetAndCause!
-                                    .displayHowDidItStart
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Possible Cause',
-                                buttonText: historyTrackerModel!
-                                    .onsetAndCause!
-                                    .possibleCause
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Investigations Done',
-                                buttonText: historyTrackerModel!
-                                    .previousInvestigations!
-                                    .investigationsDone
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Display Analysis',
-                                buttonText: historyTrackerModel!
-                                    .gaitAnalysis!
-                                    .displayAnalysis!
-                                    .toString(),
-                              ),
-                              _text(
-                                firstText: 'Factors',
-                                buttonText: historyTrackerModel!
-                                    .relievingFactors!
-                                    .factors
-                                    .toString(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                )
-              : Center(child: CircularProgressIndicator()),
-        );
+                            );
+                          }),
+                        ],
+                      )
+                    : Center(child: Center(child: CircularProgressIndicator())),
+              )
+            : Scaffold(
+                body: Center(child: CustomText(text: 'No data found')),
+              );
       },
     );
   }
@@ -487,8 +503,7 @@ Widget _text({
   required String firstText,
   String? secondText,
   String? buttonText,
-})
-{
+}) {
   if (secondText.toString().isNotEmpty &&
       secondText != 'No data' &&
       secondText != 'No data' &&
