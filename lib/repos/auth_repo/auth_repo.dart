@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:doctor_app/data/models/current_patient_model.dart';
+import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
+import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
 import 'package:doctor_app/repos/patient_local_repo/patient_local_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
@@ -18,11 +20,15 @@ class AuthRepoImpl implements AuthRepoBase {
   BaseApi api;
   ProfileLocalRepo localRepo;
   PatientLocalRepo patientLocalRepo;
+  AllVisitLocalRepo allVisitLocalRepo;
+  AllConsultantAssessmentLocalRepo allConsultantAssessmentLocalRepo;
 
   AuthRepoImpl({
     required this.api,
     required this.localRepo,
     required this.patientLocalRepo,
+    required this.allVisitLocalRepo,
+    required this.allConsultantAssessmentLocalRepo,
   });
 
   @override
@@ -63,6 +69,9 @@ class AuthRepoImpl implements AuthRepoBase {
       await localRepo.deleteToken();
       await localRepo.deleteProfile();
       await patientLocalRepo.deletePatientData();
+      await allVisitLocalRepo.deleteAllVisitDataFromLocal();
+      await allConsultantAssessmentLocalRepo
+          .deleteAllConsultantAssessmentDataFromLocal();
     }
   }
 
@@ -124,6 +133,4 @@ class AuthRepoImpl implements AuthRepoBase {
       }
     }
   }
-
-
 }

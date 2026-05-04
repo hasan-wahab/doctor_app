@@ -4,6 +4,7 @@ import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/core/app_exceptions/base_exceptions.dart';
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../../core/app_keys/local_keys.dart';
 import '../local_db.dart';
@@ -67,4 +68,7 @@ class LocalCurdImpl implements LocalCurdBase {
       );
     }
   }
+
+
+
 }

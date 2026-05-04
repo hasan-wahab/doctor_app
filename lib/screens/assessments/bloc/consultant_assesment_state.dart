@@ -1,5 +1,7 @@
+import 'package:doctor_app/data/models/all_consutant_assessment_model.dart';
 import 'package:doctor_app/data/models/consultant_assesment_model.dart';
-import 'package:doctor_app/data/models/current_patient_model.dart' hide ConsultantAssessmentModel;
+import 'package:doctor_app/data/models/current_patient_model.dart'
+    hide ConsultantAssessmentModel;
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 
 class ConsultantAssessmentState {}
@@ -18,7 +20,6 @@ class ConsultantLoadedFromRecordsState extends ConsultantAssessmentState {
 }
 
 class ConsultantFromHomeLoaded extends ConsultantAssessmentState {
-  CurrentPatientModel? patientData;
-  LoginModel1? profileData;
-  ConsultantFromHomeLoaded({this.patientData, this.profileData});
+  List<AllConsultantAssessmentModel>? allConsultantAssessmentModel = [];
+  ConsultantFromHomeLoaded({this.allConsultantAssessmentModel});
 }

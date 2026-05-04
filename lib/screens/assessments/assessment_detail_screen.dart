@@ -3,11 +3,14 @@ import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../data/models/all_consutant_assessment_model.dart';
 import '../../data/models/consultant_assesment_model.dart';
 import '../../data/models/current_patient_model.dart'
     hide ConsultantAssessmentModel;
@@ -24,7 +27,7 @@ class AssessmentDetailScreen extends StatefulWidget {
 }
 
 class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
-  CurrentPatientModel? currentPatientData;
+  List<AllConsultantAssessmentModel>? allConsultantAssessmentModel;
   ConsultantAssessmentModel? consultantAssessments;
   // var consultantAtIndex;
 
@@ -49,277 +52,328 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
-        print(state);
+        if (kDebugMode) {
+          print(state);
+        }
       },
 
       builder: (context, state) {
         if (state is ConsultantFromHomeLoaded) {
-          currentPatientData = state.patientData;
-          final consultantAssessmentData = currentPatientData!.patient!.visits;
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
-              ),
-              centerTitle: true,
-              title: Text('Consultant Assessments'),
-              automaticallyImplyLeading: false,
+          allConsultantAssessmentModel = state.allConsultantAssessmentModel;
+
+          return RefreshIndicator(
+            onRefresh: () async => context.read<ConsultantAssessmentBloc>().add(
+              ConsultantAssessmentEvent(isRefresh: true),
             ),
-            backgroundColor: AppColors.bgColor,
-            body: consultantAssessmentData.isNotEmpty
-                ? ListView(
-                    padding: EdgeInsets.only(
-                      left: 20.w,
-                      right: 20.w,
-                      top: 10.h,
-                      bottom: 60.h,
-                    ),
-                    children: [
-                      CustomText(
-                        text: 'Consultant Assessments',
-                        fontSize: 20,
-                        color: AppColors.primaryColor,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: AppColors.bgColor,
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new),
+                ),
+                centerTitle: true,
+                title: Text('Consultant Assessments'),
+                automaticallyImplyLeading: false,
+              ),
+              backgroundColor: AppColors.bgColor,
+              body: allConsultantAssessmentModel != null
+                  ? ListView(
+                      padding: EdgeInsets.only(
+                        left: 20.w,
+                        right: 20.w,
+                        top: 10.h,
+                        bottom: 60.h,
                       ),
-                      SizedBox(height: 30.h),
+                      children: [
+                        CustomText(
+                          text: 'Consultant Assessments',
+                          fontSize: 20,
+                          color: AppColors.primaryColor,
+                        ),
+                        SizedBox(height: 30.h),
 
-                      ...List.generate(
-                        (consultantAssessmentData.isNotEmpty
-                            ? consultantAssessmentData.length
-                            : 1),
-                        (index) {
-                          return Card(
-                            color: AppColors.secondaryColor,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 20.h),
-                              // height: 404.h,
-                              width: 350.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 10.w,
-                                    ),
-                                    height: 40.h,
-                                    width: 350.w,
-                                    decoration: BoxDecoration(
-                                      border: Border(bottom: BorderSide()),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width:
-                                              MediaQuery.sizeOf(context).width /
-                                                  1.3 -
-                                              15,
-                                          child: Stack(
-                                            alignment: Alignment.centerLeft,
-                                            children: [
-                                              CustomText(
-                                                text:
-                                                    consultantAssessmentData[index]
-                                                            .consultant !=
-                                                        null
-                                                    ? consultantAssessmentData[index]
-                                                          .consultant!
-                                                          .displayName
-                                                          .toString()
-                                                    : '',
-                                              ),
-                                            ],
+                        ...List.generate(
+                          (allConsultantAssessmentModel!.isNotEmpty
+                              ? allConsultantAssessmentModel!.length
+                              : 1),
+                          (index) {
+                            List<MuscleAssessment> muscleAssessments =
+                                allConsultantAssessmentModel![index]
+                                    .muscleAssessments;
+
+                            return Card(
+                              color: AppColors.secondaryColor,
+                              child: Container(
+                                margin: EdgeInsets.only(bottom: 20.h),
+                                // height: 404.h,
+                                width: 350.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                      ),
+                                      height: 40.h,
+                                      width: 350.w,
+                                      decoration: BoxDecoration(
+                                        border: Border(bottom: BorderSide()),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width:
+                                                MediaQuery.sizeOf(
+                                                      context,
+                                                    ).width /
+                                                    1.3 -
+                                                15,
+                                            child: Stack(
+                                              alignment: Alignment.centerLeft,
+                                              children: [
+                                                CustomText(
+                                                  text:
+                                                      allConsultantAssessmentModel![index]
+                                                          .consultant
+                                                          .toString(),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
+                                    SizedBox(height: 10.h),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Assessment Finding',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
                                     ),
-                                    child: CustomText(
-                                      text: 'Assessment Finding',
-                                      fontSize: 14,
-                                      color: AppColors.primaryColor,
+                                    RowText(
+                                      firstText: 'Assessment Id',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .assessmentId
+                                              .toString(),
                                     ),
-                                  ),
-                                  RowText(
-                                    firstText: 'Observation',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayObservationFindings
-                                        : 'No data',
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Final Diagnosis',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayFinalDiagnosis
-                                        : 'No data',
-                                  ),
-                                  RowText(
-                                    firstText: 'DifferentialDiagnoses',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayDifferentialDiagnoses
-                                        : 'No data',
-                                  ),
-                                  RowText(
-                                    firstText: 'Final Diagnosis Other',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayFinalDiagnosisOther
-                                        : 'No data',
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Palpation',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayPalpationResults
-                                        : '',
-                                  ),
-                                  RowText(
-                                    firstText: 'Next Review Date',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayNextReviewDate
-                                        : 'No data',
-                                  ),
-                                  RowText(
-                                    firstText: 'ROM',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayRomAssessment
-                                        : 'No data',
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Neuro Test:',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displaySpecialTests
-                                        : 'No data',
-                                  ),
-                                  Divider(thickness: 1, color: Colors.black),
-
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
-                                    ),
-                                    child: CustomText(
-                                      text: 'Medications',
-                                      fontSize: 14,
-                                      color: AppColors.primaryColor,
-                                    ),
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Muscle Relaxant',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? List.generate(
-                                            consultantAssessmentData[index]
-                                                .consultantAssessment!
-                                                .muscleAssessments
-                                                .length,
-                                            (index2) =>
-                                                consultantAssessmentData[index]
-                                                    .consultantAssessment!
-                                                    .muscleAssessments[index2]
-                                                    .displayConditions
-                                                    .toString(),
-                                          ).toString()
-                                        : 'No data',
-                                  ),
-
-                                  Divider(thickness: 1, color: Colors.black),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0,
-                                    ),
-                                    child: CustomText(
-                                      text: 'Diagnosis & Treament',
-                                      fontSize: 14,
-                                      color: AppColors.primaryColor,
-                                    ),
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Final Diagnosis',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .displayFinalDiagnosis
-                                        : 'No data',
-                                  ),
-
-                                  RowText(
-                                    firstText: 'Duration',
-                                    secondText:
-                                        consultantAssessmentData[index]
-                                                .consultantAssessment !=
-                                            null
-                                        ? consultantAssessmentData[index]
-                                              .consultantAssessment!
-                                              .sessionDuration
+                                    RowText(
+                                      firstText: 'Final Diagnosis',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .clinicalFindings!
+                                              .diagnosis
                                               .toString()
-                                        : 'No data',
-                                  ),
-                                ],
+                                              .toString(),
+                                    ),
+
+                                    RowText(
+                                      firstText: 'Next Review Date',
+                                      secondText:
+                                          DateAndTimeFormater.dateFormat(
+                                            allConsultantAssessmentModel![index]
+                                                .visitDate
+                                                .toString(),
+                                          ),
+                                    ),
+
+                                    RowText(
+                                      firstText: 'Neuro Test:',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .specialTests
+                                              .toString(),
+                                    ),
+
+                                    RowText(
+                                      firstText: 'Manual Muscle Testing (MMT)',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .mmt
+                                              .toString(),
+                                    ),
+                                    Divider(thickness: 1, color: Colors.black),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0,
+                                      ),
+                                      child: CustomText(
+                                        text: 'Muscle Assessment',
+                                        fontSize: 14,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                    RowText(
+                                      firstText: 'Status',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .conditionStatus;
+                                        },
+                                      ).toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Exercise',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .prescribedExercises
+                                              .toString();
+                                        },
+                                      ).toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Default Exercise',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .defaultExercises
+                                              .toString();
+                                        },
+                                      ).toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Manual Treatment',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .manualTreatment
+                                              .toString();
+                                        },
+                                      ).toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Muscle',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .muscle
+                                              .toString();
+                                        },
+                                      ).toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Other Treatment',
+                                      secondText: List.generate(
+                                        (muscleAssessments.length),
+                                        (index2) {
+                                          return muscleAssessments[index2]
+                                              .otherTreatment;
+                                        },
+                                      ).toString(),
+                                    ),
+
+                                    RowText(
+                                      firstText: 'MMT',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .mmt
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Selected Package',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .selectedPackages
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Duration',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .sessionSettings!
+                                              .duration
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Investigations Done',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .advice!
+                                              .investigationsDone
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Other Advice',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .advice!
+                                              .otherAdvice
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Advanced',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .advanced
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Topicals',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .topicals
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Anti Inflammatory',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .antiInflammatory
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Thermo',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .thermo
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Electrotherapy',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .electrotherapy
+                                              .toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Medications',
+                                      secondText:
+                                          allConsultantAssessmentModel![index]
+                                              .prescription!
+                                              .medications
+                                              .toString(),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  )
-                : Center(child: CustomText(text: 'text')),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : Center(child: CustomText(text: 'text')),
+            ),
           );
         }
         if (state is ConsultantLoadedFromRecordsState) {

@@ -1,5 +1,10 @@
 import 'dart:convert';
 
+import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
+import 'package:doctor_app/data/models/all_visits_model.dart';
+import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
+import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
+import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
@@ -25,6 +30,7 @@ import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_curd_base/local_curd_impl.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../data/models/current_patient_model.dart';
+import '../../repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/show_msg.dart';
 

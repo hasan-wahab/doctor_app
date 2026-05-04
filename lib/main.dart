@@ -2,6 +2,10 @@ import 'package:doctor_app/core/app_keys/api_keys.dart';
 import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
 import 'package:doctor_app/data/local_storage/local_storage.dart';
+import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
+import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
+import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
+import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
 import 'package:doctor_app/repos/auth_repo/auth_repo.dart';
 import 'package:doctor_app/repos/consultant_assasment_repo/consultant_assesment_repo.dart';
 import 'package:doctor_app/repos/history_tracker_repo/history_tracker_repo_Impl.dart';
@@ -20,6 +24,7 @@ import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/seesion/bloc/session_bloc.dart';
 import 'package:doctor_app/screens/seesion/sessiom_detail_screen.dart';
+import 'package:doctor_app/screens/visits_detail/bloc/visit_detail_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,14 +65,18 @@ class _MyAppState extends State<MyApp> {
   late HistoryTrackerRepoImpl historyTrackerRepoImpl;
   late ConsultantAssessmentRepo consultantAssessmentRepo;
   late SessionsDetailRepo sessionsDetailRepo;
+  late AllVisitLocalRepo allVisitLocalRepo;
+  late AllVisitRepo allVisitRepo;
+  late AllConsultantAssessmentLocalRepo allConsultantAssessmentLocalRepo;
+  late AllConsultantAssessmentRepo allConsultantAssessmentRepo;
+
   @override
   void initState() {
     super.initState();
 
     apiImpl = BaseApiImpl();
-    curdImpl = LocalCurdImpl();
 
-    profileLocalRepo = ProfileLocalRepo(curdBase: curdImpl);
+    curdImpl = LocalCurdImpl();
 
     patientLocalRepo = PatientLocalRepo(curdBase: curdImpl);
 
@@ -78,17 +87,40 @@ class _MyAppState extends State<MyApp> {
       patientLocalRepo: patientLocalRepo,
     );
 
-    authRepoBase = AuthRepoImpl(
-      patientLocalRepo: patientLocalRepo,
-      api: apiImpl,
-      localRepo: profileLocalRepo,
-    );
+    allVisitLocalRepo = AllVisitLocalRepo(localCurdBase: curdImpl);
+
     historyTrackerRepoImpl = HistoryTrackerRepoImpl(
       api: apiImpl,
       curdBase: curdImpl,
     );
+
     consultantAssessmentRepo = ConsultantAssessmentRepo(api: apiImpl);
+
     sessionsDetailRepo = SessionsDetailRepo(api: apiImpl);
+
+    allVisitLocalRepo = AllVisitLocalRepo(localCurdBase: curdImpl);
+
+    allVisitRepo = AllVisitRepo(
+      api: apiImpl,
+      allVisitLocalRepo: AllVisitLocalRepo(localCurdBase: curdImpl),
+    );
+
+    allConsultantAssessmentLocalRepo = AllConsultantAssessmentLocalRepo(
+      localCurdBase: curdImpl,
+    );
+
+    allConsultantAssessmentRepo = AllConsultantAssessmentRepo(
+      api: apiImpl,
+      allConsultantAssessmentLocalRepo: allConsultantAssessmentLocalRepo,
+    );
+
+    authRepoBase = AuthRepoImpl(
+      allConsultantAssessmentLocalRepo: allConsultantAssessmentLocalRepo,
+      allVisitLocalRepo: allVisitLocalRepo,
+      patientLocalRepo: patientLocalRepo,
+      api: apiImpl,
+      localRepo: profileLocalRepo,
+    );
   }
 
   @override
@@ -101,12 +133,14 @@ class _MyAppState extends State<MyApp> {
             profileLocalRepo: profileLocalRepo,
           ),
         ),
+
         BlocProvider(
           create: (context) => NaveBarBloc(
             profileLocalRepo: profileLocalRepo,
             authRepo: authRepoBase,
           ),
         ),
+
         BlocProvider(
           create: (context) => ProfileBloc(
             patientRepoBase: patientRepoImpl,
@@ -115,6 +149,7 @@ class _MyAppState extends State<MyApp> {
             patientLocalRepo: patientLocalRepo,
           ),
         ),
+
         BlocProvider(
           create: (context) => DashboardBloc(
             profileLocalRepo: profileLocalRepo,
@@ -122,25 +157,37 @@ class _MyAppState extends State<MyApp> {
             patientLocalRepo: patientLocalRepo,
           )..add(DashboardRefreshDataEvent()),
         ),
+
         BlocProvider(
           create: (context) => HistoryTrackerBloc(
             historyTrackerRepoImpl: historyTrackerRepoImpl,
           ),
         ),
+
         BlocProvider(
           create: (context) => ConsultantAssessmentBloc(
+            allConsultantAssessmentLocalRepo: allConsultantAssessmentLocalRepo,
+            allConsultantAssessmentRepo: allConsultantAssessmentRepo,
             patientLocalRepo: patientLocalRepo,
-
             profileLocalRepo: profileLocalRepo,
             consultantRepo: consultantAssessmentRepo,
           ),
         ),
+
         BlocProvider(
           create: (context) => TherapySessionBloc(
             patientLocalRepo: patientLocalRepo,
-
             profileLocalRepo: profileLocalRepo,
             sessionsDetailRepo: sessionsDetailRepo,
+          ),
+        ),
+
+        BlocProvider(
+          create: (context) => VisitDetailBloc(
+            patientLocalRepo: patientLocalRepo,
+            profileLocalRepo: profileLocalRepo,
+            allVisitLocalRepo: allVisitLocalRepo,
+            allVisitRepo: allVisitRepo,
           ),
         ),
       ],
@@ -158,7 +205,6 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           ),
-
           onGenerateRoute: (RouteSettings settings) {
             return AppGenerateRoute.onGenerateRoute(settings, context);
           },

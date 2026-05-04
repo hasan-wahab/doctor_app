@@ -29,4 +29,19 @@ class ApiKeys {
 
   /// Session detail key
   static String sessionDetailKey = "$baseUrl/patient/therapist";
+
+  /// All visits key
+  static String allVisitsKey = "$baseUrl/patient/visits/all";
+
+  /// All Consultant key
+
+  static String allConsultantKey = "$baseUrl/patient/consultant/all";
+
+  /// All Therapist key
+
+  static String allTherapistKey = "$baseUrl/patient/therapist/all";
+
+  /// All HistoryTaker key
+
+  static String allHistoryTakerKey = "$baseUrl/patient/histrytaker/all";
 }

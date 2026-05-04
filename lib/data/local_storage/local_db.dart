@@ -45,5 +45,17 @@ class DBHelper {
       ${LocalKeys.patientKey} TEXT
     )
     ''');
+    await db.execute('''
+    CREATE TABLE ${TableName.allVisits}(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${LocalKeys.allVisitKey} TEXT
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE ${TableName.allConsultantAssessment}(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${LocalKeys.allConsultantAssessmentKey} TEXT
+    )
+    ''');
   }
 }

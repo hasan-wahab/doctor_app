@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_impl.dart';
+import 'package:doctor_app/data/models/all_consutant_assessment_model.dart';
 import 'package:doctor_app/data/models/consultant_assesment_model.dart';
 import 'package:doctor_app/data/models/current_patient_model.dart'
     hide ConsultantAssessmentModel;
+import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
 import 'package:doctor_app/repos/consultant_assasment_repo/consultant_assesment_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
+import 'package:flutter/foundation.dart';
 
+import '../../../repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
 import '../../../repos/patient_local_repo/patient_local_repo.dart';
 import 'consultant_assesment_event.dart';
 import 'consultant_assesment_state.dart';
@@ -19,16 +23,21 @@ class ConsultantAssessmentBloc
   ConsultantAssessmentRepo consultantRepo;
   ProfileLocalRepo profileLocalRepo;
   PatientLocalRepo patientLocalRepo;
+  AllConsultantAssessmentLocalRepo allConsultantAssessmentLocalRepo;
+  AllConsultantAssessmentRepo allConsultantAssessmentRepo;
   ConsultantAssessmentBloc({
     required this.consultantRepo,
     required this.profileLocalRepo,
     required this.patientLocalRepo,
+    required this.allConsultantAssessmentLocalRepo,
+    required this.allConsultantAssessmentRepo,
   }) : super(ConsultantAssessmentState()) {
     on<ConsultantAssessmentEvent>(_onConsultantAssessmentEvent);
   }
   ConsultantAssessmentModel? consultantAssessmentModel;
   CurrentPatientModel? patientData;
-  LoginModel1? profileData;
+  List<AllConsultantAssessmentModel>? allConsultantAssessmentModel;
+
   FutureOr _onConsultantAssessmentEvent(
     ConsultantAssessmentEvent event,
     Emitter<ConsultantAssessmentState> emit,
@@ -45,20 +54,45 @@ class ConsultantAssessmentBloc
         emit(
           ConsultantLoadedFromRecordsState(model: consultantAssessmentModel),
         );
-        print(event.id);
+        if (kDebugMode) {
+          print(event.id);
+        }
       } else {
+        String? token = await profileLocalRepo.getToken();
         patientData = await patientLocalRepo.getPatientDataLocal();
-        profileData = await profileLocalRepo.getProfile();
+        if (patientData == null) return;
+        if (patientData!.patient == null) return;
+        String patientId = patientData!.patient!.id.toString();
+        if (token != null && patientId.isNotEmpty) {
+          // First we will try to get data from local
+          if (event.isRefresh) {
+            // Here we will get data from server
+            allConsultantAssessmentModel = await allConsultantAssessmentRepo
+                .getAllConsultantAssessment(token: token, patientId: patientId);
+          } else {
+            allConsultantAssessmentModel =
+                await allConsultantAssessmentLocalRepo
+                    .getAllConsultantAssessmentFromLocal();
+            if (allConsultantAssessmentModel == null ||
+                allConsultantAssessmentModel!.isEmpty) {
+              // Here we will get data from server
+              allConsultantAssessmentModel = await allConsultantAssessmentRepo
+                  .getAllConsultantAssessment(
+                    token: token,
+                    patientId: patientId,
+                  );
+            }
+          }
 
-        if (patientData != null && profileData != null) {
           emit(
             ConsultantFromHomeLoaded(
-              patientData: patientData,
-              profileData: profileData,
+              allConsultantAssessmentModel: allConsultantAssessmentModel,
             ),
           );
         } else {
-          emit(ConsultantMessageState(message: "Something went wrong"));
+          if (kDebugMode) {
+            print('Somethings went worng');
+          }
         }
       }
     } catch (e) {
