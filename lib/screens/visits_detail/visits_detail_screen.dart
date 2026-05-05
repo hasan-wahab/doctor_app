@@ -68,91 +68,101 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
               automaticallyImplyLeading: false,
             ),
             backgroundColor: AppColors.bgColor,
-            body: isLoading == false && allVisitsModel != null
-                ? allVisitsModel!.visits.isNotEmpty
-                      ? ListView(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 10.h,
-                          ),
-                          children: [
-                            CustomText(
-                              text: 'Visit History',
-                              fontSize: 20,
-                              color: AppColors.primaryColor,
+            body: SafeArea(
+              child: isLoading == false && allVisitsModel != null
+                  ? allVisitsModel!.visits.isNotEmpty
+                        ? ListView(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 10.h,
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: List.generate(
-                                allVisitsModel!.visits.length,
-                                (index) {
-                                  final currentPatient = allVisitsModel!.visits;
-                                  return Container(
-                                    margin: EdgeInsets.only(top: 10.h),
-                                    height: 178.h,
-                                    width: 360.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-
-                                    child: Card(
-                                      margin: EdgeInsets.zero,
-                                      color: AppColors.secondaryColor,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 12.w,
-                                          vertical: 12.h,
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            RowText(
-                                              firstText: 'Date',
-                                              secondText:
-                                                  DateAndTimeFormater.dateFormat(
-                                                    currentPatient[index]
-                                                        .displayDate,
-                                                  ),
-                                            ),
-                                            RowText(
-                                              firstText: 'Type',
-                                              buttonText: currentPatient[index]
-                                                  .displayType
-                                                  .toString(),
-                                            ),
-                                            RowText(
-                                              firstText: 'Doctor',
-                                              secondText: currentPatient[index]
-                                                  .displayDoctor,
-                                            ),
-                                            RowText(
-                                              firstText: 'Stage',
-                                              secondText: currentPatient[index]
-                                                  .displayStage,
-                                            ),
-                                            RowText(
-                                              firstText: 'Amount',
-                                              secondText: currentPatient[index]
-                                                  .displayConsultationFee,
-                                            ),
-                                            RowText(
-                                              firstText: 'Status',
-                                              secondText: currentPatient[index]
-                                                  .displayStatus,
-                                            ),
-                                          ],
+                            children: [
+                              CustomText(
+                                text: 'Visit History',
+                                fontSize: 20,
+                                color: AppColors.primaryColor,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: List.generate(
+                                  allVisitsModel!.visits.length,
+                                  (index) {
+                                    final currentPatient =
+                                        allVisitsModel!.visits;
+                                    return Container(
+                                      margin: EdgeInsets.only(top: 10.h),
+                                      height: 178.h,
+                                      width: 360.w,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          12.r,
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
+
+                                      child: Card(
+                                        margin: EdgeInsets.zero,
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12.w,
+                                            vertical: 12.h,
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              RowText(
+                                                firstText: 'Date',
+                                                secondText:
+                                                    DateAndTimeFormater.dateFormat(
+                                                      currentPatient[index]
+                                                          .displayDate,
+                                                    ),
+                                              ),
+                                              RowText(
+                                                firstText: 'Type',
+                                                buttonText:
+                                                    currentPatient[index]
+                                                        .displayType
+                                                        .toString(),
+                                              ),
+                                              RowText(
+                                                firstText: 'Doctor',
+                                                secondText:
+                                                    currentPatient[index]
+                                                        .displayDoctor,
+                                              ),
+                                              RowText(
+                                                firstText: 'Stage',
+                                                secondText:
+                                                    currentPatient[index]
+                                                        .displayStage,
+                                              ),
+                                              RowText(
+                                                firstText: 'Amount',
+                                                secondText:
+                                                    currentPatient[index]
+                                                        .displayConsultationFee,
+                                              ),
+                                              RowText(
+                                                firstText: 'Status',
+                                                secondText:
+                                                    currentPatient[index]
+                                                        .displayStatus,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
-                        )
-                      : Center(child: Text('No data'))
-                : Center(child: CircularProgressIndicator()),
+                            ],
+                          )
+                        : Center(child: Text('No data'))
+                  : Center(child: CircularProgressIndicator()),
+            ),
           ),
         );
       },

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/models/all_visits_model.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
+import 'package:doctor_app/repos/all_packages_repo/all_packages_repo.dart';
+import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';

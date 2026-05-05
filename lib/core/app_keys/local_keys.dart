@@ -6,6 +6,10 @@ class LocalKeys {
   static const String token = 'TOKEN';
   static const String allVisitKey = 'All_Visits';
   static const String allConsultantAssessmentKey = 'All_Consultant_Assessment';
+  static const String allTherapistSessionKey = 'All_Therapist_Session';
+  static const String allPackagesKey = 'All_Packages';
+  static const String coverPhotoKey = 'Cover_Photo';
+  static const String sliderImagesKey = 'Slider_Images';
 }
 
 class TableName {
@@ -16,4 +20,8 @@ class TableName {
   static const String token = 'TokenTable';
   static const String allVisits = 'AllVisits';
   static const String allConsultantAssessment = 'AllConsultantAssessment';
+  static const String allTherapistSession = 'AllTherapistSession';
+  static const String allPackages = 'AllPackages';
+  static const String coverPhoto = 'CoverPhoto';
+  static const String sliderImages = 'SliderImages';
 }

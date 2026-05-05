@@ -59,251 +59,253 @@ class _AssistantManagerScreenState extends State<AssistantManagerScreen> {
                   automaticallyImplyLeading: false,
                 ),
                 backgroundColor: AppColors.bgColor,
-                body:
-                    currentPatientData != null &&
-                        currentPatientData!.patient != null &&
-                        currentPatientData!.patient!.visits.isNotEmpty
-                    ? ListView(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.w,
-                          vertical: 10.h,
-                        ),
-                        children: [
-                          CustomText(
-                            text: 'Assistant Manager Assessment',
-                            fontSize: 20,
-                            color: AppColors.primaryColor,
+                body: SafeArea(
+                  child:
+                      currentPatientData != null &&
+                          currentPatientData!.patient != null &&
+                          currentPatientData!.patient!.visits.isNotEmpty
+                      ? ListView(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
                           ),
+                          children: [
+                            CustomText(
+                              text: 'Assistant Manager Assessment',
+                              fontSize: 20,
+                              color: AppColors.primaryColor,
+                            ),
 
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: List.generate(
-                              currentPatientData!.patient!.visits.isNotEmpty
-                                  ? currentPatientData!.patient!.visits.length
-                                  : 1,
-                              (index) {
-                                if (currentPatientData!
-                                    .patient!
-                                    .visits
-                                    .isNotEmpty) {
-                                  return Card(
-                                    margin: EdgeInsets.only(top: 10.h),
-                                    color: AppColors.secondaryColor,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 15.w,
-                                        vertical: 20.h,
-                                      ),
-                                      // height: 420.h,
-                                      width: 360.w,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          12.r,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: List.generate(
+                                currentPatientData!.patient!.visits.isNotEmpty
+                                    ? currentPatientData!.patient!.visits.length
+                                    : 1,
+                                (index) {
+                                  if (currentPatientData!
+                                      .patient!
+                                      .visits
+                                      .isNotEmpty) {
+                                    return Card(
+                                      margin: EdgeInsets.only(top: 10.h),
+                                      color: AppColors.secondaryColor,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 15.w,
+                                          vertical: 20.h,
+                                        ),
+                                        // height: 420.h,
+                                        width: 360.w,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                        ),
+
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            RowText(
+                                              firstText: 'Visit Date #',
+                                              secondText:
+                                                  DateAndTimeFormater.dateFormat(
+                                                    currentPatientData!
+                                                        .patient!
+                                                        .displayCreatedAt,
+                                                  ),
+                                            ),
+                                            RowText(
+                                              firstText: 'AM Name',
+                                              secondText: currentPatientData!
+                                                  .patient!
+                                                  .visits[index]
+                                                  .assistantManager!
+                                                  .displayName,
+                                            ),
+                                            RowText(
+                                              firstText: 'Consultant',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .consultant !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .consultant!
+                                                        .displayName
+                                                  : '',
+                                            ),
+
+                                            RowText(
+                                              firstText: 'Occupation',
+                                              secondText: currentPatientData!
+                                                  .patient!
+                                                  .displayOccupation,
+                                            ),
+                                            RowText(
+                                              firstText: 'Chief Complaint',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayChiefComplaint
+                                                  : "",
+                                            ),
+                                            RowText(
+                                              firstText: 'Complaint Onset',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayComplaintOnset
+                                                  : '',
+                                            ),
+                                            RowText(
+                                              firstText: 'Pain Severity',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayPainSeverity
+                                                  : '',
+                                            ),
+                                            RowText(
+                                              firstText: 'Pain Type',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayPainType
+                                                  : '',
+                                            ),
+
+                                            RowText(
+                                              firstText: 'Pain Location',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayPainLocation
+                                                  : '',
+                                            ),
+                                            RowText(
+                                              firstText: 'Pain Radiation',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayPainRadiationSide
+                                                  : '',
+                                            ),
+                                            RowText(
+                                              firstText: 'Aggravating Factors',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayAggravatingFactors
+                                                  : '',
+                                            ),
+                                            RowText(
+                                              firstText: 'Relieving Factors',
+                                              secondText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayRelievingFactors
+                                                  : '',
+                                            ),
+
+                                            RowText(
+                                              firstText: 'Consent',
+                                              buttonText:
+                                                  currentPatientData!
+                                                          .patient!
+                                                          .visits[index]
+                                                          .historyTaking !=
+                                                      null
+                                                  ? currentPatientData!
+                                                        .patient!
+                                                        .visits[index]
+                                                        .historyTaking!
+                                                        .displayConsentGiven
+                                                  : '',
+                                            ),
+
+                                            RowText(
+                                              firstText: 'Red Flags',
+                                              secondText: currentPatientData!
+                                                  .patient!
+                                                  .visits[index]
+                                                  .displayStatus,
+                                            ),
+                                          ],
                                         ),
                                       ),
-
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          RowText(
-                                            firstText: 'Visit Date #',
-                                            secondText:
-                                                DateAndTimeFormater.dateFormat(
-                                                  currentPatientData!
-                                                      .patient!
-                                                      .displayCreatedAt,
-                                                ),
-                                          ),
-                                          RowText(
-                                            firstText: 'AM Name',
-                                            secondText: currentPatientData!
-                                                .patient!
-                                                .visits[index]
-                                                .assistantManager!
-                                                .displayName,
-                                          ),
-                                          RowText(
-                                            firstText: 'Consultant',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .consultant !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .consultant!
-                                                      .displayName
-                                                : '',
-                                          ),
-
-                                          RowText(
-                                            firstText: 'Occupation',
-                                            secondText: currentPatientData!
-                                                .patient!
-                                                .displayOccupation,
-                                          ),
-                                          RowText(
-                                            firstText: 'Chief Complaint',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayChiefComplaint
-                                                : "",
-                                          ),
-                                          RowText(
-                                            firstText: 'Complaint Onset',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayComplaintOnset
-                                                : '',
-                                          ),
-                                          RowText(
-                                            firstText: 'Pain Severity',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayPainSeverity
-                                                : '',
-                                          ),
-                                          RowText(
-                                            firstText: 'Pain Type',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayPainType
-                                                : '',
-                                          ),
-
-                                          RowText(
-                                            firstText: 'Pain Location',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayPainLocation
-                                                : '',
-                                          ),
-                                          RowText(
-                                            firstText: 'Pain Radiation',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayPainRadiationSide
-                                                : '',
-                                          ),
-                                          RowText(
-                                            firstText: 'Aggravating Factors',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayAggravatingFactors
-                                                : '',
-                                          ),
-                                          RowText(
-                                            firstText: 'Relieving Factors',
-                                            secondText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayRelievingFactors
-                                                : '',
-                                          ),
-
-                                          RowText(
-                                            firstText: 'Consent',
-                                            buttonText:
-                                                currentPatientData!
-                                                        .patient!
-                                                        .visits[index]
-                                                        .historyTaking !=
-                                                    null
-                                                ? currentPatientData!
-                                                      .patient!
-                                                      .visits[index]
-                                                      .historyTaking!
-                                                      .displayConsentGiven
-                                                : '',
-                                          ),
-
-                                          RowText(
-                                            firstText: 'Red Flags',
-                                            secondText: currentPatientData!
-                                                .patient!
-                                                .visits[index]
-                                                .displayStatus,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return Center(child: Container());
-                              },
+                                    );
+                                  }
+                                  return Center(child: Container());
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    : Center(child: CustomText(text: 'No data')),
+                          ],
+                        )
+                      : Center(child: CustomText(text: 'No data')),
+                ),
               )
             : Scaffold(body: Center(child: CircularProgressIndicator()));
       },

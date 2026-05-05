@@ -44,4 +44,10 @@ class ApiKeys {
   /// All HistoryTaker key
 
   static String allHistoryTakerKey = "$baseUrl/patient/histrytaker/all";
+
+  /// All Packages key
+  static String allPackagesKey = "$baseUrl/allpakages";
+
+  /// Slider Images Key
+  static String sliderKey = "${ApiKeys.baseUrl}/apisliders";
 }

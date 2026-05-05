@@ -4,6 +4,10 @@ import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.da
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
+import 'package:doctor_app/repos/all_packages_repo/all_packages_local_repo.dart';
+import 'package:doctor_app/repos/all_packages_repo/all_packages_repo.dart';
+import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_local_repo.dart';
+import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
 import 'package:doctor_app/repos/auth_repo/auth_repo.dart';
@@ -14,11 +18,14 @@ import 'package:doctor_app/repos/patient_repo/patient_repo_impl.dart';
 
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/repos/session_detail_repo/sessions_detail_repo.dart';
+import 'package:doctor_app/repos/slider_repo/slider_local_repo.dart';
+import 'package:doctor_app/repos/slider_repo/slider_repo.dart';
 import 'package:doctor_app/screens/assessments/bloc/consultant_assesmant_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
 import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_bloc.dart';
+import 'package:doctor_app/screens/home/bloc/home_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
@@ -69,22 +76,31 @@ class _MyAppState extends State<MyApp> {
   late AllVisitRepo allVisitRepo;
   late AllConsultantAssessmentLocalRepo allConsultantAssessmentLocalRepo;
   late AllConsultantAssessmentRepo allConsultantAssessmentRepo;
+  late AllTherapySessionRepo allTherapySessionRepo;
+  late AllTherapySessionLocalRepo allTherapySessionLocalRepo;
+  late AllPackagesLocalRepo allPackagesLocalRepo;
+  late AllPackagesRepo allPackagesRepo;
+  late SliderImagesLocalRepo sliderImagesLocalRepo;
+  late SliderRepo sliderRepo;
 
   @override
   void initState() {
     super.initState();
-
-    apiImpl = BaseApiImpl();
-
     curdImpl = LocalCurdImpl();
-
+    profileLocalRepo = ProfileLocalRepo(curdBase: curdImpl);
     patientLocalRepo = PatientLocalRepo(curdBase: curdImpl);
+    apiImpl = BaseApiImpl();
 
     patientRepoImpl = PatientRepoImpl(
       api: apiImpl,
       profileLocalRepo: profileLocalRepo,
       curdBase: curdImpl,
       patientLocalRepo: patientLocalRepo,
+    );
+    allPackagesLocalRepo = AllPackagesLocalRepo(localCurdBase: curdImpl);
+    allPackagesRepo = AllPackagesRepo(
+      api: apiImpl,
+      localRepo: allPackagesLocalRepo,
     );
 
     allVisitLocalRepo = AllVisitLocalRepo(localCurdBase: curdImpl);
@@ -113,14 +129,24 @@ class _MyAppState extends State<MyApp> {
       api: apiImpl,
       allConsultantAssessmentLocalRepo: allConsultantAssessmentLocalRepo,
     );
-
+    allTherapySessionLocalRepo = AllTherapySessionLocalRepo(
+      localCurdBase: curdImpl,
+    );
     authRepoBase = AuthRepoImpl(
+      allTherapySessionLocalRepo: allTherapySessionLocalRepo,
       allConsultantAssessmentLocalRepo: allConsultantAssessmentLocalRepo,
       allVisitLocalRepo: allVisitLocalRepo,
       patientLocalRepo: patientLocalRepo,
       api: apiImpl,
       localRepo: profileLocalRepo,
     );
+
+    allTherapySessionRepo = AllTherapySessionRepo(
+      api: apiImpl,
+      localRepo: allTherapySessionLocalRepo,
+    );
+    sliderImagesLocalRepo = SliderImagesLocalRepo(localCurdBase: curdImpl);
+    sliderRepo = SliderRepo(api: apiImpl, localRepo: sliderImagesLocalRepo);
   }
 
   @override
@@ -131,6 +157,14 @@ class _MyAppState extends State<MyApp> {
           create: (context) => LoginBloc(
             authRepo: authRepoBase,
             profileLocalRepo: profileLocalRepo,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => HomeBloc(
+            sliderImagesLocalRepo: sliderImagesLocalRepo,
+            sliderRepo: sliderRepo,
+            allPackagesLocalRepo: allPackagesLocalRepo,
+            allPackagesRepo: allPackagesRepo,
           ),
         ),
 
@@ -176,6 +210,8 @@ class _MyAppState extends State<MyApp> {
 
         BlocProvider(
           create: (context) => TherapySessionBloc(
+            allTherapySessionLocalRepo: allTherapySessionLocalRepo,
+            allTherapySessionRepo: allTherapySessionRepo,
             patientLocalRepo: patientLocalRepo,
             profileLocalRepo: profileLocalRepo,
             sessionsDetailRepo: sessionsDetailRepo,

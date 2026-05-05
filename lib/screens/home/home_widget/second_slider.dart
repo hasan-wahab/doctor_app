@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 import '../../../core/app_routes/routes_name.dart';
 import '../../../core/app_styles/app_colors.dart';
 import '../../../widgets/custom_text.dart';
@@ -20,7 +19,12 @@ class SecondSlider extends StatefulWidget {
 }
 
 class _SecondSliderState extends State<SecondSlider> {
-  final List<String> videoImageId = ['x3sKVlYFj5w','ho3Wpg1gPAQ','NuAFBlMGTwI','1Z6Iu0JcIhI'];
+  final List<String> videoImageId = [
+    'x3sKVlYFj5w',
+    'ho3Wpg1gPAQ',
+    'NuAFBlMGTwI',
+    '1Z6Iu0JcIhI',
+  ];
 
   @override
   Widget build(BuildContext context) {

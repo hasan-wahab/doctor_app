@@ -1,3 +1,4 @@
+import 'package:doctor_app/data/models/all_therapist_model.dart';
 import 'package:doctor_app/data/models/therapay_session_model.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
@@ -30,6 +31,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   String? id;
 
   bool isLoading = false;
+  AllTherapistModel? allTherapistModel;
   @override
   Future<void> didChangeDependencies() async {
     id = ModalRoute.of(context)!.settings.arguments as String?;
@@ -203,7 +205,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         }
         if (state is SessionFromHomeLoaded) {
           print('From Home /..............');
-
+          allTherapistModel = state.allTherapistModel;
           currentPatientData = state.patientData;
           return Scaffold(
             appBar: AppBar(
@@ -219,99 +221,157 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               automaticallyImplyLeading: false,
             ),
             backgroundColor: AppColors.bgColor,
-            body: currentPatientData != null
-                ? ListView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    children: [
-                      CustomText(
-                        text: 'Therapy Sessions',
-                        fontSize: 20,
-                        color: AppColors.primaryColor,
-                      ),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: List.generate(
-                          currentPatientData!.therapySessions.length,
-                          (index) {
-                            return Card(
-                              color: AppColors.secondaryColor,
-                              margin: EdgeInsets.only(top: 15.h),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w,
-                                  vertical: 20.h,
-                                ),
-
-                                //   height: 178.h,
-                                width: 360.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                                ),
-
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    RowText(
-                                      firstText: 'Sessions#',
-                                      secondText: currentPatientData!
-                                          .therapySessions[index]
-                                          .displayId
-                                          .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Next session date',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
-                                            currentPatientData!
-                                                .therapySessions[index]
-                                                .displayNextSessionDate
-                                                .toString(),
-                                          ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Therapist',
-                                      secondText: currentPatientData!
-                                          .therapySessions[index]
-                                          .therapist!
-                                          .name
-                                          .toString(),
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Duration',
-                                      secondText: currentPatientData!
-                                          .therapySessions[index]
-                                          .durationSeconds
-                                          .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Notes',
-                                      secondText:
-                                          currentPatientData!
-                                                  .therapySessions[index]
-                                                  .notes !=
-                                              null
-                                          ? 'asd'
-                                          : currentPatientData!
-                                                .therapySessions[index]
-                                                .notes,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+            body: SafeArea(
+              child: allTherapistModel != null
+                  ? RefreshIndicator(
+                      onRefresh: () async => context
+                          .read<TherapySessionBloc>()
+                          .add(TherapySessionEvent(refresh: true)),
+                      child: ListView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 10.h,
                         ),
+                        children: [
+                          CustomText(
+                            text: 'Therapy Sessions',
+                            fontSize: 20,
+                            color: AppColors.primaryColor,
+                          ),
+              
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: List.generate(
+                              allTherapistModel!.allSessions.length,
+                              (index) {
+                                TherapistVisitGroupModel completedVisitsModel =
+                                    allTherapistModel!.completedVisits[index];
+                                return Card(
+                                  color: AppColors.secondaryColor,
+                                  margin: EdgeInsets.only(top: 15.h),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 15.w,
+                                      vertical: 20.h,
+                                    ),
+              
+                                    //   height: 178.h,
+                                    width: 360.w,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                                    ),
+              
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // All Session model
+                                        RowText(
+                                          firstText: 'Sessions#',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displaySessionId
+                                              .toString(),
+                                        ),
+                                        RowText(
+                                          firstText: 'Next session date',
+                                          secondText:
+                                              DateAndTimeFormater.dateFormat(
+                                                allTherapistModel!
+                                                    .allSessions[index]
+                                                    .displayNextSessionDate
+                                                    .toString(),
+                                              ),
+                                        ),
+                                        RowText(
+                                          firstText: 'Therapist',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displayTherapist
+                                              .toString(),
+                                        ),
+              
+                                        RowText(
+                                          firstText: 'Duration',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .sessionDurationTotal
+                                              .toString(),
+                                        ),
+                                        RowText(
+                                          firstText: 'Notes',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .clinicalNotes,
+                                        ),
+                                        RowText(
+                                          firstText: 'Package',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displayPackageUsed,
+                                        ),
+                                        RowText(
+                                          firstText: 'Active time',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displayActiveTime,
+                                        ),
+                                        RowText(
+                                          firstText: 'Created at',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displayCreatedAt,
+                                        ),
+                                        RowText(
+                                          firstText: 'Next session date',
+                                          secondText: allTherapistModel!
+                                              .allSessions[index]
+                                              .displayNextSessionDate,
+                                        ),
+                                        // Complete visit model
+                                        RowText(
+                                          firstText: 'Visit Status',
+                                          secondText: completedVisitsModel
+                                              .visitSummary!
+                                              .displayVisitStatus,
+                                        ),
+                                        RowText(
+                                          firstText: 'Current Stage',
+                                          secondText: completedVisitsModel
+                                              .visitSummary!
+                                              .displayCurrentStage,
+                                        ),
+                                        RowText(
+                                          firstText: 'Clinic',
+                                          secondText: completedVisitsModel
+                                              .visitSummary!
+                                              .displayClinic,
+                                        ),
+                                        RowText(
+                                          firstText: 'Visit Date',
+                                          secondText: completedVisitsModel
+                                              .visitSummary!
+                                              .displayVisitDate,
+                                        ),
+                                        RowText(
+                                          firstText: 'Visit Id',
+                                          secondText: completedVisitsModel
+                                              .visitSummary!
+                                              .displayVisitId,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  )
-                : Center(child: CircularProgressIndicator()),
+                    )
+                  : Center(child: CircularProgressIndicator()),
+            ),
           );
         }
         if (state is SessionLoadingState) {

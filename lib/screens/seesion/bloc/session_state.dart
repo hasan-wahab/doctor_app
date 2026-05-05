@@ -4,6 +4,8 @@ import 'package:doctor_app/data/models/current_patient_model.dart'
 import 'package:doctor_app/data/models/therapay_session_model.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 
+import '../../../data/models/all_therapist_model.dart';
+
 class TherapySessionState {}
 
 class SessionLoadingState extends TherapySessionState {}
@@ -22,5 +24,6 @@ class SessionLoadedFromRecordsState extends TherapySessionState {
 class SessionFromHomeLoaded extends TherapySessionState {
   CurrentPatientModel? patientData;
   LoginModel1? profileData;
-  SessionFromHomeLoaded({this.patientData, this.profileData});
+  AllTherapistModel? allTherapistModel;
+  SessionFromHomeLoaded({this.patientData, this.profileData,this.allTherapistModel});
 }

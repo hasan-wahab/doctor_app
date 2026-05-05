@@ -79,300 +79,318 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                 automaticallyImplyLeading: false,
               ),
               backgroundColor: AppColors.bgColor,
-              body: allConsultantAssessmentModel != null
-                  ? ListView(
-                      padding: EdgeInsets.only(
-                        left: 20.w,
-                        right: 20.w,
-                        top: 10.h,
-                        bottom: 60.h,
-                      ),
-                      children: [
-                        CustomText(
-                          text: 'Consultant Assessments',
-                          fontSize: 20,
-                          color: AppColors.primaryColor,
+              body: SafeArea(
+                child: allConsultantAssessmentModel != null
+                    ? ListView(
+                        padding: EdgeInsets.only(
+                          left: 20.w,
+                          right: 20.w,
+                          top: 10.h,
+                          bottom: 60.h,
                         ),
-                        SizedBox(height: 30.h),
+                        children: [
+                          CustomText(
+                            text: 'Consultant Assessments',
+                            fontSize: 20,
+                            color: AppColors.primaryColor,
+                          ),
+                          SizedBox(height: 30.h),
 
-                        ...List.generate(
-                          (allConsultantAssessmentModel!.isNotEmpty
-                              ? allConsultantAssessmentModel!.length
-                              : 1),
-                          (index) {
-                            List<MuscleAssessment> muscleAssessments =
-                                allConsultantAssessmentModel![index]
-                                    .muscleAssessments;
+                          ...List.generate(
+                            (allConsultantAssessmentModel!.isNotEmpty
+                                ? allConsultantAssessmentModel!.length
+                                : 1),
+                            (index) {
+                              List<MuscleAssessment> muscleAssessments =
+                                  allConsultantAssessmentModel![index]
+                                      .muscleAssessments;
+                              List<Exercise> exercies =
+                                  muscleAssessments[index].prescribedExercises;
 
-                            return Card(
-                              color: AppColors.secondaryColor,
-                              child: Container(
-                                margin: EdgeInsets.only(bottom: 20.h),
-                                // height: 404.h,
-                                width: 350.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                      ),
-                                      height: 40.h,
-                                      width: 350.w,
-                                      decoration: BoxDecoration(
-                                        border: Border(bottom: BorderSide()),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width:
-                                                MediaQuery.sizeOf(
-                                                      context,
-                                                    ).width /
-                                                    1.3 -
-                                                15,
-                                            child: Stack(
-                                              alignment: Alignment.centerLeft,
-                                              children: [
-                                                CustomText(
-                                                  text:
-                                                      allConsultantAssessmentModel![index]
-                                                          .consultant
-                                                          .toString(),
-                                                ),
-                                              ],
+                              return Card(
+                                color: AppColors.secondaryColor,
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 20.h),
+                                  // height: 404.h,
+                                  width: 350.w,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                        ),
+                                        height: 40.h,
+                                        width: 350.w,
+                                        decoration: BoxDecoration(
+                                          border: Border(bottom: BorderSide()),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width:
+                                                  MediaQuery.sizeOf(
+                                                        context,
+                                                      ).width /
+                                                      1.3 -
+                                                  15,
+                                              child: Stack(
+                                                alignment: Alignment.centerLeft,
+                                                children: [
+                                                  CustomText(
+                                                    text:
+                                                        allConsultantAssessmentModel![index]
+                                                            .consultant
+                                                            .toString(),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
+                                      SizedBox(height: 10.h),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Assessment Finding',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
-                                      child: CustomText(
-                                        text: 'Assessment Finding',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
-                                      ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Assessment Id',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .assessmentId
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Final Diagnosis',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .clinicalFindings!
-                                              .diagnosis
-                                              .toString()
-                                              .toString(),
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Next Review Date',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
+                                      RowText(
+                                        firstText: 'Assessment Id',
+                                        secondText:
                                             allConsultantAssessmentModel![index]
-                                                .visitDate
+                                                .assessmentId
                                                 .toString(),
-                                          ),
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Neuro Test:',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .specialTests
-                                              .toString(),
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Manual Muscle Testing (MMT)',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .mmt
-                                              .toString(),
-                                    ),
-                                    Divider(thickness: 1, color: Colors.black),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
                                       ),
-                                      child: CustomText(
-                                        text: 'Muscle Assessment',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
+                                      RowText(
+                                        firstText: 'Final Diagnosis',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .clinicalFindings!
+                                                .diagnosis
+                                                .toString()
+                                                .toString(),
                                       ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Status',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .conditionStatus;
-                                        },
-                                      ).toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Exercise',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .prescribedExercises
-                                              .toString();
-                                        },
-                                      ).toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Default Exercise',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .defaultExercises
-                                              .toString();
-                                        },
-                                      ).toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Manual Treatment',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .manualTreatment
-                                              .toString();
-                                        },
-                                      ).toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Muscle',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .muscle
-                                              .toString();
-                                        },
-                                      ).toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Other Treatment',
-                                      secondText: List.generate(
-                                        (muscleAssessments.length),
-                                        (index2) {
-                                          return muscleAssessments[index2]
-                                              .otherTreatment;
-                                        },
-                                      ).toString(),
-                                    ),
 
-                                    RowText(
-                                      firstText: 'MMT',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .mmt
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Selected Package',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .selectedPackages
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Duration',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .sessionSettings!
-                                              .duration
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Investigations Done',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .advice!
-                                              .investigationsDone
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Other Advice',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .advice!
-                                              .otherAdvice
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Advanced',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .advanced
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Topicals',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .topicals
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Anti Inflammatory',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .antiInflammatory
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Thermo',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .thermo
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Electrotherapy',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .electrotherapy
-                                              .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Medications',
-                                      secondText:
-                                          allConsultantAssessmentModel![index]
-                                              .prescription!
-                                              .medications
-                                              .toString(),
-                                    ),
-                                  ],
+                                      RowText(
+                                        firstText: 'Next Review Date',
+                                        secondText:
+                                            DateAndTimeFormater.dateFormat(
+                                              allConsultantAssessmentModel![index]
+                                                  .visitDate
+                                                  .toString(),
+                                            ),
+                                      ),
+
+                                      RowText(
+                                        firstText: 'Neuro Test:',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .specialTests
+                                                .toString(),
+                                      ),
+
+                                      RowText(
+                                        firstText:
+                                            'Manual Muscle Testing (MMT)',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .mmt
+                                                .toString(),
+                                      ),
+                                      Divider(
+                                        thickness: 1,
+                                        color: Colors.black,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Muscle Assessment',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ),
+                                      RowText(
+                                        firstText: 'Status',
+                                        secondText: List.generate(
+                                          (muscleAssessments.length),
+                                          (index2) {
+                                            return muscleAssessments[index2]
+                                                .conditionStatus;
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Exercise',
+                                        secondText: List.generate(
+                                          (exercies.length),
+                                          (index2) {
+                                            return exercies[index2].name
+                                                .toString();
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Dosage',
+                                        secondText: List.generate(
+                                          (exercies.length),
+                                          (index2) {
+                                            return exercies[index2].dosage
+                                                .toString();
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Default Exercise',
+                                        secondText: List.generate(
+                                          (muscleAssessments.length),
+                                          (index2) {
+                                            return muscleAssessments[index2]
+                                                .defaultExercises
+                                                .toString();
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Manual Treatment',
+                                        secondText: List.generate(
+                                          (muscleAssessments.length),
+                                          (index2) {
+                                            return muscleAssessments[index2]
+                                                .manualTreatment
+                                                .toString();
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Muscle',
+                                        secondText: List.generate(
+                                          (muscleAssessments.length),
+                                          (index2) {
+                                            return muscleAssessments[index2]
+                                                .muscle
+                                                .toString();
+                                          },
+                                        ).toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Other Treatment',
+                                        secondText: List.generate(
+                                          (muscleAssessments.length),
+                                          (index2) {
+                                            return muscleAssessments[index2]
+                                                .otherTreatment;
+                                          },
+                                        ).toString(),
+                                      ),
+
+                                      RowText(
+                                        firstText: 'MMT',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .mmt
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Selected Package',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .selectedPackages
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Duration',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .sessionSettings!
+                                                .duration
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Investigations Done',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .advice!
+                                                .investigationsDone
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Other Advice',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .advice!
+                                                .otherAdvice
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Advanced',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .advanced
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Topicals',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .topicals
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Anti Inflammatory',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .antiInflammatory
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Thermo',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .thermo
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Electrotherapy',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .electrotherapy
+                                                .toString(),
+                                      ),
+                                      RowText(
+                                        firstText: 'Medications',
+                                        secondText:
+                                            allConsultantAssessmentModel![index]
+                                                .prescription!
+                                                .medications
+                                                .toString(),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    )
-                  : Center(child: CustomText(text: 'text')),
+                              );
+                            },
+                          ),
+                        ],
+                      )
+                    : Center(child: CustomText(text: 'text')),
+              ),
             ),
           );
         }

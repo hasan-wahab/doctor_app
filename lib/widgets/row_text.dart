@@ -34,6 +34,8 @@ class RowText extends StatelessWidget {
         secondText != 'null' &&
         secondText != null &&
         secondText.contains("[]") == false) {
+      // Remove the square brackets from the string
+      final cleanText = secondText.replaceAll('[', '').replaceAll(']', '');
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
         child: Row(
@@ -44,7 +46,7 @@ class RowText extends StatelessWidget {
             SizedBox(width: 10.w),
             Expanded(
               child: CustomText(
-                text: secondText,
+                text: cleanText,
                 align: TextAlign.start,
                 fontSize: 12,
                 maxLines: 5,

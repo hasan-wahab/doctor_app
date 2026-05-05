@@ -64,12 +64,13 @@ class ConsultantAssessmentBloc
         if (patientData!.patient == null) return;
         String patientId = patientData!.patient!.id.toString();
         if (token != null && patientId.isNotEmpty) {
-          // First we will try to get data from local
           if (event.isRefresh) {
             // Here we will get data from server
             allConsultantAssessmentModel = await allConsultantAssessmentRepo
                 .getAllConsultantAssessment(token: token, patientId: patientId);
           } else {
+            // First we will try to get data from local
+
             allConsultantAssessmentModel =
                 await allConsultantAssessmentLocalRepo
                     .getAllConsultantAssessmentFromLocal();

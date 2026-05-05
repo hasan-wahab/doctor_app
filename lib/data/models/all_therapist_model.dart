@@ -205,7 +205,7 @@ class TherapistVisitGroupModel {
 
   TherapistVisitGroupModel({required this.sessions, this.summary});
 
-  // Helpers
+  // ── Helpers ───────────────────────────────────────────────────────────────
   bool get hasSessions => sessions.isNotEmpty;
   int get sessionCount => sessions.length;
   TherapistVisitSummaryModel? get visitSummary => summary?.visitSummary;

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:doctor_app/data/local_storage/local_storage.dart';
 import 'package:doctor_app/data/models/current_patient_model.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
+import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_local_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
 import 'package:doctor_app/repos/patient_local_repo/patient_local_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
@@ -22,12 +23,14 @@ class AuthRepoImpl implements AuthRepoBase {
   PatientLocalRepo patientLocalRepo;
   AllVisitLocalRepo allVisitLocalRepo;
   AllConsultantAssessmentLocalRepo allConsultantAssessmentLocalRepo;
+  AllTherapySessionLocalRepo allTherapySessionLocalRepo;
 
   AuthRepoImpl({
     required this.api,
     required this.localRepo,
     required this.patientLocalRepo,
     required this.allVisitLocalRepo,
+    required this.allTherapySessionLocalRepo,
     required this.allConsultantAssessmentLocalRepo,
   });
 
@@ -72,6 +75,7 @@ class AuthRepoImpl implements AuthRepoBase {
       await allVisitLocalRepo.deleteAllVisitDataFromLocal();
       await allConsultantAssessmentLocalRepo
           .deleteAllConsultantAssessmentDataFromLocal();
+      await allTherapySessionLocalRepo.deleteAllTherapySession();
     }
   }
 

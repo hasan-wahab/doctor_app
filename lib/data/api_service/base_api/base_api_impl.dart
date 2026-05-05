@@ -58,6 +58,7 @@ class BaseApiImpl implements BaseApi {
   @override
   Future getApi({required String url, String? patientId, String? token}) async {
     var urL = Uri.parse("$url/$patientId");
+    if (patientId == null) urL = Uri.parse(url);
     try {
       http.Response response = await http
           .get(
