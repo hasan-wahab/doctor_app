@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_app/core/app_keys/api_keys.dart';
 import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/models/all_visits_model.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
@@ -28,6 +29,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../core/functions.dart';
 import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_curd_base/local_curd_impl.dart';
 import '../../data/local_storage/local_storage.dart';
@@ -46,8 +48,8 @@ class DashbordScreen extends StatefulWidget {
 class _DashbordScreenState extends State<DashbordScreen> {
   bool isLoading = false;
   bool isObscureBalanceText = true;
-  int totalSession = 8;
-  int usedSession = 6;
+  String totalSession = '1';
+  String usedSession = '0';
 
   int totalPayment = 10;
   int paidPayment = 5;
@@ -64,7 +66,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
     Icons.warning_amber_outlined,
     Icons.remove_red_eye,
     Icons.payment,
-    Icons.warning_amber_outlined,
   ];
 
   List<String> cardText = [
@@ -73,7 +74,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
     'Assessments',
     'Invoice',
     'Sessions',
-    'Assistant Manager',
   ];
   List<String> screenNameList = [
     AppRoutes.visitsDetailScreen,
@@ -81,10 +81,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
     AppRoutes.assessmentScreen,
     AppRoutes.invoiceDetailScreen,
     AppRoutes.sessionsDetailScreen,
-    AppRoutes.assistantManagerScreen,
   ];
   LoginModel1? profileData;
   CurrentPatientModel? currentPatientData;
+
+  String? profileImage, patientName, walletBalance;
+  double? totalAmount, totalSpend, remaining;
+  PatientModel? patientModel;
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<DashboardBloc, DashboardStates>(
@@ -103,6 +107,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
         if (state is DashboardLoadedState) {
           currentPatientData = state.patientData;
           profileData = state.profileData;
+          profileImage = state.patientData.patient!.displayImageUrl;
+          patientName = state.patientData.patient!.displayName;
+          walletBalance = state.patientData.patient!.displayWalletBalance;
+          totalAmount = state.patientData.stats!.totalAmount;
+          totalSpend = state.patientData.stats!.totalSpend;
+          patientModel = state.patientData.patient;
         }
       },
       builder: (context, state) {
@@ -145,28 +155,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       shape: BoxShape.circle,
                                     ),
                                     child: ClipOval(
-                                      child:
-                                          profileData!.user!.profilePicture !=
-                                              null
+                                      child: profileImage != null
                                           ? Image.network(
                                               fit: BoxFit.cover,
-                                              'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
-
+                                              '$profileImage',
                                               headers: {
                                                 "Authorization":
                                                     "Bearer ${profileData!.accessToken.toString()}",
                                               },
                                               errorBuilder:
                                                   (context, error, stackTrace) {
-                                                    return profileData!.user !=
-                                                            null
-                                                        ? Image.network(
-                                                            profileData!
-                                                                .user!
-                                                                .profilePicture
-                                                                .toString(),
-                                                          )
-                                                        : Container();
+                                                    return CircleAvatar();
                                                   },
                                             )
                                           : CircleAvatar(),
@@ -180,8 +179,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                     SizedBox(
                                       width: 200.w,
                                       child: CustomText(
-                                        text:
-                                            'Hi, ${currentPatientData!.patient!.user!.name.toString()}',
+                                        text: patientName != null
+                                            ? 'Hi, $patientName'
+                                            : '',
                                         fontSize: 18,
                                       ),
                                     ),
@@ -284,13 +284,23 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                             CrossAxisAlignment.center,
                                         spacing: 10,
                                         children: [
-                                          CustomText(
-                                            text: isObscureBalanceText != true
-                                                ? 'PKR ${currentPatientData!.patient!.walletBalance}'
-                                                : '* * * * * *',
-                                            fontSize: 13,
-                                            color: AppColors.textWhiteColor,
-                                          ),
+                                          walletBalance != null
+                                              ? CustomText(
+                                                  text:
+                                                      isObscureBalanceText !=
+                                                          true
+                                                      ? 'PKR $walletBalance'
+                                                      : '* * * * * *',
+                                                  fontSize: 13,
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                )
+                                              : CustomText(
+                                                  text: '0.0',
+                                                  fontSize: 13,
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                ),
                                           InkWell(
                                             onTap: () {
                                               setState(() {
@@ -337,28 +347,32 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        CustomText(
-                                          text:
-                                              'Total:  ${double.parse(currentPatientData!.stats!.totalAmount.toString())}',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textWhiteColor,
-                                        ),
+                                        totalAmount != null
+                                            ? CustomText(
+                                                text: 'Total:  $totalAmount',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : SizedBox(),
 
-                                        CustomText(
-                                          text:
-                                              'Paid: ${currentPatientData!.stats!.totalSpend.toString()}',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textWhiteColor,
-                                        ),
-                                        CustomText(
-                                          text:
-                                              'Remaining: ${currentPatientData!.stats!.totalAmount! - currentPatientData!.stats!.totalSpend!.toDouble()}',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textWhiteColor,
-                                        ),
+                                        totalSpend != null
+                                            ? CustomText(
+                                                text: 'Paid: $totalSpend',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : SizedBox(),
+                                        remaining != null
+                                            ? CustomText(
+                                                text:
+                                                    'Remaining: ${totalAmount! - totalSpend!}',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : SizedBox(),
                                       ],
                                     ),
                                   ),
@@ -372,7 +386,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         height: 80.h,
                                         width: 80.w,
                                         child: CircularProgressIndicator(
-                                          value: getTotalPaymentProgress(),
+                                          value:
+                                              totalAmount != null &&
+                                                  totalSpend != null
+                                              ? getTotalPaymentProgress(
+                                                  total: totalAmount,
+                                                  paid: totalSpend,
+                                                )
+                                              : 0.0,
                                           strokeWidth: 12,
                                           backgroundColor: Colors.grey.shade300,
                                           valueColor: AlwaysStoppedAnimation(
@@ -382,11 +403,13 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                       ),
                                       Column(
                                         children: [
-                                          CustomText(
-                                            text:
-                                                "${(getTotalPaymentProgress() * 100).toStringAsFixed(0)}%",
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          totalAmount != null
+                                              ? CustomText(
+                                                  text:
+                                                      "${(getTotalPaymentProgress(total: totalAmount, paid: totalSpend) * 100).toStringAsFixed(0)}%",
+                                                  fontWeight: FontWeight.bold,
+                                                )
+                                              : SizedBox(),
                                           const SizedBox(height: 4),
                                           CustomText(
                                             text: "Completed",
@@ -419,18 +442,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
                             verticalDirection: VerticalDirection.down,
 
                             children: [
-                              ...List.generate((6), (index) {
+                              ...List.generate((screenNameList.length), (
+                                index,
+                              ) {
                                 List cardSecondText = [
-                                  currentPatientData!.patient!.visits.length
-                                      .toString(),
-                                  currentPatientData!.patient!.packages.length
-                                      .toString(),
+                                  patientModel!.visits.length.toString(),
+                                  patientModel!.packages.length.toString(),
                                   '',
                                   currentPatientData!.recentInvoices.length
                                       .toString(),
                                   currentPatientData!.therapySessions.length
                                       .toString(),
-                                  '',
                                 ];
                                 final screenWidth =
                                     MediaQuery.sizeOf(context).width / 2.2;
@@ -503,117 +525,112 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         SizedBox(height: 10.h),
 
                         /// Session Progress
-                        currentPatientData!.patient!.packages.isNotEmpty
+                        patientModel!.packages.isNotEmpty
                             ? CustomText(text: 'Session Progress')
                             : Container(),
                         SizedBox(height: 10.h),
-                        ...List.generate(
-                          currentPatientData!.patient!.packages.length,
+                        ...List.generate(patientModel!.packages.length, (
+                          index,
+                        ) {
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 10.h),
 
-                          (index) {
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 10.h),
-
-                              height: 110.h,
-                              width: 360.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: Card(
-                                color: AppColors.secondaryColor,
-                                margin: EdgeInsets.zero,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.h,
-                                    vertical: 10,
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CustomText(
-                                        text:
-                                            currentPatientData!
-                                                .patient!
-                                                .packages
-                                                .isEmpty
-                                            ? 'No data'
-                                            : currentPatientData!
-                                                  .patient!
-                                                  .packages[index]
-                                                  .name
-                                                  .toString(),
-                                        fontSize: 12,
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText(
-                                            text: 'Sessions Progress',
-                                            fontSize: 12,
-                                            color: AppColors.secondaryTextColor,
-                                          ),
-                                          CustomText(
-                                            text:
-                                                '${currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed}/${currentPatientData!.patient!.packages[index].pivot!.sessionsTotal}',
-                                            fontSize: 10,
-                                          ),
-                                        ],
-                                      ),
-
-                                      LinearProgressIndicator(
-                                        value:
-                                            currentPatientData!
-                                                .patient!
-                                                .packages
-                                                .isEmpty
-                                            ? 1.0
-                                            : getSessionProgress(index),
-                                        valueColor: AlwaysStoppedAnimation(
-                                          AppColors.primaryColor,
+                            height: 110.h,
+                            width: 360.w,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Card(
+                              color: AppColors.secondaryColor,
+                              margin: EdgeInsets.zero,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.h,
+                                  vertical: 10,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: patientModel!.packages.isEmpty
+                                          ? 'No data'
+                                          : patientModel!.packages[index].name
+                                                .toString(),
+                                      fontSize: 12,
+                                    ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomText(
+                                          text: 'Sessions Progress',
+                                          fontSize: 12,
+                                          color: AppColors.secondaryTextColor,
                                         ),
-                                      ),
+                                        CustomText(
+                                          text:
+                                              '${patientModel!.packages[index].pivot!.displaySessionsUsed}/${patientModel!.packages[index].pivot!.sessionsTotal}',
+                                          fontSize: 10,
+                                        ),
+                                      ],
+                                    ),
 
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText(
-                                            text: 'Next Session Date',
-                                            fontSize: 15,
-                                          ),
-                                          CustomText(
-                                            text:
-                                                currentPatientData!
-                                                    .therapySessions[index]
-                                                    .displayNextSessionDate!
-                                                    .isNotEmpty
-                                                ? DateAndTimeFormater.dateFormat(
-                                                    // currentPatientData!
-                                                    currentPatientData!
-                                                        .therapySessions[index]
-                                                        .displayNextSessionDate
-                                                        .toString(),
-                                                  )
-                                                : 'No data',
-                                            fontSize: 12,
-                                          ),
-                                        ],
+                                    LinearProgressIndicator(
+                                      value: patientModel!.packages.isEmpty
+                                          ? 1.0
+                                          : getSessionProgress(
+                                              totalSession: patientModel!
+                                                  .packages[index]
+                                                  .pivot!
+                                                  .displaySessionsTotal,
+                                              usedSession: patientModel!
+                                                  .packages[index]
+                                                  .pivot!
+                                                  .displaySessionsUsed,
+                                            ),
+                                      valueColor: AlwaysStoppedAnimation(
+                                        AppColors.primaryColor,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomText(
+                                          text: 'Next Session Date',
+                                          fontSize: 15,
+                                        ),
+                                        CustomText(
+                                          text:
+                                              currentPatientData!
+                                                  .therapySessions[index]
+                                                  .displayNextSessionDate!
+                                                  .isNotEmpty
+                                              ? DateAndTimeFormater.dateFormat(
+                                                  // currentPatientData!
+                                                  currentPatientData!
+                                                      .therapySessions[index]
+                                                      .displayNextSessionDate
+                                                      .toString(),
+                                                )
+                                              : 'No data',
+                                          fontSize: 12,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -661,31 +678,10 @@ class _DashbordScreenState extends State<DashbordScreen> {
     );
   }
 
-  double getTotalPaymentProgress() {
-    final total = currentPatientData!.stats!.totalAmount;
-    final paid = currentPatientData!.stats!.totalSpend;
-
+  double getTotalPaymentProgress({required total, required paid}) {
     if (total == 0) return 0.0;
-
-    final progress = double.parse(paid.toString()) / total!;
-
-    if (progress.isNaN || progress.isInfinite) return 0.0;
-
-    return progress.clamp(0.0, 1.0);
-  }
-
-  double getSessionProgress(int index) {
-    final total = currentPatientData!
-        .patient!
-        .packages[index]
-        .pivot!
-        .displaySessionsTotal;
-    final used =
-        currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed;
-
-    if (total == 0) return 0.0;
-
-    final progress = double.parse(used) / double.parse(total);
+    if (paid == 0) return 0.0;
+    final progress = paid / total!;
 
     if (progress.isNaN || progress.isInfinite) return 0.0;
 

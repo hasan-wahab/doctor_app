@@ -67,8 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: (value) {
                 if (value == '') {
                   return 'Please enter your email';
-                } else if (value!.contains('@gmail.com') == false) {
-                  return 'Your email format is incorrect (@gmail.com)';
                 }
                 email = value;
                 return null;

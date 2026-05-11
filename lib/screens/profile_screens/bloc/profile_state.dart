@@ -4,7 +4,7 @@ import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_mod
 abstract class ProfileState {}
 
 class MyProfileState extends ProfileState {
-  final List? visits;
+  final List<VisitModel>? visits;
   final List? therapaySessions;
   CurrentPatientModel? currentPatientModel;
   LoginModel1? profileData;

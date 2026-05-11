@@ -437,277 +437,528 @@
 // // }
 //
 
+import 'package:doctor_app/data/models/current_patient_model.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
+import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_bloc.dart';
+import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_event.dart';
+import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_state.dart';
+import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../nave_bar/nave_bar.dart';
 
-class NfcCardPage extends StatelessWidget {
+class NfcCardPage extends StatefulWidget {
   bool fromProfile;
   NfcCardPage({super.key, this.fromProfile = false});
 
   @override
+  State<NfcCardPage> createState() => _NfcCardPageState();
+}
+
+class _NfcCardPageState extends State<NfcCardPage> {
+  PatientModel? patientModel;
+  bool isLoading = false;
+  @override
+  void initState() {
+    context.read<NfcCardBloc>().add(NfcCardEvent());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
     return WillPopScope(
       onWillPop: () async {
-        if (fromProfile == false) {
+        if (widget.fromProfile == false) {
           context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
         } else {
           Navigator.pop(context);
         }
         return false;
       },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppColors.bgColor,
-          leading: IconButton(
-            onPressed: () {
-              if (fromProfile == false) {
-                context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            icon: Icon(Icons.arrow_back_ios_new),
-          ),
-          centerTitle: true,
-          title: Text('My Card'),
-          automaticallyImplyLeading: false,
-        ),
-        body: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-          children: [
-            /// CARD
-            Container(
-              height: 220.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.primaries[4],
-                    Colors.primaries[4],
-                    Colors.blueAccent,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 6),
+      child: BlocConsumer<NfcCardBloc, NfcCardState>(
+        listener: (context, state) {
+          if (state is NfcLoadingState) {
+            isLoading = true;
+          }
+          if (state is NfcMessageState) {
+            AppMsg.showSnackBar(context, message: state.message.toString());
+          }
+          if (state is NfcCardDataState) {
+            patientModel = state.patientModel;
+          }
+        },
+        builder: (context, state) {
+          if (patientModel != null) {
+            if (patientModel!.cardUid != null && patientModel!.cardUid != '') {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: AppColors.bgColor,
+                  leading: IconButton(
+                    onPressed: () {
+                      if (widget.fromProfile == false) {
+                        context.read<NaveBarBloc>().add(
+                          NaveBarIndexEvent(index: 0),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new),
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// HEADER
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: screenWidth * 0.03,
-                      right: screenWidth * 0.03,
-                      top: screenWidth * 0.03,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// Left info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "ALI THERAPY",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
+                  centerTitle: true,
+                  title: Text('My Card'),
+                  automaticallyImplyLeading: false,
+                ),
+                body: ListView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 15.w,
+                    vertical: 15.h,
+                  ),
+                  children: [
+                    /// CARD
+                    Container(
+                      height: 212.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        color: Color(0xFF167FC9),
+                      ),
+
+                      child: Column(
+                        children: [
+                          /// Top
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 12.h,
+                            ),
+                            height: 69.h,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF167FC9),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12.r),
+                                topRight: Radius.circular(12.r),
+                              ),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 0.3,
+                                ),
                               ),
                             ),
-                            SizedBox(height: screenWidth * 0.02),
-                            Row(
-                              spacing: 10.w,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(
-                                  height: 50.h,
-                                  width: 50.h,
-                                  padding: EdgeInsets.all(screenWidth * 0.2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                      screenWidth * 0.02,
-                                    ),
-                                  ),
-                                  child: Image.asset(
-                                    'assets/images/circle_avatar.png',
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
                                 Column(
-                                  spacing: 4.h,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "MUHAMMAD MAZHAR ALI",
+                                    CustomText(
+                                      text: 'DR. ALI THARAPY',
                                       style: TextStyle(
-                                        color: AppColors.whiteIconColor,
-                                        fontSize: 15.sp,
+                                        color: AppColors.textWhiteColor,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 2.w,
                                       ),
                                     ),
-                                    Text(
-                                      "C2199B03",
+                                    CustomText(
+                                      text: 'PATIENT IDENTIFICATION CARD',
                                       style: TextStyle(
-                                        color: AppColors.whiteIconColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12.sp,
+                                        color: AppColors.textWhiteColor,
+                                        fontSize: 9.sp,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: 1.w,
+                                      ),
+                                    ),
+                                    CustomText(
+                                      text:
+                                          'Pakland & Kiran Plaza F-8, Islamabad, Islamabad',
+                                      style: TextStyle(
+                                        color: AppColors.textWhiteColor,
+                                        fontSize: 8.sp,
+                                        fontWeight: FontWeight.w400,
                                       ),
                                     ),
                                   ],
                                 ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 5.h,
+                                    // vertical: 8.h,
+                                  ),
+                                  height: 45.h,
+                                  width: 45.w,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/main_logo.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-
-                        const Spacer(),
-
-                        /// Logo
-                        Container(
-                          height: 50.h,
-                          width: 50.h,
-                          padding: EdgeInsets.all(8.r),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: Container(),
-                          // child: Image.asset(
-                          //   "assets/logo.png", // apna logo path
-                          //   fit: BoxFit.contain,
-                          // ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  const SizedBox(height: 14),
+                          /// Middle
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 12.h,
+                              ),
+                              child: Row(
+                                spacing: 16.w,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(4.r),
+                                        height: 52.h,
+                                        width: 50.w,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 1.w,
+                                            color: AppColors.whiteIconColor,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                        ),
+                                        child:
+                                            patientModel!.displayImageUrl !=
+                                                'No data'
+                                            ? Image.network(
+                                                patientModel!.displayImageUrl,
+                                              )
+                                            : Icon(
+                                                Icons.image,
+                                                color: Colors.grey,
+                                              ),
+                                      ),
+                                      Container(
+                                        height: 20.h,
+                                        width: 30.w,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 1.w,
+                                            color: AppColors.whiteIconColor,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            5.r,
+                                          ),
+                                          image: DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: AssetImage(
+                                              'assets/images/sim_chip.png',
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CustomText(
+                                        text: patientModel!.displayName,
+                                        style: TextStyle(
+                                          color: AppColors.textWhiteColor,
+                                          letterSpacing: 1.w,
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      CustomText(
+                                        text:
+                                            'ID  ${patientModel!.cardUid ?? "569EF532"}',
+                                        style: TextStyle(
+                                          color: AppColors.textWhiteColor,
+                                          letterSpacing: 1.w,
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
 
-                  /// DETAILS
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _row("Phone", "0324-8511223", screenWidth),
-                        ),
-                        Expanded(
-                          child: _row("CNIC", "17101-7897602-4", screenWidth),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                    child: Row(
-                      children: [
-                        Expanded(child: _row("Blood", "B+", screenWidth)),
-                        Expanded(child: _row("Gender", "Male", screenWidth)),
-                      ],
-                    ),
-                  ),
+                                      SizedBox(
+                                        width: 170.w,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: CustomText(
+                                                text: 'PHONE',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: CustomText(
+                                                text: ':',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: CustomText(
+                                                text:
+                                                    patientModel!.displayPhone,
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
 
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                    child: _row("Date", "No data", screenWidth),
-                  ),
-
-                  const Spacer(),
-
-                  /// FOOTER
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 30.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade900,
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(12.r),
+                                      SizedBox(
+                                        width: 170.w,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: CustomText(
+                                                text: 'CNIC',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: CustomText(
+                                                text: ':',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: CustomText(
+                                                text: patientModel!.displayCnic,
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 170.w,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: CustomText(
+                                                text: 'BLOOD',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 1,
+                                              child: CustomText(
+                                                text: ':',
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: CustomText(
+                                                text: patientModel!
+                                                    .displayBloodGroup,
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textWhiteColor,
+                                                  letterSpacing: 1.w,
+                                                  fontSize: 8.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 15.w, right: 15.w),
+
+                          /// Bottom
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 6.h,
+                            ),
+                            height: 35.h,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF167FC9),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(12.r),
+                                bottomRight: Radius.circular(12.r),
+                              ),
+                              border: Border(
+                                top: BorderSide(
+                                  color: Colors.grey.shade400,
+                                  width: 0.3,
+                                ),
+                              ),
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'Pakland & Kiran Plaza, near IDC, F-Islamabad, 48000(051) 2125380',
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: 'https://alitherapy.neonweb.tech/',
+                                      style: TextStyle(
+                                        color: AppColors.textWhiteColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 8.sp,
+                                        letterSpacing: 1.w,
+                                      ),
+                                    ),
+                                    CustomText(
+                                      text: '0516125380',
+                                      style: TextStyle(
+                                        color: AppColors.textWhiteColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 8.sp,
+                                        letterSpacing: 1.w,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                CustomText(
+                                  text: '0000000000013933',
                                   style: TextStyle(
-                                    letterSpacing: 0.15.w,
-                                    color: Colors.white,
-                                    fontSize: 9.sp,
+                                    color: AppColors.textWhiteColor,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 8.sp,
+                                    letterSpacing: 1.w,
                                   ),
                                 ),
-                                Icon(
-                                  Icons.wifi,
-                                  color: AppColors.whiteIconColor,
-                                  size: 12.r,
+                                Container(
+                                  height: 25.h,
+                                  width: 25.h,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.whiteIconColor,
+                                    borderRadius: BorderRadius.circular(5.r),
+                                  ),
+                                  child: Icon(Icons.qr_code),
                                 ),
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                    ),
 
-            SizedBox(height: 20.h),
+                    SizedBox(height: 20.h),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Hold phone close to the NFC reader",
-                  style: TextStyle(color: Colors.black54, fontSize: 18.sp),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Hold phone close to the NFC reader",
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _row(String label, String value, double width) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.h),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: width * 0.02,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: AppColors.whiteIconColor, fontSize: 13.sp),
-          ),
-
-          Text(
-            value,
-            style: TextStyle(
-              color: AppColors.whiteIconColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 12.sp,
-            ),
-          ),
-        ],
+              );
+            } else {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: AppColors.bgColor,
+                  leading: IconButton(
+                    onPressed: () {
+                      if (widget.fromProfile == false) {
+                        context.read<NaveBarBloc>().add(
+                          NaveBarIndexEvent(index: 0),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new),
+                  ),
+                  centerTitle: true,
+                  title: Text('My Card'),
+                  automaticallyImplyLeading: false,
+                ),
+                body: Center(child: CustomText(text: 'Card Not Available!')),
+              );
+            }
+          } else {
+            return Scaffold(
+              body: Center(child: CustomText(text: 'No Data')),
+            );
+          }
+        },
       ),
     );
   }

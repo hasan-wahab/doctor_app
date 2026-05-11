@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/functions.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
 import '../../widgets/date_time_foemat.dart';
@@ -145,7 +146,19 @@ class _PackagesScreenState extends State<PackagesScreen> {
                                                 .packages
                                                 .isEmpty
                                             ? 1.0
-                                            : getSessionProgress(index),
+                                            : getSessionProgress(
+                                                usedSession: currentPatientData!
+                                                    .patient!
+                                                    .packages[index]
+                                                    .pivot!
+                                                    .displaySessionsUsed,
+                                                totalSession:
+                                                    currentPatientData!
+                                                        .patient!
+                                                        .packages[index]
+                                                        .pivot!
+                                                        .displaySessionsTotal,
+                                              ),
                                         valueColor: AlwaysStoppedAnimation(
                                           AppColors.primaryColor,
                                         ),
@@ -221,28 +234,5 @@ class _PackagesScreenState extends State<PackagesScreen> {
               ),
       ],
     );
-  }
-
-  double getSessionProgress(int index) {
-    final total = currentPatientData!
-        .patient!
-        .packages[index]
-        .pivot!
-        .displaySessionsUsed
-        .toString();
-    final used = currentPatientData!
-        .patient!
-        .packages[index]
-        .pivot!
-        .displaySessionsTotal
-        .toString();
-
-    if (total == 0) return 0.0;
-
-    final progress = double.parse(used) / double.parse(total);
-
-    if (progress.isNaN || progress.isInfinite) return 0.0;
-
-    return progress.clamp(0.0, 1.0);
   }
 }

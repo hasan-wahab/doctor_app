@@ -7,7 +7,7 @@ import 'package:doctor_app/data/models/therapay_session_model.dart';
 class SessionsDetailRepo {
   final BaseApi api;
   SessionsDetailRepo({required this.api});
-  Future<TherapySessionsResponseModel> getConsultantsAssessmentByVisitId({
+  Future<TherapySessionsResponseModel> getTherapySessionByVisitId({
     required String visitId,
     required String token,
   }) async {

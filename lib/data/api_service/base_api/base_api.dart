@@ -9,6 +9,8 @@ abstract class BaseApi {
     String? phone,
     String? email,
     String? password,
+    String? birthDate,
+    String? gender,
   });
   Future getApi({required String url, String? patientId, String? token});
 

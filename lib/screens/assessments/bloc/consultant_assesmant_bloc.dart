@@ -42,62 +42,53 @@ class ConsultantAssessmentBloc
     ConsultantAssessmentEvent event,
     Emitter<ConsultantAssessmentState> emit,
   ) async {
-    try {
-      emit(ConsultantLoadingState());
-      String token = await profileLocalRepo.getToken() ?? '';
-      if (token != '' && event.id != null) {
-        consultantAssessmentModel = await consultantRepo
-            .getConsultantsAssessmentByVisitId(
-              visitId: event.id!,
-              token: token,
-            );
-        emit(
-          ConsultantLoadedFromRecordsState(model: consultantAssessmentModel),
-        );
-        if (kDebugMode) {
-          print(event.id);
-        }
-      } else {
-        String? token = await profileLocalRepo.getToken();
-        patientData = await patientLocalRepo.getPatientDataLocal();
-        if (patientData == null) return;
-        if (patientData!.patient == null) return;
-        String patientId = patientData!.patient!.id.toString();
-        if (token != null && patientId.isNotEmpty) {
-          if (event.isRefresh) {
+    //try {
+    emit(ConsultantLoadingState());
+    String token = await profileLocalRepo.getToken() ?? '';
+    if (token != '' && event.id != null) {
+      consultantAssessmentModel = await consultantRepo
+          .getConsultantsAssessmentByVisitId(visitId: event.id!, token: token);
+      emit(ConsultantLoadedFromRecordsState(model: consultantAssessmentModel));
+      if (kDebugMode) {
+        print(event.id);
+      }
+    } else {
+      String? token = await profileLocalRepo.getToken();
+      patientData = await patientLocalRepo.getPatientDataLocal();
+      if (patientData == null) return;
+      if (patientData!.patient == null) return;
+      String patientId = patientData!.patient!.id.toString();
+      if (token != null && patientId.isNotEmpty) {
+        if (event.isRefresh) {
+          // Here we will get data from server
+          allConsultantAssessmentModel = await allConsultantAssessmentRepo
+              .getAllConsultantAssessment(token: token, patientId: patientId);
+        } else {
+          // First we will try to get data from local
+
+          allConsultantAssessmentModel = await allConsultantAssessmentLocalRepo
+              .getAllConsultantAssessmentFromLocal();
+          if (allConsultantAssessmentModel == null ||
+              allConsultantAssessmentModel!.isEmpty) {
             // Here we will get data from server
             allConsultantAssessmentModel = await allConsultantAssessmentRepo
                 .getAllConsultantAssessment(token: token, patientId: patientId);
-          } else {
-            // First we will try to get data from local
-
-            allConsultantAssessmentModel =
-                await allConsultantAssessmentLocalRepo
-                    .getAllConsultantAssessmentFromLocal();
-            if (allConsultantAssessmentModel == null ||
-                allConsultantAssessmentModel!.isEmpty) {
-              // Here we will get data from server
-              allConsultantAssessmentModel = await allConsultantAssessmentRepo
-                  .getAllConsultantAssessment(
-                    token: token,
-                    patientId: patientId,
-                  );
-            }
-          }
-
-          emit(
-            ConsultantFromHomeLoaded(
-              allConsultantAssessmentModel: allConsultantAssessmentModel,
-            ),
-          );
-        } else {
-          if (kDebugMode) {
-            print('Somethings went worng');
           }
         }
+
+        emit(
+          ConsultantFromHomeLoaded(
+            allConsultantAssessmentModel: allConsultantAssessmentModel,
+          ),
+        );
+      } else {
+        if (kDebugMode) {
+          print('Somethings went worng');
+        }
       }
-    } catch (e) {
-      emit(ConsultantMessageState(message: e.toString()));
     }
+    // } catch (e) {
+    //   emit(ConsultantMessageState(message: e.toString()));
+    // }
   }
 }

@@ -36,13 +36,13 @@ class TherapySessionBloc
     required this.allTherapySessionRepo,
     required this.allTherapySessionLocalRepo,
   }) : super(TherapySessionState()) {
-    on<TherapySessionEvent>(_onConsultantAssessmentEvent);
+    on<TherapySessionEvent>(_onAllTherapySessionEvent);
   }
   TherapySessionsResponseModel? therapySessionsResponseModel;
   CurrentPatientModel? patientData;
   LoginModel1? profileData;
   AllTherapistModel? allTherapistModel;
-  FutureOr _onConsultantAssessmentEvent(
+  FutureOr _onAllTherapySessionEvent(
     TherapySessionEvent event,
     Emitter<TherapySessionState> emit,
   ) async {
@@ -51,15 +51,14 @@ class TherapySessionBloc
       String token = await profileLocalRepo.getToken() ?? '';
       if (token != '' && event.id != null) {
         therapySessionsResponseModel = await sessionsDetailRepo
-            .getConsultantsAssessmentByVisitId(
-              visitId: event.id!,
-              token: token,
-            );
+            .getTherapySessionByVisitId(visitId: event.id!, token: token);
         emit(
           SessionLoadedFromRecordsState(model: therapySessionsResponseModel),
         );
         print(event.id);
-      } else {
+      }
+      else
+      {
         patientData = await patientLocalRepo.getPatientDataLocal();
         profileData = await profileLocalRepo.getProfile();
 
@@ -79,7 +78,15 @@ class TherapySessionBloc
           // First we wil try to get from local
           allTherapistModel = await allTherapySessionLocalRepo
               .getAllTherapySession();
-          if (allTherapistModel == null || allTherapistModel!.isEmpty) {
+
+          if (allTherapistModel != null &&
+              allTherapistModel!.visitGroups.isNotEmpty) {
+            print('From Local All Thrapist');
+            allTherapistModel = await allTherapySessionLocalRepo
+                .getAllTherapySession();
+          } else {
+            print('From Api All Thrapist');
+
             allTherapistModel = await allTherapySessionRepo
                 .getAllTherapySession(
                   token: token,

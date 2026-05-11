@@ -17,5 +17,7 @@ abstract class AuthRepoBase {
     required String cnic,
     required String phone,
     required String token,
+    required String birthDate,
+    required String gender,
   });
 }

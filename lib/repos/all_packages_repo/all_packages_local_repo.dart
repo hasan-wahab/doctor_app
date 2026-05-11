@@ -19,7 +19,7 @@ class AllPackagesLocalRepo {
 
   Future<AllPackagesModel> getAllPackagesFromLocal() async {
     var result = await localCurdBase.getData(tableName: TableName.allPackages);
-
+    print('From local All APackagrs$result');
     if (result.isEmpty) {
       print('All Packages Empty');
       return AllPackagesModel.fromJson([]);

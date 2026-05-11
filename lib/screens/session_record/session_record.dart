@@ -13,6 +13,7 @@ import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
+import 'package:doctor_app/screens/session_record/session_notes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../core/functions.dart';
 import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../data/models/current_patient_model.dart';
@@ -41,6 +43,7 @@ class _SessionRecordState extends State<SessionRecord> {
   CurrentPatientModel? currentPatientData;
   LoginModel1? profileData;
   bool isVisitDetail = false;
+  List<VisitModel> visits = [];
 
   @override
   void initState() {
@@ -57,7 +60,9 @@ class _SessionRecordState extends State<SessionRecord> {
         } else if (state is MyProfileState) {
           isLoading = false;
           profileData = state.profileData;
+
           currentPatientData = state.currentPatientModel;
+          visits = state.visits!;
         } else {
           isLoading = false;
           AppMsg.showErrorMsg(context, msg: state.toString());
@@ -74,14 +79,6 @@ class _SessionRecordState extends State<SessionRecord> {
             body: const Center(child: CircularProgressIndicator()),
           );
         }
-
-        currentPatientData = latestData;
-        final visits = List.from(latestData.patient!.visits);
-
-        visits.sort(
-          (a, b) => (a.visitAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-              .compareTo(b.visitAt ?? DateTime.fromMillisecondsSinceEpoch(0)),
-        );
         return PopScope(
           canPop: false,
           onPopInvoked: (didPop) {
@@ -225,7 +222,17 @@ class _SessionRecordState extends State<SessionRecord> {
                                                                 .isEmpty
                                                             ? 1.0
                                                             : getSessionProgress(
-                                                                index,
+                                                                usedSession: currentPatientData!
+                                                                    .patient!
+                                                                    .packages[index]
+                                                                    .pivot!
+                                                                    .displaySessionsUsed,
+                                                                totalSession:
+                                                                    currentPatientData!
+                                                                        .patient!
+                                                                        .packages[index]
+                                                                        .pivot!
+                                                                        .displaySessionsTotal,
                                                               ),
                                                         valueColor:
                                                             AlwaysStoppedAnimation(
@@ -285,14 +292,12 @@ class _SessionRecordState extends State<SessionRecord> {
                                         text: 'My Visits',
                                         color: AppColors.primaryColor,
                                       ),
-                                      CustomText(text: '23/9', fontSize: 12),
+                                      //CustomText(text: '', fontSize: 12),
                                     ],
                                   ),
                                   SizedBox(height: 10.h),
 
                                   ...List.generate(visits.length, (index) {
-                                    final visit = visits[index];
-
                                     return Container(
                                       margin: EdgeInsets.only(bottom: 10.h),
                                       alignment: Alignment.center,
@@ -329,16 +334,9 @@ class _SessionRecordState extends State<SessionRecord> {
                                                             .start,
                                                     children: [
                                                       CustomText(
-                                                        text:
-                                                            visit
-                                                                    .therapist
-                                                                    ?.name
-                                                                    .isNotEmpty ==
-                                                                true
-                                                            ? visit
-                                                                  .therapist!
-                                                                  .name
-                                                            : 'no data',
+                                                        text: visits[index]
+                                                            .therapist!
+                                                            .displayName,
                                                         fontSize: 20,
                                                         color: AppColors
                                                             .firstTextBlackColor,
@@ -381,16 +379,19 @@ class _SessionRecordState extends State<SessionRecord> {
                                                             .start,
                                                     children: [
                                                       CustomText(
-                                                        text: visit.visitAt
-                                                            .toString(),
+                                                        text:
+                                                            DateAndTimeFormater.dateFormat(
+                                                              visits[index]
+                                                                  .displayVisitAt
+                                                                  .toString(),
+                                                            ),
                                                         fontSize: 15,
                                                         color: AppColors
                                                             .secondaryTextColor,
                                                       ),
                                                       CustomText(
-                                                        text:
-                                                            visit.type ??
-                                                            'Cognitive Therapy',
+                                                        text: visits[index]
+                                                            .displayType,
                                                         fontSize: 15,
                                                         color: AppColors
                                                             .secondaryTextColor,
@@ -403,12 +404,26 @@ class _SessionRecordState extends State<SessionRecord> {
                                                           8.r,
                                                         ),
                                                     onTap: () async {
-                                                      Navigator.pushNamed(
+                                                      String id = visits[index]
+                                                          .displayId;
+                                                      print(
+                                                        visits[index]
+                                                            .displayType,
+                                                      );
+                                                      Navigator.push(
                                                         context,
-                                                        AppRoutes.notesScreen,
-                                                        arguments: visits[index]
-                                                            .id
-                                                            .toString(),
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              SessionNotes(
+                                                                isConsultation:
+                                                                    visits[index]
+                                                                            .consultant ==
+                                                                        null
+                                                                    ? false
+                                                                    : true,
+                                                                visitId: id,
+                                                              ),
+                                                        ),
                                                       );
                                                     },
                                                     height: 33,
@@ -430,6 +445,7 @@ class _SessionRecordState extends State<SessionRecord> {
                             ),
                           ),
                         )
+                      //Session Records
                       : RefreshIndicator(
                           onRefresh: () async {
                             context.read<ProfileBloc>().add(MyProfileEvent());
@@ -445,7 +461,6 @@ class _SessionRecordState extends State<SessionRecord> {
                                   children: [
                                     SizedBox(height: 23.h),
                                     ...List.generate(1, (index) {
-                                      final visit = visits[index];
                                       return Container(
                                         margin: EdgeInsets.only(bottom: 10.h),
                                         alignment: Alignment.center,
@@ -481,16 +496,9 @@ class _SessionRecordState extends State<SessionRecord> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     CustomText(
-                                                      text:
-                                                          visit
-                                                                  .therapist
-                                                                  ?.name
-                                                                  .isNotEmpty ==
-                                                              true
-                                                          ? visit
-                                                                .therapist!
-                                                                .name
-                                                          : 'no data',
+                                                      text: visits[index]
+                                                          .therapist!
+                                                          .displayName,
                                                       fontSize: 20,
                                                       color: AppColors
                                                           .firstTextBlackColor,
@@ -538,8 +546,12 @@ class _SessionRecordState extends State<SessionRecord> {
                                                             TextOverflow
                                                                 .ellipsis,
 
-                                                        text: visit.visitAt
-                                                            .toString(),
+                                                        text:
+                                                            DateAndTimeFormater.dateFormat(
+                                                              visits[index]
+                                                                  .displayVisitAt
+                                                                  .toString(),
+                                                            ),
                                                         fontSize: 15,
                                                         color: AppColors
                                                             .secondaryTextColor,
@@ -548,9 +560,8 @@ class _SessionRecordState extends State<SessionRecord> {
                                                     CustomText(
                                                       textOverflow:
                                                           TextOverflow.ellipsis,
-                                                      text:
-                                                          visit.type ??
-                                                          'Cognitive Therapy',
+                                                      text: visits[index]
+                                                          .displayType,
                                                       fontSize: 15,
                                                       color: AppColors
                                                           .secondaryTextColor,
@@ -590,23 +601,5 @@ class _SessionRecordState extends State<SessionRecord> {
         );
       },
     );
-  }
-
-  double getSessionProgress(int index) {
-    final total = currentPatientData!
-        .patient!
-        .packages[index]
-        .pivot!
-        .displaySessionsTotal;
-    final used =
-        currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed;
-
-    if (total == 0) return 0.0;
-
-    final progress = double.parse(used) / double.parse(total);
-
-    if (progress.isNaN || progress.isInfinite) return 0.0;
-
-    return progress.clamp(0.0, 1.0);
   }
 }

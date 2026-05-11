@@ -1,10 +1,10 @@
 import 'package:doctor_app/core/app_routes/routes_name.dart';
 import 'package:doctor_app/screens/all_packages_screen/all_packages_screen.dart';
 import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
-import 'package:doctor_app/screens/assestent_manager/assistent_manager.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
 import 'package:doctor_app/screens/auth_screen/reset_password_screen.dart';
 import 'package:doctor_app/screens/history_tracker_screen/history_tracker_screen.dart';
+import 'package:doctor_app/screens/location/location_screen.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/screens/packages/packages_screen.dart';
 
@@ -23,7 +23,6 @@ import '../../screens/home/search_screen.dart';
 import '../../screens/invioce/invoice_detail_screen.dart';
 import '../../screens/nfc_card/nfc_card.dart';
 import '../../screens/seesion/sessiom_detail_screen.dart';
-
 
 class AppGenerateRoute {
   String routeName;
@@ -58,56 +57,11 @@ class AppGenerateRoute {
       routeName: AppRoutes.restPassword,
       screen: ResetPasswordScreen(),
     ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.confirmAppointment,
-    //   screen: ConfirmAppointmentScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.bookAppointmentScreen,
-    //   screen: BookAppointmentScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.appointmentDetailScreen,
-    //   screen: AppointmentDetailScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.transactionHistoryScreen,
-    //   screen: TransactionHistoryScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.rechargeScreen,
-    //   screen: RechargeWalletScreen(),
-    // ),
-    // AppGenerateRoute(routeName: AppRoutes.walletScreen, screen: WalletScreen()),
-    // // AppGenerateRoute(
-    // //   routeName: AppRoutes.paymentOptionScreen,
-    // //   screen: PaymentOptionScreen(),
-    // // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.paymentMethodeScreen,
-    //   screen: PaymentMethodScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.walletPaymentScreen,
-    //   screen: WalletPaymentScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.easyPaisaPaymentScreen,
-    //   screen: EasypaisaPaymentScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.bankPaymentScreen,
-    //   screen: BankTransferScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.creditCardPaymentScreen,
-    //   screen: CreditCardPaymentScreen(),
-    // ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.successPaymentScreen,
-    //   screen: PaymentSuccessScreen(),
-    // ),
-    AppGenerateRoute(routeName: AppRoutes.myNFCCardScreen, screen: NfcCardPage()),
+
+    AppGenerateRoute(
+      routeName: AppRoutes.myNFCCardScreen,
+      screen: NfcCardPage(),
+    ),
     AppGenerateRoute(
       routeName: AppRoutes.myProfileScreen,
       screen: MyProfileScreen(),
@@ -125,15 +79,16 @@ class AppGenerateRoute {
       routeName: AppRoutes.invoiceDetailScreen,
       screen: InvoiceDetailScreen(),
     ),
+    AppGenerateRoute(routeName: AppRoutes.mapScreen, screen: LocationScreen()),
     AppGenerateRoute(
       routeName: AppRoutes.assessmentScreen,
       screen: AssessmentDetailScreen(),
     ),
     AppGenerateRoute(routeName: AppRoutes.searchScreen, screen: SearchScreen()),
-    AppGenerateRoute(
-      routeName: AppRoutes.assistantManagerScreen,
-      screen: AssistantManagerScreen(),
-    ),
+    // AppGenerateRoute(
+    //   routeName: AppRoutes.assistantManagerScreen,
+    //   screen: AssistantManagerScreen(),
+    // ),
     AppGenerateRoute(
       routeName: AppRoutes.sessionsDetailScreen,
       screen: SessionDetailScreen(),

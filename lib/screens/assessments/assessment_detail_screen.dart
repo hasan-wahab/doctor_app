@@ -11,9 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/all_consutant_assessment_model.dart';
-import '../../data/models/consultant_assesment_model.dart';
+import '../../data/models/consultant_assesment_model.dart' hide AdviceModel;
 import '../../data/models/current_patient_model.dart'
-    hide ConsultantAssessmentModel;
+    hide ConsultantAssessmentModel, MuscleAssessmentModel;
 import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
 import 'bloc/consultant_assesment_event.dart';
@@ -29,7 +29,12 @@ class AssessmentDetailScreen extends StatefulWidget {
 class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
   List<AllConsultantAssessmentModel>? allConsultantAssessmentModel;
   ConsultantAssessmentModel? consultantAssessments;
-  // var consultantAtIndex;
+  MuscleAssessmentModel? muscleAssessmentModel;
+  SessionSettings? settingsModel;
+  AdviceModel? adviceModel;
+  GeneralTherapeuticPrescription? prescriptionModel;
+  List<String>? selectedPackages;
+  List<String>? mmt;
 
   String? id;
   bool isLoading = false;
@@ -58,6 +63,9 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
       },
 
       builder: (context, state) {
+        if (state is ConsultantMessageState) {
+          print(state.message.toString());
+        }
         if (state is ConsultantFromHomeLoaded) {
           allConsultantAssessmentModel = state.allConsultantAssessmentModel;
 

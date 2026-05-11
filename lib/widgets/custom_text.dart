@@ -10,9 +10,11 @@ class CustomText extends StatelessWidget {
   final int? maxLines;
   final TextAlign? align;
   final TextOverflow textOverflow;
+  final TextStyle ?style;
 
   const CustomText({
     super.key,
+    this.style,
     required this.text,
     this.fontSize = 15,
     this.fontWeight = FontWeight.w500,
@@ -29,7 +31,7 @@ class CustomText extends StatelessWidget {
       maxLines: maxLines,
       textAlign: align,
       text,
-      style: TextStyle(
+      style:style?? TextStyle(
         fontSize: fontSize.sp,
         fontWeight: fontWeight,
         color: color,

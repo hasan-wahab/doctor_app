@@ -1247,8 +1247,8 @@ class PatientStatsModel {
         therapyVisits: _int(json['therapy_visits']),
         activePackages: _int(json['active_packages']),
         completedPackages: _int(json['completed_packages']),
-        totalSpend: _dbl(json['total_spend']),
-        totalAmount: _dbl(json['total_amount']),
+        totalSpend: _dbl(json['total_paid']),
+        totalAmount: _dbl(json['total_billed']),
         totalSpent: _dbl(json['total_spent']),
       );
 
@@ -1258,8 +1258,8 @@ class PatientStatsModel {
     'therapy_visits': therapyVisits,
     'active_packages': activePackages,
     'completed_packages': completedPackages,
-    'total_spend': totalSpend,
-    'total_amount': totalAmount,
+    'total_paid': totalSpend,
+    'total_billed': totalAmount,
     'total_spent': totalSpent,
   };
 }

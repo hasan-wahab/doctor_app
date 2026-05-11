@@ -1,6 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-// all_consultant_assessment_repo.dart
-// Single file - full nested JSON model (null safe)
+// all_consultant_assessment_model.dart (FIXED)
 // ─────────────────────────────────────────────────────────────
 
 class AllConsultantAssessmentModel {
@@ -13,13 +12,13 @@ class AllConsultantAssessmentModel {
   final SessionSettings? sessionSettings;
   final AdviceModel? advice;
 
-  final List<dynamic> specialTests;
-  final List<dynamic> mmt;
+  final Map<String, List<SpecialTest>> specialTests;
 
+  // 🔥 FIX: dynamic because API sends [] OR {} depending on patient
+  final List<dynamic> mmt;
   final List<MuscleAssessment> muscleAssessments;
 
   final GeneralTherapeuticPrescription? prescription;
-
   final List<String> selectedPackages;
 
   AllConsultantAssessmentModel({
@@ -56,8 +55,17 @@ class AllConsultantAssessmentModel {
           ? AdviceModel.fromJson(json['Advice'])
           : null,
 
-      specialTests: json['Special Tests Examination'] ?? [],
-      mmt: json['Manual Muscle Testing (MMT)'] ?? [],
+      specialTests:
+          (json['Special Tests Examination'] as Map<String, dynamic>? ?? {})
+              .map(
+                (key, value) => MapEntry(
+                  key,
+                  (value as List).map((e) => SpecialTest.fromJson(e)).toList(),
+                ),
+              ),
+
+      // 🔥 KEY FIX: MMT can be [] (List) OR {} (Map) — handle both safely
+      mmt: _parseMmt(json['Manual Muscle Testing (MMT)']),
 
       muscleAssessments: (json['Muscle Assessments / Exercises'] as List? ?? [])
           .map((e) => MuscleAssessment.fromJson(e))
@@ -82,7 +90,9 @@ class AllConsultantAssessmentModel {
       'Clinical Findings & Diagnosis': clinicalFindings?.toJson(),
       'Session Settings': sessionSettings?.toJson(),
       'Advice': advice?.toJson(),
-      'Special Tests Examination': specialTests,
+      'Special Tests Examination': specialTests.map(
+        (key, value) => MapEntry(key, value.map((e) => e.toJson()).toList()),
+      ),
       'Manual Muscle Testing (MMT)': mmt,
       'Muscle Assessments / Exercises': muscleAssessments
           .map((e) => e.toJson())
@@ -93,10 +103,44 @@ class AllConsultantAssessmentModel {
   }
 }
 
-// ─────────────────────────────────────────────
-// Nested Models
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// 🔥 MMT SAFE PARSER
+// API sends [] (empty List) OR {} (empty/filled Map)
+// Both cases return empty List so UI never crashes
+// ─────────────────────────────────────────────────────────────
+List<dynamic> _parseMmt(dynamic value) {
+  if (value == null) return [];
+  if (value is List) return value; // normal case: []
+  if (value is Map) return []; // edge case: {} → treat as empty
+  return [];
+}
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 Special Test Model
+// ─────────────────────────────────────────────────────────────
+class SpecialTest {
+  final String? test;
+  final String? result;
+  final String? findings;
+
+  SpecialTest({this.test, this.result, this.findings});
+
+  factory SpecialTest.fromJson(Map<String, dynamic> json) {
+    return SpecialTest(
+      test: json['Test'],
+      result: json['Result'],
+      findings: json['Findings'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'Test': test, 'Result': result, 'Findings': findings};
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 🔹 Clinical Findings
+// ─────────────────────────────────────────────────────────────
 class ClinicalFindings {
   final List<String> diagnosis;
   final String? note;
@@ -115,6 +159,9 @@ class ClinicalFindings {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 Session Settings
+// ─────────────────────────────────────────────────────────────
 class SessionSettings {
   final String? duration;
 
@@ -129,6 +176,9 @@ class SessionSettings {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 Advice
+// ─────────────────────────────────────────────────────────────
 class AdviceModel {
   final List<dynamic> investigationsDone;
   final String? otherAdvice;
@@ -150,6 +200,9 @@ class AdviceModel {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 Muscle Assessment
+// ─────────────────────────────────────────────────────────────
 class MuscleAssessment {
   final String? muscle;
   final List<String> conditionStatus;
@@ -172,7 +225,7 @@ class MuscleAssessment {
       muscle: json['Muscle'],
       conditionStatus: List<String>.from(json['Condition / Status'] ?? []),
       manualTreatment: json['Manual Treatment'] ?? [],
-      otherTreatment: json['Other Treatment'] ?? '',
+      otherTreatment: json['Other Treatment'],
       prescribedExercises: (json['Prescribed Exercises'] as List? ?? [])
           .map((e) => Exercise.fromJson(e))
           .toList(),
@@ -194,6 +247,9 @@ class MuscleAssessment {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 Exercise
+// ─────────────────────────────────────────────────────────────
 class Exercise {
   final String? name;
   final String? dosage;
@@ -209,6 +265,9 @@ class Exercise {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 🔹 General Therapeutic Prescription
+// ─────────────────────────────────────────────────────────────
 class GeneralTherapeuticPrescription {
   final String? electrotherapy;
   final String? thermo;

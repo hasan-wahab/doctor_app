@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       //    ?
                                                       Image.network(
                                                         fit: BoxFit.cover,
-                                                        'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
+                                                        currentPatientData!.patient!.displayImageUrl,
 
                                                         headers: {
                                                           "Authorization":

@@ -21,6 +21,8 @@ class BaseApiImpl implements BaseApi {
     String? name,
     String? cnic,
     String? phone,
+    String? birthDate,
+    String? gender,
   }) async {
     var urL = Uri.parse(url);
     try {
@@ -33,6 +35,8 @@ class BaseApiImpl implements BaseApi {
               if (name != null) "name": name,
               if (cnic != null) "cnic": cnic,
               if (phone != null) "phone": phone,
+              if (birthDate != null) "birthDate": birthDate,
+              if (gender != null) "gender": gender,
             }),
             headers: {
               "Content-Type": "application/json",

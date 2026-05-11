@@ -33,7 +33,7 @@ class UpdateProfile extends StatefulWidget {
 
 class _UpdateProfileState extends State<UpdateProfile> {
   bool isLoading = false;
-  String? selectedValue;
+  String? selectedGender;
   DateTime? pickedData;
   CurrentPatientModel? currentPatientModel;
   LoginModel1? profileData;
@@ -45,7 +45,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     super.initState();
   }
 
-  String? name, email, cnic, phone;
+  String? name, email, cnic, phone, birthDate, gender;
   File? pickImage;
   @override
   Widget build(BuildContext context) {
@@ -69,6 +69,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
           email = currentPatientModel!.patient!.displayEmail.toString();
           cnic = currentPatientModel!.patient!.displayCnic.toString();
           phone = currentPatientModel!.patient!.displayPhone.toString();
+          birthDate = currentPatientModel!.patient!.displayBirthDate.toString();
+          gender = currentPatientModel!.patient!.gender.toString();
         }
       },
       builder: (context, state) {
@@ -168,7 +170,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     fontSize: 20,
                                   ),
                                   CustomText(
-                                    text: 'Patient ID: #MC-2025',
+                                    text: profileData!
+                                        .patientData!
+                                        .patientInfo!
+                                        .cardUid
+                                        .toString(),
                                     color: AppColors.secondaryTextColor,
                                   ),
                                 ],
@@ -217,6 +223,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                   ),
                                 ],
                               ),
+
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -332,6 +339,42 @@ class _UpdateProfileState extends State<UpdateProfile> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  CustomText(text: 'Gender'),
+                                  Container(
+                                    width: MediaQuery.sizeOf(context).width,
+                                    height: 50.h,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      border: Border.all(
+                                        color: AppColors.secondaryTextColor,
+                                      ),
+                                    ),
+                                    child: DropdownButton(
+                                      value: gender,
+                                      underline: SizedBox(),
+                                      padding: EdgeInsets.all(5.r),
+                                      isExpanded: true,
+                                      items: [
+                                        DropdownMenuItem(
+                                          value: 'Male',
+                                          child: CustomText(text: 'Male'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'Female',
+                                          child: CustomText(text: 'Female'),
+                                        ),
+                                      ],
+                                      onChanged: (value) {
+                                        gender = value;
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   CustomText(text: 'Email'),
                                   Container(
                                     height: 50.h,
@@ -381,7 +424,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                   if (name != null &&
                                       email != null &&
                                       cnic != null &&
-                                      phone != null) {
+                                      phone != null &&
+                                      birthDate != null) {
                                     context.read<ProfileBloc>().add(
                                       UpdateProfileEvent(
                                         path: pickImage,
@@ -389,6 +433,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                         email: email!,
                                         cnic: cnic!,
                                         phone: phone!,
+                                        birthDate: birthDate!,
+                                        gender: gender!,
                                       ),
                                     );
                                   } else {

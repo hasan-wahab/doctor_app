@@ -49,6 +49,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
+        if (state is SessionFromHomeLoaded) {
+          print(state.allTherapistModel!.totalSessionCount);
+        }
       },
       builder: (context, state) {
         if (state is SessionLoadedFromRecordsState) {
@@ -222,27 +225,28 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             ),
             backgroundColor: AppColors.bgColor,
             body: SafeArea(
-              child: allTherapistModel != null
-                  ? RefreshIndicator(
-                      onRefresh: () async => context
-                          .read<TherapySessionBloc>()
-                          .add(TherapySessionEvent(refresh: true)),
-                      child: ListView(
+              child: RefreshIndicator(
+                onRefresh: () async => context.read<TherapySessionBloc>().add(
+                  TherapySessionEvent(refresh: true),
+                ),
+                child: allTherapistModel != null
+                    ? ListView(
                         padding: EdgeInsets.symmetric(
                           horizontal: 20.w,
                           vertical: 10.h,
                         ),
                         children: [
                           CustomText(
+                            maxLines: 3,
                             text: 'Therapy Sessions',
                             fontSize: 20,
                             color: AppColors.primaryColor,
                           ),
-              
+
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: List.generate(
-                              allTherapistModel!.allSessions.length,
+                              allTherapistModel!.totalSessionCount,
                               (index) {
                                 TherapistVisitGroupModel completedVisitsModel =
                                     allTherapistModel!.completedVisits[index];
@@ -254,14 +258,14 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                       horizontal: 15.w,
                                       vertical: 20.h,
                                     ),
-              
+
                                     //   height: 178.h,
                                     width: 360.w,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12.r),
                                       //  border: Border.all(color: AppColors.primaryColor, width: 2),
                                     ),
-              
+
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -291,7 +295,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                               .displayTherapist
                                               .toString(),
                                         ),
-              
+
                                         RowText(
                                           firstText: 'Duration',
                                           secondText: allTherapistModel!
@@ -368,9 +372,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                             ),
                           ),
                         ],
-                      ),
-                    )
-                  : Center(child: CircularProgressIndicator()),
+                      )
+                    : Center(child: CircularProgressIndicator()),
+              ),
             ),
           );
         }

@@ -43,7 +43,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileBloc, ProfileState>(
-
       listener: (context, state) {
         if (state is ProfileLoadingState) {
           // isLoading = true;
@@ -89,7 +88,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                             ? ClipOval(
                                                 child: Image.network(
                                                   fit: BoxFit.cover,
-                                                  'https://alitherapy.neonweb.tech/storage/${currentPatientData!.patient!.displayImageUrl.toString()}',
+                                                  currentPatientData!
+                                                      .patient!
+                                                      .displayImageUrl,
 
                                                   headers: {
                                                     "Authorization":

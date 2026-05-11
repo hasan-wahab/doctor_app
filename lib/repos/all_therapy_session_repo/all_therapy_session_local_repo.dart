@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
 import 'package:doctor_app/data/models/all_therapist_model.dart';
 import 'package:flutter/foundation.dart';
@@ -25,18 +26,17 @@ class AllTherapySessionLocalRepo {
 
     if (result.isEmpty) {
       if (kDebugMode) {
-        print('⚠️ No local patient data found');
-        return AllTherapistModel.fromJson([]);
+        print(' No local therapist data found');
       }
+      return AllTherapistModel(visitGroups: []);
     }
     var allTherapySessionJsonString =
         result.first[LocalKeys.allTherapistSessionKey];
     if (allTherapySessionJsonString == null) {
       if (kDebugMode) {
-        print('⚠️ patientKey is null');
-
-        return AllTherapistModel.fromJson([]);
+        print('All Therapist Key is null');
       }
+      return AllTherapistModel(visitGroups: []);
     }
     AllTherapistModel model = AllTherapistModel.fromJson(
       jsonDecode(allTherapySessionJsonString as String),

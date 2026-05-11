@@ -1,8 +1,7 @@
-import 'package:doctor_app/data/models/slider_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../data/api_service/api_service.dart';
+import '../../../data/models/slider_model.dart';
 
 class FirstSlider extends StatefulWidget {
   SliderModel? sliderModel;
@@ -13,7 +12,7 @@ class FirstSlider extends StatefulWidget {
     super.key,
     required this.currentValue,
     required this.controller,
-    this.sliderModel,
+    required this.sliderModel,
   });
 
   @override
@@ -23,33 +22,35 @@ class FirstSlider extends StatefulWidget {
 class _FirstSliderState extends State<FirstSlider> {
   @override
   Widget build(BuildContext context) {
-    return widget.sliderModel != null
+    final images = widget.sliderModel;
+
+    return images != null
         ? SizedBox(
             height: 174.h,
             child: PageView(
               onPageChanged: (value) {
                 widget.currentValue = value;
-                print(value);
                 setState(() {});
               },
               controller: widget.controller,
               scrollDirection: Axis.horizontal,
-              children: List.generate((widget.sliderModel?.data.length ?? 1), (
-                index,
-              ) {
-                return SizedBox(
-                  height: 174.h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: widget.sliderModel!.data.isNotEmpty
-                        ? Image.network(widget.sliderModel!.data[index])
-                        : Image.asset(
-                            'assets/images/istockphoto-2171324541-612x612 1.png',
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                );
-              }),
+              children: List.generate(
+                (images.data.isNotEmpty ? images.data.length : 5),
+                (index) {
+                  return SizedBox(
+                    height: 174.h,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: images.data.isNotEmpty
+                          ? Image.network(images.data[index])
+                          : Image.asset(
+                              'assets/images/istockphoto-2171324541-612x612 1.png',
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  );
+                },
+              ),
             ),
           )
         : Center(child: CircularProgressIndicator());

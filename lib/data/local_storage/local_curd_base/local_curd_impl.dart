@@ -68,7 +68,4 @@ class LocalCurdImpl implements LocalCurdBase {
       );
     }
   }
-
-
-
 }

@@ -41,90 +41,90 @@ class HistoryTrackerModel {
     return HistoryTrackerModel(
       patientInformation: json['Patient Information'] != null
           ? PatientInformationModel.fromJson(
-              json['Patient Information'] as Map<String, dynamic>,
-            )
+        json['Patient Information'] as Map<String, dynamic>,
+      )
           : null,
       painLocation: json['Pain Location (3D Medical Dashboard)'] != null
           ? PainLocationModel.fromJson(
-              json['Pain Location (3D Medical Dashboard)']
-                  as Map<String, dynamic>,
-            )
+        json['Pain Location (3D Medical Dashboard)']
+        as Map<String, dynamic>,
+      )
           : null,
       regionInvolved: json['Region Involved'] != null
           ? RegionInvolvedModel.fromJson(
-              json['Region Involved'] as Map<String, dynamic>,
-            )
+        json['Region Involved'] as Map<String, dynamic>,
+      )
           : null,
       chiefComplaint: json['Chief Complaint'] != null
           ? ChiefComplaintModel.fromJson(
-              json['Chief Complaint'] as Map<String, dynamic>,
-            )
+        json['Chief Complaint'] as Map<String, dynamic>,
+      )
           : null,
       painDetails: json['Pain Details'] != null
           ? PainDetailsModel.fromJson(
-              json['Pain Details'] as Map<String, dynamic>,
-            )
+        json['Pain Details'] as Map<String, dynamic>,
+      )
           : null,
       radiatingPain: json['Radiating Pain (MANDATORY)'] != null
           ? RadiatingPainModel.fromJson(
-              json['Radiating Pain (MANDATORY)'] as Map<String, dynamic>,
-            )
+        json['Radiating Pain (MANDATORY)'] as Map<String, dynamic>,
+      )
           : null,
       associatedSymptoms: json['Associated Symptoms'] != null
           ? AssociatedSymptomsModel.fromJson(
-              json['Associated Symptoms'] as Map<String, dynamic>,
-            )
+        json['Associated Symptoms'] as Map<String, dynamic>,
+      )
           : null,
       movementRelatedPain: json['Movement-Related Pain / Difficulty'] != null
           ? MovementRelatedPainModel.fromJson(
-              json['Movement-Related Pain / Difficulty']
-                  as Map<String, dynamic>,
-            )
+        json['Movement-Related Pain / Difficulty']
+        as Map<String, dynamic>,
+      )
           : null,
       onsetAndCause: json['Onset & Cause'] != null
           ? OnsetAndCauseModel.fromJson(
-              json['Onset & Cause'] as Map<String, dynamic>,
-            )
+        json['Onset & Cause'] as Map<String, dynamic>,
+      )
           : null,
       aggravatingFactors: json['Aggravating Factors'] != null
           ? AggravatingFactorsModel.fromJson(
-              json['Aggravating Factors'] as Map<String, dynamic>,
-            )
+        json['Aggravating Factors'] as Map<String, dynamic>,
+      )
           : null,
       relievingFactors: json['Relieving Factors'] != null
           ? RelievingFactorsModel.fromJson(
-              json['Relieving Factors'] as Map<String, dynamic>,
-            )
+        json['Relieving Factors'] as Map<String, dynamic>,
+      )
           : null,
       functionalLimitations: json['Functional Limitations (ADL)'] != null
           ? FunctionalLimitationsModel.fromJson(
-              json['Functional Limitations (ADL)'] as Map<String, dynamic>,
-            )
+        json['Functional Limitations (ADL)'] as Map<String, dynamic>,
+      )
           : null,
       gaitAnalysis: json['Gait & Movement Analysis'] != null
           ? GaitAnalysisModel.fromJson(
-              json['Gait & Movement Analysis'] as Map<String, dynamic>,
-            )
+        json['Gait & Movement Analysis'] as Map<String, dynamic>,
+      )
           : null,
       pastMedicalHistory:
-          json['Past Medical History & Previous Treatment'] != null
+      json['Past Medical History & Previous Treatment'] != null
           ? PastMedicalHistoryModel.fromJson(
-              json['Past Medical History & Previous Treatment']
-                  as Map<String, dynamic>,
-            )
+        json['Past Medical History & Previous Treatment']
+        as Map<String, dynamic>,
+      )
           : null,
       previousInvestigations: json['Previous Investigations & Reports'] != null
           ? PreviousInvestigationsModel.fromJson(
-              json['Previous Investigations & Reports'] as Map<String, dynamic>,
-            )
+        json['Previous Investigations & Reports'] as Map<String, dynamic>,
+      )
           : null,
       redFlags: json['Red Flags'] != null
           ? RedFlagsModel.fromJson(json['Red Flags'] as Map<String, dynamic>)
           : null,
       forMenOnly: json['For Men Only'] != null
           ? ForMenOnlyModel.fromJson(
-              json['For Men Only'] as Map<String, dynamic>,
-            )
+        json['For Men Only'] as Map<String, dynamic>,
+      )
           : null,
     );
   }
@@ -163,6 +163,22 @@ List<String> _parseStringList(dynamic value) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Helper — safely parse a field that could be String OR List<dynamic>
+// If List  → joins with ", "
+// If String → returns as-is
+// If null  → returns null
+// ─────────────────────────────────────────────────────────────────────────────
+String? _parseStringOrList(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  if (value is List) {
+    final items = value.map((e) => e?.toString() ?? '').toList();
+    return items.isEmpty ? null : items.join(', ');
+  }
+  return value.toString();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 1. Patient Information
 // ─────────────────────────────────────────────────────────────────────────────
 class PatientInformationModel {
@@ -172,7 +188,6 @@ class PatientInformationModel {
 
   PatientInformationModel({this.name, this.age, this.occupation});
 
-  /// Safe getters — UI uses these, never raw nullable fields
   String get displayName => name ?? 'No data';
   String get displayAge => age ?? 'No data';
   String get displayOccupation => occupation ?? 'No data';
@@ -211,10 +226,12 @@ class PainLocationModel {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Region Involved
+// FIX: 'Side Affected' can be null, String, or List<dynamic> from API.
+//      Using _parseStringOrList() to handle all cases safely.
 // ─────────────────────────────────────────────────────────────────────────────
 class RegionInvolvedModel {
   final String? region;
-  final String? sideAffected;
+  final String? sideAffected;   // may arrive as List → joined to String
   final String? deviation;
 
   RegionInvolvedModel({this.region, this.sideAffected, this.deviation});
@@ -225,9 +242,9 @@ class RegionInvolvedModel {
 
   factory RegionInvolvedModel.fromJson(Map<String, dynamic> json) {
     return RegionInvolvedModel(
-      region: json['Region'] as String?,
-      sideAffected: json['Side Affected']?.toString(),
-      deviation: json['Deviation'] as String?,
+      region: _parseStringOrList(json['Region']),        // ← fix
+      sideAffected: _parseStringOrList(json['Side Affected']),  // ← fix
+      deviation: _parseStringOrList(json['Deviation']),  // ← fix
     );
   }
 
@@ -491,7 +508,6 @@ class PastMedicalHistoryModel {
   String get displaySurgicalHistory => surgicalHistory ?? 'No data';
 
   factory PastMedicalHistoryModel.fromJson(Map<String, dynamic> json) {
-    // Parse treatment responses map safely
     Map<String, String?> parsedResponses = {};
     final responsesRaw = json['Treatment Responses'];
     if (responsesRaw is Map) {

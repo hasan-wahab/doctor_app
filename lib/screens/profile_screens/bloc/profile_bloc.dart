@@ -40,10 +40,10 @@ class ProfileBloc extends Bloc<ProfileEvents, ProfileState> {
       emit(ProfileMessageState(message: e.toString()));
     }
     if (patientData != null && profileData != null) {
-      var visits = List.from(patientData!.patient!.visits);
+      List<VisitModel> visits = List.from(patientData!.patient!.visits);
       var therapySessions = List.from(patientData!.therapySessions);
 
-      visits.sort((a, b) => a.visitAt.compareTo(b.visitAt));
+      visits.sort((a, b) => a.displayVisitAt!.compareTo(b.displayVisitAt));
       emit(
         MyProfileState(
           currentPatientModel: patientData,
@@ -71,6 +71,8 @@ class ProfileBloc extends Bloc<ProfileEvents, ProfileState> {
           email: event.email,
           cnic: event.cnic,
           phone: event.phone,
+          birthDate: event.birthDate,
+          gender: event.gender,
           token: token,
         );
         profileData = await profileLocalRepo.getProfile();

@@ -29,6 +29,7 @@ class AllConsultantAssessmentRepo {
       List<AllConsultantAssessmentModel> allConsultantAssessmentList = [];
       var jsonListResponse = jsonResponse['data']['assessments'];
       for (var a in jsonListResponse) {
+        print(a);
         allConsultantAssessmentList.add(
           AllConsultantAssessmentModel.fromJson(a),
         );

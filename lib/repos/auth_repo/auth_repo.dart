@@ -87,6 +87,8 @@ class AuthRepoImpl implements AuthRepoBase {
     required String cnic,
     required String phone,
     required String token,
+    required String birthDate,
+    required String gender,
   }) async {
     if (file.path.isEmpty) return;
     await api.multiPartPostApi(

@@ -23,6 +23,24 @@ class HistoryTrackerScreen extends StatefulWidget {
 class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
   HistoryTrackerModel? historyTrackerModel;
 
+  ForMenOnlyModel? forMenOnlyModel;
+  PatientInformationModel? patientInformationModel;
+  PainLocationModel? painLocationModel;
+  RegionInvolvedModel? regionInvolvedModel;
+  ChiefComplaintModel? chiefComplaintModel;
+  PainDetailsModel? painDetailsModel;
+  RadiatingPainModel? radiatingPainModel;
+  AssociatedSymptomsModel? associatedSymptomsModel;
+  MovementRelatedPainModel? movementRelatedPainModel;
+  OnsetAndCauseModel? onsetAndCauseModel;
+  AggravatingFactorsModel? aggravatingFactorsModel;
+  RelievingFactorsModel? relievingFactorsModel;
+  FunctionalLimitationsModel? functionalLimitationsModel;
+  GaitAnalysisModel? gaitAnalysisModel;
+  PastMedicalHistoryModel? pastMedicalHistoryModel;
+  PreviousInvestigationsModel? previousInvestigationsModel;
+  RedFlagsModel? redFlagsModel;
+
   @override
   Widget build(BuildContext context) {
     bool isLoading = false;
@@ -37,6 +55,30 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
           isLoading = false;
 
           historyTrackerModel = state.historyTrackerModel;
+          forMenOnlyModel = state.historyTrackerModel.forMenOnly;
+          patientInformationModel =
+              state.historyTrackerModel.patientInformation;
+          painLocationModel = state.historyTrackerModel.painLocation;
+          regionInvolvedModel = state.historyTrackerModel.regionInvolved;
+          chiefComplaintModel = state.historyTrackerModel.chiefComplaint;
+          painDetailsModel = state.historyTrackerModel.painDetails;
+          radiatingPainModel = state.historyTrackerModel.radiatingPain;
+          associatedSymptomsModel =
+              state.historyTrackerModel.associatedSymptoms;
+          movementRelatedPainModel =
+              state.historyTrackerModel.movementRelatedPain;
+          onsetAndCauseModel = state.historyTrackerModel.onsetAndCause;
+          aggravatingFactorsModel =
+              state.historyTrackerModel.aggravatingFactors;
+          relievingFactorsModel = state.historyTrackerModel.relievingFactors;
+          functionalLimitationsModel =
+              state.historyTrackerModel.functionalLimitations;
+          gaitAnalysisModel = state.historyTrackerModel.gaitAnalysis;
+          pastMedicalHistoryModel =
+              state.historyTrackerModel.pastMedicalHistory;
+          previousInvestigationsModel =
+              state.historyTrackerModel.previousInvestigations;
+          redFlagsModel = state.historyTrackerModel.redFlags;
         }
       },
       builder: (context, state) {
@@ -150,27 +192,29 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
                                         color: AppColors.primaryColor,
                                       ),
                                     ),
+                                    patientInformationModel != null
+                                        ? _text(
+                                            firstText: 'Name',
+                                            secondText: patientInformationModel!
+                                                .displayName,
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Name',
-                                      secondText: historyTrackerModel!
-                                          .patientInformation!
-                                          .displayName,
-                                    ),
+                                    patientInformationModel != null
+                                        ? _text(
+                                            firstText: 'Age',
+                                            secondText: patientInformationModel!
+                                                .displayAge,
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Age',
-                                      secondText: historyTrackerModel!
-                                          .patientInformation!
-                                          .displayAge,
-                                    ),
-
-                                    _text(
-                                      firstText: 'Occupation',
-                                      secondText: historyTrackerModel!
-                                          .patientInformation!
-                                          .displayOccupation,
-                                    ),
+                                    patientInformationModel != null
+                                        ? _text(
+                                            firstText: 'Occupation',
+                                            secondText: patientInformationModel!
+                                                .displayOccupation,
+                                          )
+                                        : SizedBox(),
 
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -183,123 +227,141 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
                                       ),
                                     ),
 
-                                    _text(
-                                      firstText: 'Deviation',
-                                      secondText: historyTrackerModel!
-                                          .chiefComplaint!
-                                          .displayDeviation,
-                                    ),
+                                    chiefComplaintModel != null
+                                        ? _text(
+                                            firstText: 'Deviation',
+                                            secondText: chiefComplaintModel!
+                                                .displayDeviation,
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Complaints',
-                                      secondText: historyTrackerModel!
-                                          .chiefComplaint
-                                          ?.complaints
-                                          .toString(),
-                                    ),
+                                    chiefComplaintModel != null
+                                        ? _text(
+                                            firstText: 'Complaints',
+                                            secondText: chiefComplaintModel!
+                                                .complaints
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Side Affected',
-                                      secondText: historyTrackerModel!
-                                          .chiefComplaint!
-                                          .sideAffected
-                                          .toString(),
-                                    ),
+                                    chiefComplaintModel != null
+                                        ? _text(
+                                            firstText: 'Side Affected',
+                                            secondText: chiefComplaintModel!
+                                                .sideAffected
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Pain Relieve',
-                                      secondText: historyTrackerModel!
-                                          .aggravatingFactors!
-                                          .factors
-                                          .toString(),
-                                    ),
+                                    aggravatingFactorsModel != null
+                                        ? _text(
+                                            firstText: 'Factors',
+                                            secondText: aggravatingFactorsModel!
+                                                .factors
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Symptoms',
-                                      secondText: historyTrackerModel!
-                                          .associatedSymptoms!
-                                          .symptoms
-                                          .toString(),
-                                    ),
+                                    associatedSymptomsModel != null
+                                        ? _text(
+                                            firstText: 'Symptoms',
+                                            secondText: associatedSymptomsModel!
+                                                .symptoms
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Bladder Or Sexual Worsening',
-                                      secondText: historyTrackerModel!
-                                          .forMenOnly!
-                                          .displayBladderOrSexualWorsening
-                                          .toString(),
-                                    ),
+                                    forMenOnlyModel != null
+                                        ? _text(
+                                            firstText:
+                                                'Bladder Or Sexual Worsening',
+                                            secondText: forMenOnlyModel!
+                                                .displayBladderOrSexualWorsening
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Genital Numbness',
-                                      secondText: historyTrackerModel!
-                                          .forMenOnly!
-                                          .displayGenitalNumbness
-                                          .toString(),
-                                    ),
+                                    forMenOnlyModel != null
+                                        ? _text(
+                                            firstText: 'Genital Numbness',
+                                            secondText: forMenOnlyModel!
+                                                .displayGenitalNumbness
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Urine Leakage',
-                                      secondText: historyTrackerModel!
-                                          .forMenOnly!
-                                          .displayUrineLeakage
-                                          .toString(),
-                                    ),
+                                    forMenOnlyModel != null
+                                        ? _text(
+                                            firstText: 'Urine Leakage',
+                                            secondText: forMenOnlyModel!
+                                                .displayUrineLeakage
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Urination Pain',
-                                      secondText: historyTrackerModel!
-                                          .forMenOnly!
-                                          .displayUrinationPain
-                                          .toString(),
-                                    ),
+                                    forMenOnlyModel != null
+                                        ? _text(
+                                            firstText: 'Urination Pain',
+                                            secondText: forMenOnlyModel!
+                                                .displayUrinationPain
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Nocturia',
-                                      secondText: historyTrackerModel!
-                                          .forMenOnly!
-                                          .displayNocturia
-                                          .toString(),
-                                    ),
+                                    forMenOnlyModel != null
+                                        ? _text(
+                                            firstText: 'Nocturia',
+                                            secondText: forMenOnlyModel!
+                                                .displayNocturia
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Limited Activities',
-                                      secondText: historyTrackerModel!
-                                          .functionalLimitations!
-                                          .limitedActivities
-                                          .toString(),
-                                    ),
+                                    functionalLimitationsModel != null
+                                        ? _text(
+                                            firstText: 'Limited Activities',
+                                            secondText:
+                                                functionalLimitationsModel!
+                                                    .limitedActivities
+                                                    .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Analysis',
-                                      secondText: historyTrackerModel!
-                                          .gaitAnalysis!
-                                          .displayAnalysis,
-                                    ),
+                                    gaitAnalysisModel != null
+                                        ? _text(
+                                            firstText: 'Analysis',
+                                            secondText: gaitAnalysisModel!
+                                                .displayAnalysis,
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Movements',
-                                      secondText: historyTrackerModel!
-                                          .movementRelatedPain!
-                                          .movements
-                                          .toString(),
-                                    ),
+                                    movementRelatedPainModel != null
+                                        ? _text(
+                                            firstText: 'Movements',
+                                            secondText:
+                                                movementRelatedPainModel!
+                                                    .movements
+                                                    .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'How Did It Start',
-                                      secondText: historyTrackerModel!
-                                          .onsetAndCause!
-                                          .displayHowDidItStart
-                                          .toString(),
-                                    ),
+                                    onsetAndCauseModel != null
+                                        ? _text(
+                                            firstText: 'How Did It Start',
+                                            secondText: onsetAndCauseModel!
+                                                .displayHowDidItStart
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Possible Cause',
-                                      secondText: historyTrackerModel!
-                                          .onsetAndCause!
-                                          .possibleCause
-                                          .toString(),
-                                    ),
+                                    onsetAndCauseModel != null
+                                        ? _text(
+                                            firstText: 'Possible Cause',
+                                            secondText: onsetAndCauseModel!
+                                                .possibleCause
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
                                     Divider(thickness: 1, color: Colors.black),
 
                                     Padding(
@@ -313,37 +375,41 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
                                       ),
                                     ),
 
-                                    _text(
-                                      firstText: 'Duration',
-                                      secondText: historyTrackerModel!
-                                          .painDetails!
-                                          .displayDuration
-                                          .toString(),
-                                    ),
+                                    painDetailsModel != null
+                                        ? _text(
+                                            firstText: 'Duration',
+                                            secondText: painDetailsModel!
+                                                .displayDuration
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Pain Intensity Vas',
-                                      secondText: historyTrackerModel!
-                                          .painDetails!
-                                          .displayPainIntensity
-                                          .toString(),
-                                    ),
+                                    painDetailsModel != null
+                                        ? _text(
+                                            firstText: 'Pain Intensity Vas',
+                                            secondText: painDetailsModel!
+                                                .displayPainIntensity
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Pain Timing',
-                                      secondText: historyTrackerModel!
-                                          .painDetails!
-                                          .painTiming
-                                          .toString(),
-                                    ),
+                                    painDetailsModel != null
+                                        ? _text(
+                                            firstText: 'Pain Timing',
+                                            secondText: painDetailsModel!
+                                                .painTiming
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Type Of Pain',
-                                      secondText: historyTrackerModel!
-                                          .painDetails!
-                                          .typeOfPain
-                                          .toString(),
-                                    ),
+                                    painDetailsModel != null
+                                        ? _text(
+                                            firstText: 'Type Of Pain',
+                                            secondText: painDetailsModel!
+                                                .typeOfPain
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
                                     Divider(thickness: 1, color: Colors.black),
 
                                     Padding(
@@ -357,131 +423,151 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
                                       ),
                                     ),
 
-                                    _text(
-                                      firstText: 'Surgical History',
-                                      secondText: historyTrackerModel!
-                                          .pastMedicalHistory!
-                                          .displaySurgicalHistory
-                                          .toString(),
-                                    ),
+                                    pastMedicalHistoryModel != null
+                                        ? _text(
+                                            firstText: 'Surgical History',
+                                            secondText: pastMedicalHistoryModel!
+                                                .displaySurgicalHistory
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Medical History',
-                                      secondText: historyTrackerModel!
-                                          .pastMedicalHistory!
-                                          .medicalHistory
-                                          .toString(),
-                                    ),
+                                    pastMedicalHistoryModel != null
+                                        ? _text(
+                                            firstText: 'Medical History',
+                                            secondText: pastMedicalHistoryModel!
+                                                .medicalHistory
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Medical History Details',
-                                      secondText: historyTrackerModel!
-                                          .pastMedicalHistory!
-                                          .medicalHistoryDetails
-                                          .toString(),
-                                    ),
+                                    pastMedicalHistoryModel != null
+                                        ? _text(
+                                            firstText:
+                                                'Medical History Details',
+                                            secondText: pastMedicalHistoryModel!
+                                                .medicalHistoryDetails
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Previous Treatments',
-                                      secondText: historyTrackerModel!
-                                          .pastMedicalHistory!
-                                          .previousTreatments
-                                          .toString(),
-                                    ),
+                                    pastMedicalHistoryModel != null
+                                        ? _text(
+                                            firstText: 'Previous Treatments',
+                                            secondText: pastMedicalHistoryModel!
+                                                .previousTreatments
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Treatment Responses',
-                                      secondText: historyTrackerModel!
-                                          .pastMedicalHistory!
-                                          .treatmentResponses
-                                          .values
-                                          .toString(),
-                                    ),
+                                    pastMedicalHistoryModel != null
+                                        ? _text(
+                                            firstText: 'Treatment Responses',
+                                            secondText: pastMedicalHistoryModel!
+                                                .treatmentResponses
+                                                .values
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
 
-                                    _text(
-                                      firstText: 'Pain Location',
-                                      secondText: historyTrackerModel!
-                                          .painLocation!
-                                          .painLocation
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Investigations Done',
-                                      secondText: historyTrackerModel!
-                                          .previousInvestigations!
-                                          .investigationsDone
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Red Flags',
-                                      buttonText: historyTrackerModel!
-                                          .redFlags!
-                                          .flags
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Radiating Status',
-                                      buttonText: historyTrackerModel!
-                                          .radiatingPain!
-                                          .displayRadiatingStatus
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Radiating Side',
-                                      buttonText: historyTrackerModel!
-                                          .radiatingPain!
-                                          .displayRadiationSide
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Radiating Path',
-                                      buttonText: historyTrackerModel!
-                                          .radiatingPain!
-                                          .radiationPath
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Limited Activities',
-                                      buttonText: historyTrackerModel!
-                                          .functionalLimitations!
-                                          .limitedActivities
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'How Did It Start',
-                                      buttonText: historyTrackerModel!
-                                          .onsetAndCause!
-                                          .displayHowDidItStart
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Possible Cause',
-                                      buttonText: historyTrackerModel!
-                                          .onsetAndCause!
-                                          .possibleCause
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Investigations Done',
-                                      buttonText: historyTrackerModel!
-                                          .previousInvestigations!
-                                          .investigationsDone
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Display Analysis',
-                                      buttonText: historyTrackerModel!
-                                          .gaitAnalysis!
-                                          .displayAnalysis!
-                                          .toString(),
-                                    ),
-                                    _text(
-                                      firstText: 'Factors',
-                                      buttonText: historyTrackerModel!
-                                          .relievingFactors!
-                                          .factors
-                                          .toString(),
-                                    ),
+                                    painLocationModel != null
+                                        ? _text(
+                                            firstText: 'Pain Location',
+                                            secondText: painLocationModel!
+                                                .painLocation
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    previousInvestigationsModel != null
+                                        ? _text(
+                                            firstText: 'Investigations Done',
+                                            secondText:
+                                                previousInvestigationsModel!
+                                                    .investigationsDone
+                                                    .toString(),
+                                          )
+                                        : SizedBox(),
+                                    redFlagsModel != null
+                                        ? _text(
+                                            firstText: 'Red Flags',
+                                            buttonText: redFlagsModel!.flags
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    radiatingPainModel != null
+                                        ? _text(
+                                            firstText: 'Radiating Status',
+                                            buttonText: radiatingPainModel!
+                                                .displayRadiatingStatus
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    radiatingPainModel != null
+                                        ? _text(
+                                            firstText: 'Radiating Side',
+                                            buttonText: radiatingPainModel!
+                                                .displayRadiationSide
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    radiatingPainModel != null
+                                        ? _text(
+                                            firstText: 'Radiating Path',
+                                            buttonText: radiatingPainModel!
+                                                .radiationPath
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    functionalLimitationsModel != null
+                                        ? _text(
+                                            firstText: 'Limited Activities',
+                                            buttonText:
+                                                functionalLimitationsModel!
+                                                    .limitedActivities
+                                                    .toString(),
+                                          )
+                                        : SizedBox(),
+                                    onsetAndCauseModel != null
+                                        ? _text(
+                                            firstText: 'How Did It Start',
+                                            buttonText: onsetAndCauseModel!
+                                                .displayHowDidItStart
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    onsetAndCauseModel != null
+                                        ? _text(
+                                            firstText: 'Possible Cause',
+                                            buttonText: onsetAndCauseModel!
+                                                .possibleCause
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    previousInvestigationsModel != null
+                                        ? _text(
+                                            firstText: 'Investigations Done',
+                                            buttonText:
+                                                previousInvestigationsModel!
+                                                    .investigationsDone
+                                                    .toString(),
+                                          )
+                                        : SizedBox(),
+                                    gaitAnalysisModel != null
+                                        ? _text(
+                                            firstText: 'Display Analysis',
+                                            buttonText: gaitAnalysisModel!
+                                                .displayAnalysis
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
+                                    relievingFactorsModel != null
+                                        ? _text(
+                                            firstText: 'Factors',
+                                            buttonText: relievingFactorsModel!
+                                                .factors
+                                                .toString(),
+                                          )
+                                        : SizedBox(),
                                   ],
                                 ),
                               ),

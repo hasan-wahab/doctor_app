@@ -27,6 +27,7 @@ import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
 import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_bloc.dart';
 import 'package:doctor_app/screens/home/bloc/home_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
+import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/seesion/bloc/session_bloc.dart';
@@ -44,6 +45,11 @@ import 'data/local_storage/local_curd_base/local_curd_impl.dart';
 import 'repos/auth_repo/auth_repo_base.dart';
 
 Future<void> main() async {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint("FLUTTER ERROR:");
+    debugPrint(details.exceptionAsString());
+    debugPrint(details.stack.toString());
+  };
   runApp(const MyApp());
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
@@ -225,6 +231,9 @@ class _MyAppState extends State<MyApp> {
             allVisitLocalRepo: allVisitLocalRepo,
             allVisitRepo: allVisitRepo,
           ),
+        ),
+        BlocProvider(
+          create: (context) => NfcCardBloc(localRepo: patientLocalRepo),
         ),
       ],
       child: ScreenUtilInit(

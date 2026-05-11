@@ -19,8 +19,9 @@ class HistoryTrackerBloc
     HistoryTrackerEvent event,
     Emitter<HistoryTrackerState> emit,
   ) async {
-    try {
+   // try {
       emit(HistoryTrackerLoadingState());
+      print(event.visitId);
       if (event.token != '' && event.visitId != '') {
         historyTrackerModel = await historyTrackerRepoImpl.getHistoryTracker(
           token: event.token,
@@ -30,8 +31,8 @@ class HistoryTrackerBloc
       } else {
         throw AppExceptions(message: 'token or visitId is empty');
       }
-    } catch (err) {
-      emit(HistoryTrackerMessageState(message: err.toString()));
-    }
+    // } catch (err) {
+    //   emit(HistoryTrackerMessageState(message: err.toString()));
+    // }
   }
 }

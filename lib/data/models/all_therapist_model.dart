@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper
+// Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 List<String> _parseStringList(dynamic value) {
   if (value == null) return [];
@@ -17,6 +17,30 @@ String _safe(dynamic value) {
   if (value == null) return 'No data';
   final str = value.toString().trim();
   return str.isEmpty ? 'No data' : str;
+}
+
+// 🔥 KEY FIX: sessions can be [] (List) OR {} (Map) depending on patient
+// If List  → parse each item as TherapistSessionModel
+// If Map   → parse each map value as TherapistSessionModel
+// If null  → return []
+List<TherapistSessionModel> _parseSessions(dynamic value) {
+  if (value == null) return [];
+
+  if (value is List) {
+    return value
+        .whereType<Map<String, dynamic>>()
+        .map((e) => TherapistSessionModel.fromJson(e))
+        .toList();
+  }
+
+  if (value is Map) {
+    return value.values
+        .whereType<Map<String, dynamic>>()
+        .map((e) => TherapistSessionModel.fromJson(e))
+        .toList();
+  }
+
+  return [];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,7 +97,6 @@ class TherapistSessionModel {
     this.createdAt,
   });
 
-  // ── Safe display getters ──────────────────────────────────────────────────
   String get displaySessionId => sessionId?.toString() ?? 'No data';
   String get displaySessionNumber => sessionNumber?.toString() ?? 'No data';
   String get displayPackageUsed => _safe(packageUsed);
@@ -88,7 +111,7 @@ class TherapistSessionModel {
   bool get isScheduled =>
       nextSessionDate != null &&
       nextSessionDate!.trim().isNotEmpty &&
-      nextSessionDate!.toLowerCase() != 'not scheduled';
+      nextSessionDate!.toLowerCase() != 'no data';
 
   factory TherapistSessionModel.fromJson(Map<String, dynamic> json) {
     final List<ModalityModel> modalities =
@@ -147,7 +170,6 @@ class TherapistVisitSummaryModel {
     this.currentStage,
   });
 
-  // ── Safe display getters ──────────────────────────────────────────────────
   String get displayVisitId => visitId?.toString() ?? 'No data';
   String get displayVisitDate => _safe(visitDate);
   String get displayClinic => _safe(clinic);
@@ -205,20 +227,14 @@ class TherapistVisitGroupModel {
 
   TherapistVisitGroupModel({required this.sessions, this.summary});
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   bool get hasSessions => sessions.isNotEmpty;
   int get sessionCount => sessions.length;
   TherapistVisitSummaryModel? get visitSummary => summary?.visitSummary;
 
   factory TherapistVisitGroupModel.fromJson(Map<String, dynamic> json) {
-    final List<TherapistSessionModel> parsedSessions =
-        (json['sessions'] as List<dynamic>? ?? [])
-            .whereType<Map<String, dynamic>>()
-            .map((e) => TherapistSessionModel.fromJson(e))
-            .toList();
-
     return TherapistVisitGroupModel(
-      sessions: parsedSessions,
+      // 🔥 KEY FIX: _parseSessions handles both [] and {} safely
+      sessions: _parseSessions(json['sessions']),
       summary: json['summary'] != null
           ? TherapistSummaryModel.fromJson(
               json['summary'] as Map<String, dynamic>,
@@ -238,38 +254,48 @@ class TherapistVisitGroupModel {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6. AllTherapistModel — wraps the full list
+// 6. AllTherapistModel — wraps the full response
 // ─────────────────────────────────────────────────────────────────────────────
 class AllTherapistModel {
   final List<TherapistVisitGroupModel> visitGroups;
 
   AllTherapistModel({required this.visitGroups});
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   bool get isEmpty => visitGroups.isEmpty;
   int get totalGroups => visitGroups.length;
 
-  /// Flat list of all sessions across all visit groups
   List<TherapistSessionModel> get allSessions =>
       visitGroups.expand((g) => g.sessions).toList();
 
-  /// Total sessions count across all groups
   int get totalSessionCount => allSessions.length;
 
-  /// All completed visit groups
   List<TherapistVisitGroupModel> get completedVisits =>
       visitGroups.where((g) => g.visitSummary?.isCompleted == true).toList();
 
-  // ── fromJson — parses a JSON array ───────────────────────────────────────
-  factory AllTherapistModel.fromJson(List<dynamic> jsonList) {
-    final List<TherapistVisitGroupModel> parsed = jsonList
+  // 🔥 FIX: API returns { "total": 2, "visit_wise_sessions": [...] }
+  // So we read from 'visit_wise_sessions' key, not raw list
+  factory AllTherapistModel.fromJson(dynamic json) {
+    List<dynamic> list = [];
+
+    if (json is List) {
+      // fallback: if API ever returns plain list
+      list = json;
+    } else if (json is Map<String, dynamic>) {
+      // normal case: { "total": 2, "visit_wise_sessions": [...] }
+      final raw = json['visit_wise_sessions'];
+      if (raw is List) {
+        list = raw;
+      }
+    }
+
+    final parsed = list
         .whereType<Map<String, dynamic>>()
         .map((e) => TherapistVisitGroupModel.fromJson(e))
         .toList();
+
     return AllTherapistModel(visitGroups: parsed);
   }
 
-  // ── toJson — returns a JSON array ─────────────────────────────────────────
   List<Map<String, dynamic>> toJson() {
     return visitGroups.map((g) => g.toJson()).toList();
   }
@@ -278,46 +304,3 @@ class AllTherapistModel {
   String toString() =>
       'AllTherapistModel(totalGroups: $totalGroups, totalSessions: $totalSessionCount)';
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// USAGE EXAMPLE
-// ─────────────────────────────────────────────────────────────────────────────
-//
-//  import 'dart:convert';
-//
-//  final List<dynamic> rawList = jsonDecode(response.body);
-//  final AllTherapistModel allTherapist = AllTherapistModel.fromJson(rawList);
-//
-//  print(allTherapist.totalGroups);                       // 2
-//  print(allTherapist.totalSessionCount);                 // 2
-//  print(allTherapist.completedVisits.length);            // 2
-//
-//  final TherapistVisitGroupModel group = allTherapist.visitGroups[0];
-//  print(group.sessionCount);                             // 1
-//  print(group.visitSummary?.displayVisitId);             // "128"
-//  print(group.visitSummary?.displayClinic);              // "Clinic 1 Male"
-//  print(group.visitSummary?.displayVisitStatus);         // "No data" (was "")
-//  print(group.visitSummary?.isCompleted);                // true
-//
-//  final TherapistSessionModel session = group.sessions[0];
-//  print(session.displaySessionId);                       // "81"
-//  print(session.displayTherapist);                       // "DR ARSALAN JAMIL"
-//  print(session.displayActiveTime);                      // "3.45 mins"
-//  print(session.displaySessionDurationTotal);            // "00:03:27"
-//  print(session.displayNextSessionDate);                 // "Not scheduled"
-//  print(session.displayClinicalNotes);                   // "vjjghjghjh"
-//  print(session.hasModalities);                          // true
-//  print(session.isScheduled);                            // false
-//
-//  print(session.modalitiesPerformed.length);             // 4
-//  print(session.modalitiesPerformed[0].displayModality); // "GEN ELECTRO IFC"
-//  print(session.modalitiesPerformed[0].displayDuration); // "70m"
-//
-//  // empty modalities — no crash:
-//  final TherapistSessionModel session2 = allTherapist.visitGroups[1].sessions[0];
-//  print(session2.hasModalities);                         // false
-//  print(session2.modalitiesPerformed.length);            // 0
-//
-//  // Back to JSON:
-//  final List<Map<String, dynamic>> backToJson = allTherapist.toJson();
-// ─────────────────────────────────────────────────────────────────────────────
