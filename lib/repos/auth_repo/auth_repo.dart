@@ -90,51 +90,113 @@ class AuthRepoImpl implements AuthRepoBase {
     required String birthDate,
     required String gender,
   }) async {
-    if (file.path.isEmpty) return;
-    await api.multiPartPostApi(
-      token: token,
-      file: file,
-      url: ApiKeys.updateProfileImageKey,
-    );
-    var jsonResponse = await api.postApi(
-      url: ApiKeys.updateProfileKey,
-      token: token,
-      email: email,
-      cnic: cnic,
-      phone: phone,
-      name: name,
-    );
-    if (jsonResponse == null) {
-      throw AppExceptions(
-        message: 'Empty response from server Auth Api Repo',
-        debugMessage: 'jsonResponse is null',
+    if (file.path.isNotEmpty) {
+      await api.multiPartPostApi(
+        token: token,
+        file: file,
+        url: ApiKeys.updateProfileImageKey,
       );
-    }
-    if (jsonResponse != null) {
-      LoginModel1 profileData = await localRepo.getProfile();
-      if (jsonResponse['data'] != null &&
-          jsonResponse['data']['detail'] != null) {
-        var detail = jsonResponse['data']['detail'];
 
-        String? phone = detail['phone'];
-        String? email = detail['email'];
-        String? cnic = detail['cnic'];
-        String? name = detail['name'];
+      var jsonResponse = await api.postApi(
+        url: ApiKeys.updateProfileKey,
+        token: token,
+        email: email,
+        cnic: cnic,
+        phone: phone,
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+      );
+      print('d');
 
-        var patientInfo = profileData.patientData?.patientInfo;
+      if (jsonResponse == null) {
+        throw AppExceptions(
+          message: 'Empty response from server Auth Api Repo',
+          debugMessage: 'jsonResponse is null',
+        );
+      }
+      print('e');
 
-        if (patientInfo != null &&
-            phone != null &&
-            email != null &&
-            cnic != null &&
-            name != null) {
-          patientInfo.phone = phone;
-          patientInfo.email = email;
-          patientInfo.cnic = cnic;
-          patientInfo.name = name;
-          print(" ${"$name  $phone  $email  $cnic"}");
-          await localRepo.deleteProfile();
-          await localRepo.saveProfile(loginModel: profileData);
+      if (jsonResponse != null) {
+        LoginModel1 profileData = await localRepo.getProfile();
+        if (jsonResponse['data'] != null &&
+            jsonResponse['data']['detail'] != null) {
+          var detail = jsonResponse['data']['detail'];
+
+          String? phone = detail['phone'];
+          String? email = detail['email'];
+          String? cnic = detail['cnic'];
+          String? name = detail['name'];
+
+          var patientInfo = profileData.patientData?.patientInfo;
+
+          if (patientInfo != null &&
+              phone != null &&
+              email != null &&
+              cnic != null &&
+              name != null) {
+            patientInfo.phone = phone;
+            patientInfo.email = email;
+            patientInfo.cnic = cnic;
+            patientInfo.name = name;
+            print(" ${"$name  $phone  $email  $cnic"}");
+            print('f');
+
+            await localRepo.deleteProfile();
+            print('g');
+
+            await localRepo.saveProfile(loginModel: profileData);
+          }
+        }
+      }
+    } else {
+
+      var jsonResponse = await api.postApi(
+        url: ApiKeys.updateProfileKey,
+        token: token,
+        email: email,
+        cnic: cnic,
+        phone: phone,
+        name: name,
+        gender: gender,
+        birthDate: birthDate,
+      );
+
+      if (jsonResponse == null) {
+        throw AppExceptions(
+          message: 'Empty response from server Auth Api Repo',
+          debugMessage: 'jsonResponse is null',
+        );
+      }
+
+      if (jsonResponse != null) {
+        LoginModel1 profileData = await localRepo.getProfile();
+        if (jsonResponse['data'] != null &&
+            jsonResponse['data']['detail'] != null) {
+          var detail = jsonResponse['data']['detail'];
+
+          String? phone = detail['phone'];
+          String? email = detail['email'];
+          String? cnic = detail['cnic'];
+          String? name = detail['name'];
+
+          var patientInfo = profileData.patientData?.patientInfo;
+
+          if (patientInfo != null &&
+              phone != null &&
+              email != null &&
+              cnic != null &&
+              name != null) {
+            patientInfo.phone = phone;
+            patientInfo.email = email;
+            patientInfo.cnic = cnic;
+            patientInfo.name = name;
+            print(" ${"$name  $phone  $email  $cnic"}");
+
+            await localRepo.deleteProfile();
+
+            await localRepo.saveProfile(loginModel: profileData);
+          }
         }
       }
     }

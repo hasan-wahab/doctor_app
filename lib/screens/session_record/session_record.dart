@@ -130,6 +130,7 @@ class _SessionRecordState extends State<SessionRecord> {
                                   SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
+                                      spacing: 10.w,
                                       children: [
                                         ...List.generate(
                                           currentPatientData!

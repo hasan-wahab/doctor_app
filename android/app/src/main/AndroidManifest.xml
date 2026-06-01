@@ -4,11 +4,16 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
     <uses-permission android:name="android.permission.NFC"/>
     <uses-feature android:name="android.hardware.nfc.hce" android:required="true"/>
+    <!-- Android 13 aur below compatibility -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <application
         android:allowBackup="false"
-        android:label="Dr.Ali Therapy"
+        android:label="Dr. Ali Therapy"
         android:name="${applicationName}"
         android:icon="@mipmap/dr_ali_icon">
         <activity

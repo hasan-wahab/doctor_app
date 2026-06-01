@@ -7,20 +7,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 
+import '../profile_screens/widgets/profile_appbar.dart';
+
 class LocationScreen extends StatelessWidget {
   const LocationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: InkWell(
-          onTap: () => Navigator.pop(context),
-          child: Icon(Icons.arrow_back_ios_new),
-        ),
-        title: Text('Location'),
-        centerTitle: true,
-        backgroundColor: AppColors.bgColor,
+      appBar: ProfileAppbar(
+        title: 'Location',
+        isLeading: true,
+        leadingOnTap: Navigator.of(context).pop,
       ),
       backgroundColor: AppColors.bgColor,
       body: SafeArea(

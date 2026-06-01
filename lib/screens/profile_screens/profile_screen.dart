@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
@@ -111,7 +112,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       //    ?
                                                       Image.network(
                                                         fit: BoxFit.cover,
-                                                        currentPatientData!.patient!.displayImageUrl,
+                                                        currentPatientData!
+                                                            .patient!
+                                                            .displayImageUrl,
 
                                                         headers: {
                                                           "Authorization":
@@ -145,7 +148,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   CustomText(
-                                    text: currentPatientData!.patient!.user!.displayName
+                                    text: currentPatientData!
+                                        .patient!
+                                        .user!
+                                        .displayName
                                         .toString(),
                                     fontSize: 20,
                                   ),
@@ -158,188 +164,246 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               SizedBox(height: 40.h),
-                              Column(
-                                spacing: 20.h,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.myProfileScreen,
-                                      );
-                                    },
-                                    child: Card(
-                                      color: AppColors.secondaryColor,
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          AppRoutes.myProfileScreen,
+                                        );
+                                      },
+                                      child: Card(
+                                        color: AppColors.secondaryColor,
 
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10.r),
-                                        child: SizedBox(
-                                          height: 50.h,
-
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                spacing: 10.w,
-                                                children: [
-                                                  Icon(
-                                                    Icons.person,
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                  CustomText(
-                                                    text: 'My Profile',
-                                                  ),
-                                                ],
-                                              ),
-                                              Icon(
-                                                Icons
-                                                    .arrow_forward_ios_outlined,
-                                                size: 18.r,
-                                              ),
-                                            ],
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.r),
+                                          child: SizedBox(
+                                            // height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  spacing: 10.w,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.person,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    CustomText(
+                                                      text: 'My Profile',
+                                                    ),
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 18.r,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) =>
-                                              NfcCardPage(fromProfile: true),
-                                        ),
-                                      );
-                                    },
-                                    child: Card(
-                                      color: AppColors.secondaryColor,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10.r),
-                                        child: SizedBox(
-                                          height: 50.h,
-
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                spacing: 10.w,
-                                                children: [
-                                                  Icon(
-                                                    Icons.credit_card,
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                  CustomText(text: 'My Card'),
-                                                ],
-                                              ),
-                                              Icon(
-                                                Icons
-                                                    .arrow_forward_ios_outlined,
-                                                size: 18.r,
-                                              ),
-                                            ],
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) =>
+                                                NfcCardPage(fromProfile: true),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.r),
+                                          child: SizedBox(
+                                            // height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  spacing: 10.w,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.credit_card,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    CustomText(text: 'My Card'),
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 18.r,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.mapScreen,
-                                      );
-                                    },
-                                    child: Card(
-                                      color: AppColors.secondaryColor,
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          AppRoutes.mapScreen,
+                                        );
+                                      },
+                                      child: Card(
+                                        color: AppColors.secondaryColor,
 
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10.r),
-                                        child: SizedBox(
-                                          height: 50.h,
-
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                spacing: 10.w,
-                                                children: [
-                                                  Icon(
-                                                    Icons.location_on,
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                  CustomText(text: 'Location'),
-                                                ],
-                                              ),
-                                              Icon(
-                                                Icons
-                                                    .arrow_forward_ios_outlined,
-                                                size: 18.r,
-                                              ),
-                                            ],
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.r),
+                                          child: SizedBox(
+                                            // height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  spacing: 10.w,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.location_on,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    CustomText(
+                                                      text: 'Location',
+                                                    ),
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 18.r,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  InkWell(
-                                    onTap: () async {
-                                      AppMsg.showErrorMsg(
-                                        context,
-                                        msgTitle: 'Confirmation!',
-                                        msg:
-                                            'Are your sure you want to log out',
-                                        actionText: 'No',
-                                        actionText2: 'Yes',
-                                        action2: () async {
-                                          Navigator.pop(context);
-                                          context.read<NaveBarBloc>().add(
-                                            NaveBarLogoutEvent(),
+                                    InkWell(
+                                      onTap: () async {
+                                        final Uri url = Uri.parse(
+                                          'https://dralitherapy.com/privacy-policy/',
+                                        );
+
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(
+                                            url,
+                                            mode:
+                                                LaunchMode.externalApplication,
                                           );
-                                        },
-                                      );
-                                    },
-                                    child: Card(
-                                      color: AppColors.secondaryColor,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10.r),
-                                        child: SizedBox(
-                                          height: 50.h,
-
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                spacing: 10.w,
-                                                children: [
-                                                  Icon(
-                                                    Icons.logout,
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                  CustomText(text: 'Log Out'),
-                                                ],
-                                              ),
-                                              Icon(
-                                                Icons
-                                                    .arrow_forward_ios_outlined,
-                                                size: 18.r,
-                                              ),
-                                            ],
+                                        } else {
+                                          throw Exception(
+                                            'Could not launch $url',
+                                          );
+                                        }
+                                      },
+                                      child: Card(
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.r),
+                                          child: SizedBox(
+                                            // height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  spacing: 10.w,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.security,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    CustomText(
+                                                      text: 'Privacy Policy',
+                                                    ),
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 18.r,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    InkWell(
+                                      onTap: () async {
+                                        AppMsg.showErrorMsg(
+                                          context,
+                                          msgTitle: 'Confirmation!',
+                                          msg:
+                                              'Are your sure you want to log out',
+                                          actionText: 'No',
+                                          actionText2: 'Yes',
+                                          action2: () async {
+                                            Navigator.pop(context);
+                                            context.read<NaveBarBloc>().add(
+                                              NaveBarLogoutEvent(),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Card(
+                                        color: AppColors.secondaryColor,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.r),
+                                          child: SizedBox(
+                                            // height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  spacing: 10.w,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.logout,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                    CustomText(text: 'Log Out'),
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons
+                                                      .arrow_forward_ios_outlined,
+                                                  size: 18.r,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),

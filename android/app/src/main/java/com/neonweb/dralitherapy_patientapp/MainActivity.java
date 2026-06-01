@@ -1,6 +1,8 @@
-package com.hasan.doctor_app;
-
+package com.neonweb.dralitherapy_patientapp;
 import android.os.Bundle;
+
+import com.hce_flutter.MyHostApduService;
+
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;

@@ -35,7 +35,7 @@ class BaseApiImpl implements BaseApi {
               if (name != null) "name": name,
               if (cnic != null) "cnic": cnic,
               if (phone != null) "phone": phone,
-              if (birthDate != null) "birthDate": birthDate,
+              if (birthDate != null) "birth_date": birthDate,
               if (gender != null) "gender": gender,
             }),
             headers: {
@@ -45,7 +45,8 @@ class BaseApiImpl implements BaseApi {
             },
           )
           .timeout(const Duration(seconds: 10));
-
+      print("STATUS CODE => ${response.statusCode}");
+      print("BODY => ${response.body}");
       return responseHandle(response);
     } on SocketException {
       throw NoInternetException();

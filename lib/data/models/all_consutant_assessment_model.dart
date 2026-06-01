@@ -13,11 +13,9 @@ class AllConsultantAssessmentModel {
   final AdviceModel? advice;
 
   final Map<String, List<SpecialTest>> specialTests;
-
   // 🔥 FIX: dynamic because API sends [] OR {} depending on patient
   final List<dynamic> mmt;
   final List<MuscleAssessment> muscleAssessments;
-
   final GeneralTherapeuticPrescription? prescription;
   final List<String> selectedPackages;
 

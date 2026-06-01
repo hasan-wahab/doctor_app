@@ -87,11 +87,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         color: AppColors.primaryColor,
                       ),
                       SizedBox(height: 17.h),
-                      AppTField(
-                        hintText: 'Search here',
-                        icon: Icon(Icons.search),
-                        isIconsLeft: true,
-                      ),
+
                       currentPatientData != null
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -109,13 +105,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                       right: 15.w,
                                       top: 20.h,
                                     ),
-                  
+
                                     width: 360.w,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12.r),
                                       //  border: Border.all(color: AppColors.primaryColor, width: 2),
                                     ),
-                  
+
                                     child: Column(
                                       spacing: 10.h,
                                       mainAxisAlignment:
@@ -125,7 +121,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                           firstText: 'Invoice #',
                                           secondText: invoice.id.toString(),
                                         ),
-                  
+
                                         RowText(
                                           firstText: 'Date',
                                           secondText:
@@ -139,18 +135,20 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         ),
                                         RowText(
                                           firstText: 'Total amount',
-                                          secondText: invoice.amount!.toString(),
+                                          secondText: invoice.amount!
+                                              .toString(),
                                         ),
                                         RowText(
                                           firstText: 'Status',
                                           buttonText: invoice.status,
                                         ),
-                  
+
                                         isExpanded[index] == true
                                             ? Column(
                                                 children: [
                                                   Divider(
-                                                    color: AppColors.primaryColor,
+                                                    color:
+                                                        AppColors.primaryColor,
                                                   ),
                                                   Row(
                                                     children: [
@@ -190,8 +188,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                                           .amount
                                                                           .toString(),
                                                                     ) -
-                                                                  double.parse(  invoice
-                                                                      .displayAmount);
+                                                                    double.parse(
+                                                                      invoice
+                                                                          .displayAmount,
+                                                                    );
                                                                 return CustomText(
                                                                   text: double.parse(
                                                                     invoice
@@ -214,24 +214,24 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                                   .start,
                                                           children: [
                                                             CustomText(
-                                                              text:
-                                                                  remainingPayments
-                                                                      .toInt()
-                                                                      .toString(),
+                                                              text: remainingPayments
+                                                                  .toInt()
+                                                                  .toString(),
                                                             ),
                                                           ],
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                  
+
                                                   Divider(
-                                                    color: AppColors.primaryColor,
+                                                    color:
+                                                        AppColors.primaryColor,
                                                   ),
                                                 ],
                                               )
                                             : Container(),
-                  
+
                                         SizedBox(height: 5.h),
                                         invoice.status != 'paid'
                                             ? Row(
@@ -246,7 +246,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                       });
                                                     },
                                                     text:
-                                                        isExpanded[index] == true
+                                                        isExpanded[index] ==
+                                                            true
                                                         ? 'see less'
                                                         : 'see more',
                                                     width: 100,
@@ -254,7 +255,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                     isColor: false,
                                                     textSize: 12,
                                                     borderRadius:
-                                                        BorderRadius.circular(5),
+                                                        BorderRadius.circular(
+                                                          5,
+                                                        ),
                                                   ),
                                                 ],
                                               )
@@ -275,6 +278,4 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       },
     );
   }
-
-
 }

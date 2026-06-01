@@ -3,12 +3,15 @@ import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/visits_detail/bloc/visit_detail_bloc.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:doctor_app/widgets/feed_back_dilog.dart';
+import 'package:doctor_app/widgets/feedback_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
 import '../profile_screens/bloc/profile_bloc.dart';
@@ -91,7 +94,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                         allVisitsModel!.visits;
                                     return Container(
                                       margin: EdgeInsets.only(top: 10.h),
-                                      height: 178.h,
+
                                       width: 360.w,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(
@@ -150,6 +153,27 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                                     currentPatient[index]
                                                         .displayStatus,
                                               ),
+
+                                              // Divider(),
+                                              // FeedbackButton(
+                                              //   initStars: 1,
+                                              //   onTap: () {
+                                              //     GiveFeedbackDialog.show(
+                                              //       context,
+                                              //       subject: FeedbackSubject(
+                                              //         name:
+                                              //             currentPatient[index]
+                                              //                 .displayDoctor,
+                                              //         subtitle:
+                                              //             currentPatient[index]
+                                              //                 .displayDate,
+                                              //         subtitle2:
+                                              //             currentPatient[index]
+                                              //                 .displayType,
+                                              //       ),
+                                              //     );
+                                              //   },
+                                              // ),
                                             ],
                                           ),
                                         ),

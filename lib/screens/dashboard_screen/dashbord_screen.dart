@@ -22,6 +22,7 @@ import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:doctor_app/widgets/feed_back_dilog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -440,7 +441,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
                             runSpacing: 15.h,
                             direction: Axis.horizontal,
                             verticalDirection: VerticalDirection.down,
-
                             children: [
                               ...List.generate((screenNameList.length), (
                                 index,
@@ -454,8 +454,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                   currentPatientData!.therapySessions.length
                                       .toString(),
                                 ];
-                                final screenWidth =
-                                    MediaQuery.sizeOf(context).width / 2.2;
+                                final screenWidth = MediaQuery.sizeOf(
+                                  context,
+                                ).width;
                                 return InkWell(
                                   onTap: () async {
                                     Navigator.pushNamed(
@@ -468,7 +469,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                     margin: EdgeInsets.zero,
                                     child: Container(
                                       height: 58.h,
-                                      width: screenWidth,
+                                      width: index == 4
+                                          ? screenWidth
+                                          : screenWidth / 2.2,
 
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 10.w,

@@ -153,7 +153,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                   fontSize: 20,
                                 ),
                                 CustomText(
-                                  text: 'Patient ID: #MC-2025',
+                                  text: 'Patient ID : ${currentPatientData!.patient!.displayId}',
                                   color: AppColors.secondaryTextColor,
                                 ),
                               ],

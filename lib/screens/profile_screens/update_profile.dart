@@ -79,370 +79,387 @@ class _UpdateProfileState extends State<UpdateProfile> {
           backgroundColor: AppColors.bgColor,
           body: currentPatientModel != null && profileData != null
               ? isLoading != true
-                    ? SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 20.h,
-                          ),
-                          child: Column(
-                            spacing: 15.h,
-                            children: [
-                              Column(
-                                children: [
-                                  SizedBox(
-                                    height: 120.h,
-                                    width: 120.w,
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          height: 118.h,
-                                          width: 118.h,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: AppColors.primaryColor,
-                                              width: 2.h,
-                                            ),
-
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: isLoading == false
-                                              ? pickImage == null
-                                                    ? ClipOval(
-                                                        child: Image.network(
-                                                          fit: BoxFit.cover,
-                                                          currentPatientModel!
-                                                              .patient!
-                                                              .displayImageUrl
-                                                              .toString(),
-                                                          headers: {
-                                                            "Authorization":
-                                                                "Bearer ${profileData!.accessToken.toString()}",
-                                                          },
-                                                        ),
-                                                      )
-                                                    : ClipOval(
-                                                        child: Image.file(
-                                                          fit: BoxFit.cover,
-                                                          pickImage!,
-                                                        ),
-                                                      )
-                                              : Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    CircularProgressIndicator(
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                  ],
-                                                ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            pickImageFromUser();
-                                          },
-                                          child: Align(
-                                            alignment: Alignment.bottomRight,
-                                            child: Container(
-                                              height: 32.h,
-                                              width: 32.w,
-                                              decoration: BoxDecoration(
+                    ? SafeArea(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 20.h,
+                            ),
+                            child: Column(
+                              spacing: 15.h,
+                              children: [
+                                Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 120.h,
+                                      width: 120.w,
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            height: 118.h,
+                                            width: 118.h,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
                                                 color: AppColors.primaryColor,
-                                                shape: BoxShape.circle,
+                                                width: 2.h,
                                               ),
-                                              child: Icon(
-                                                Icons.camera_alt,
-                                                color: AppColors.whiteIconColor,
+
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: isLoading == false
+                                                ? pickImage == null
+                                                      ? ClipOval(
+                                                          child: Image.network(
+                                                            fit: BoxFit.cover,
+                                                            currentPatientModel!
+                                                                .patient!
+                                                                .displayImageUrl
+                                                                .toString(),
+                                                            headers: {
+                                                              "Authorization":
+                                                                  "Bearer ${profileData!.accessToken.toString()}",
+                                                            },
+                                                          ),
+                                                        )
+                                                      : ClipOval(
+                                                          child: Image.file(
+                                                            fit: BoxFit.cover,
+                                                            pickImage!,
+                                                          ),
+                                                        )
+                                                : Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      CircularProgressIndicator(
+                                                        color: AppColors
+                                                            .primaryColor,
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              pickImageFromUser();
+                                            },
+                                            child: Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: Container(
+                                                height: 32.h,
+                                                width: 32.w,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.primaryColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.camera_alt,
+                                                  color:
+                                                      AppColors.whiteIconColor,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  CustomText(
-                                    text: profileData!
-                                        .patientData!
-                                        .patientInfo!
-                                        .name
-                                        .toString(),
-                                    fontSize: 20,
-                                  ),
-                                  CustomText(
-                                    text: profileData!
-                                        .patientData!
-                                        .patientInfo!
-                                        .cardUid
-                                        .toString(),
-                                    color: AppColors.secondaryTextColor,
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: 'Name'),
-                                  Container(
-                                    height: 50.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.r),
-
-                                      border: Border.all(
-                                        color: AppColors.secondaryTextColor,
+                                        ],
                                       ),
                                     ),
-                                    child: TextFormField(
-                                      onChanged: (value) {
-                                        name = value;
-                                      },
-                                      initialValue: currentPatientModel!
-                                          .patient!
-                                          .displayName
-                                          .toString(),
-                                      //  controller: nameController,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: 'Phone'),
-                                  Container(
-                                    height: 50.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.r),
-
-                                      border: Border.all(
-                                        color: AppColors.secondaryTextColor,
-                                      ),
-                                    ),
-                                    child: TextFormField(
-                                      onChanged: (value) {
-                                        phone = value;
-                                      },
-                                      initialValue: currentPatientModel!
-                                          .patient!
-                                          .displayPhone
-                                          .toString(),
-
-                                      // controller: phoneController,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: 'DOB'),
-
-                                  InkWell(
-                                    onTap: () {
-                                      String dateStr = profileData!
+                                    CustomText(
+                                      text: profileData!
                                           .patientData!
                                           .patientInfo!
-                                          .birthDate
-                                          .toString();
-
-                                      // ✅ FIX: ISO parse
-                                      DateTime parsedDate = DateTime.parse(
-                                        dateStr,
-                                      );
-
-                                      showDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(1800),
-                                        lastDate: DateTime.now(),
-                                        initialDate: parsedDate,
-                                      ).then((pickedDate1) {
-                                        if (pickedDate1 != null) {
-                                          setState(() {
-                                            pickedData = pickedDate1;
-                                          });
-                                        }
-                                      });
-                                    },
-                                    child: Container(
-                                      alignment: Alignment.centerLeft,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                      ),
-                                      height: 50,
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey),
-                                      ),
-                                      child: Text(
-                                        pickedData != null
-                                            ? DateFormat(
-                                                "MM/dd/yyyy",
-                                              ).format(pickedData!)
-                                            : profileData
-                                                      ?.patientData
-                                                      ?.patientInfo
-                                                      ?.birthDate !=
-                                                  null
-                                            ? DateFormat("MM/dd/yyyy").format(
-                                                DateTime.parse(
-                                                  profileData!
-                                                      .patientData!
-                                                      .patientInfo!
-                                                      .birthDate,
-                                                ),
-                                              )
-                                            : 'No data',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: 'Gender'),
-                                  Container(
-                                    width: MediaQuery.sizeOf(context).width,
-                                    height: 50.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      border: Border.all(
-                                        color: AppColors.secondaryTextColor,
-                                      ),
-                                    ),
-                                    child: DropdownButton(
-                                      value: gender,
-                                      underline: SizedBox(),
-                                      padding: EdgeInsets.all(5.r),
-                                      isExpanded: true,
-                                      items: [
-                                        DropdownMenuItem(
-                                          value: 'Male',
-                                          child: CustomText(text: 'Male'),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: 'Female',
-                                          child: CustomText(text: 'Female'),
-                                        ),
-                                      ],
-                                      onChanged: (value) {
-                                        gender = value;
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CustomText(text: 'Email'),
-                                  Container(
-                                    height: 50.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.r),
-
-                                      border: Border.all(
-                                        color: AppColors.secondaryTextColor,
-                                      ),
-                                    ),
-                                    child: TextFormField(
-                                      onChanged: (value) {
-                                        email = value;
-                                      },
-                                      initialValue: currentPatientModel!
-                                          .patient!
-                                          .displayEmail
+                                          .name
                                           .toString(),
-                                      //    controller: emailController,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                          ),
+                                      fontSize: 20,
+                                    ),
+                                    CustomText(
+                                      text:
+                                          'Patient ID : ${currentPatientModel!.patient!.displayId}',
+                                      color: AppColors.secondaryTextColor,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(text: 'Name'),
+                                    Container(
+                                      height: 50.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
                                         ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.r,
+
+                                        border: Border.all(
+                                          color: AppColors.secondaryTextColor,
+                                        ),
+                                      ),
+                                      child: TextFormField(
+                                        onChanged: (value) {
+                                          name = value;
+                                        },
+                                        initialValue: currentPatientModel!
+                                            .patient!
+                                            .displayName
+                                            .toString(),
+                                        //  controller: nameController,
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
                                           ),
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20.h),
-                              AppButton(
-                                text: 'Update',
-                                onTap: () async {
-                                  isLoading = true;
-                                  if (name != null &&
-                                      email != null &&
-                                      cnic != null &&
-                                      phone != null &&
-                                      birthDate != null) {
-                                    context.read<ProfileBloc>().add(
-                                      UpdateProfileEvent(
-                                        path: pickImage,
-                                        name: name!,
-                                        email: email!,
-                                        cnic: cnic!,
-                                        phone: phone!,
-                                        birthDate: birthDate!,
-                                        gender: gender!,
+                                  ],
+                                ),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(text: 'Phone'),
+                                    Container(
+                                      height: 50.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
+
+                                        border: Border.all(
+                                          color: AppColors.secondaryTextColor,
+                                        ),
                                       ),
-                                    );
-                                  } else {
-                                    print('No trigerred');
-                                  }
-                                },
-                              ),
-                            ],
+                                      child: TextFormField(
+                                        onChanged: (value) {
+                                          phone = value;
+                                        },
+                                        initialValue: currentPatientModel!
+                                            .patient!
+                                            .displayPhone
+                                            .toString(),
+
+                                        // controller: phoneController,
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(text: 'DOB'),
+
+                                    InkWell(
+                                      onTap: () {
+                                        String dateStr = profileData!
+                                            .patientData!
+                                            .patientInfo!
+                                            .birthDate
+                                            .toString();
+
+                                        // ✅ FIX: ISO parse
+                                        DateTime parsedDate = DateTime.parse(
+                                          dateStr,
+                                        );
+
+                                        showDatePicker(
+                                          context: context,
+                                          firstDate: DateTime(1800),
+                                          lastDate: DateTime.now(),
+                                          initialDate: parsedDate,
+                                        ).then((pickedDate1) {
+                                          if (pickedDate1 != null) {
+                                            setState(() {
+                                              pickedData = pickedDate1;
+                                            });
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.centerLeft,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        height: 50,
+                                        width: MediaQuery.of(
+                                          context,
+                                        ).size.width,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          pickedData != null
+                                              ? DateFormat(
+                                                  "MM/dd/yyyy",
+                                                ).format(pickedData!)
+                                              : profileData
+                                                        ?.patientData
+                                                        ?.patientInfo
+                                                        ?.birthDate !=
+                                                    null
+                                              ? DateFormat("MM/dd/yyyy").format(
+                                                  DateTime.parse(
+                                                    profileData!
+                                                        .patientData!
+                                                        .patientInfo!
+                                                        .birthDate,
+                                                  ),
+                                                )
+                                              : 'No data',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(text: 'Gender'),
+                                    Container(
+                                      width: MediaQuery.sizeOf(context).width,
+                                      height: 50.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
+                                        border: Border.all(
+                                          color: AppColors.secondaryTextColor,
+                                        ),
+                                      ),
+                                      child: DropdownButton(
+                                        value: gender,
+                                        underline: SizedBox(),
+                                        padding: EdgeInsets.all(5.r),
+                                        isExpanded: true,
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: 'Male',
+                                            child: CustomText(text: 'Male'),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: 'Female',
+                                            child: CustomText(text: 'Female'),
+                                          ),
+                                        ],
+                                        onChanged: (value) {
+                                          gender = value;
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(text: 'Email'),
+                                    Container(
+                                      height: 50.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          8.r,
+                                        ),
+
+                                        border: Border.all(
+                                          color: AppColors.secondaryTextColor,
+                                        ),
+                                      ),
+                                      child: TextFormField(
+                                        onChanged: (value) {
+                                          email = value;
+                                        },
+                                        initialValue: currentPatientModel!
+                                            .patient!
+                                            .displayEmail
+                                            .toString(),
+                                        //    controller: emailController,
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.transparent,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 20.h),
+                                AppButton(
+                                  text: 'Update',
+                                  onTap: () async {
+                                    isLoading = true;
+                                    if (name != null &&
+                                        email != null &&
+                                        cnic != null &&
+                                        phone != null &&
+                                        birthDate != null) {
+                                      context.read<ProfileBloc>().add(
+                                        UpdateProfileEvent(
+                                          path: pickImage,
+                                          name: name!,
+                                          email: email!,
+                                          cnic: cnic!,
+                                          phone: phone!,
+                                          birthDate: birthDate!,
+                                          gender: gender!,
+                                        ),
+                                      );
+                                    } else {
+                                      if (kDebugMode) {
+                                        print('No triggered');
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )

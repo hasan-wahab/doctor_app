@@ -6,4 +6,5 @@ class BaseExceptions implements Exception {
 
   @override
   String toString() => message;
+
 }

@@ -523,7 +523,7 @@ class _NfcCardPageState extends State<NfcCardPage> {
                   children: [
                     /// CARD
                     Container(
-                      height: 212.h,
+                      height: 220.h,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.r),
                         color: Color(0xFF167FC9),
@@ -537,7 +537,7 @@ class _NfcCardPageState extends State<NfcCardPage> {
                               horizontal: 16.w,
                               vertical: 12.h,
                             ),
-                            height: 69.h,
+                            height: 72.h,
                             decoration: BoxDecoration(
                               color: Color(0xFF167FC9),
                               borderRadius: BorderRadius.only(
@@ -848,7 +848,7 @@ class _NfcCardPageState extends State<NfcCardPage> {
                               horizontal: 16.w,
                               vertical: 6.h,
                             ),
-                            height: 35.h,
+                            height: 38.h,
                             decoration: BoxDecoration(
                               color: Color(0xFF167FC9),
                               borderRadius: BorderRadius.only(
