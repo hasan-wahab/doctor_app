@@ -445,8 +445,10 @@ import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_event.dart';
 import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_state.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show AppBar, AssetImage, Border, BorderRadius, BorderSide, BoxDecoration, BoxFit, BuildContext, Center, Color, Colors, Column, Container, CrossAxisAlignment, DecorationImage, EdgeInsets, Expanded, FontWeight, Icon, IconButton, Icons, Image, ListView, MainAxisAlignment, Navigator, Radius, Row, Scaffold, SizedBox, State, StatefulWidget, TargetPlatform, Text, TextStyle, Widget, WillPopScope, debugPrint;
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -464,6 +466,22 @@ class NfcCardPage extends StatefulWidget {
 class _NfcCardPageState extends State<NfcCardPage> {
   PatientModel? patientModel;
   bool isLoading = false;
+
+  static const MethodChannel _hceChannel = MethodChannel('hce.channel');
+
+  /// Android [MainActivity] par `setData` — [MyHostApduService.virtualData] update hota hai.
+  Future<void> _pushCardUidToHce(String cardUid) async {
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    if (cardUid.isEmpty) return;
+    try {
+      await _hceChannel.invokeMethod<bool>('setData', <String, dynamic>{
+        'data': cardUid,
+      });
+    } catch (e, st) {
+      debugPrint('HCE setData failed: $e\n$st');
+    }
+  }
+
   @override
   void initState() {
     context.read<NfcCardBloc>().add(NfcCardEvent());
@@ -491,6 +509,10 @@ class _NfcCardPageState extends State<NfcCardPage> {
           }
           if (state is NfcCardDataState) {
             patientModel = state.patientModel;
+            final uid = patientModel?.cardUid;
+            if (uid != null && uid.isNotEmpty) {
+              _pushCardUidToHce(uid);
+            }
           }
         },
         builder: (context, state) {

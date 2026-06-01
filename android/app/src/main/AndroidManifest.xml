@@ -46,7 +46,7 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDRBRBNInrOt9pKz-ANgHZXh7PupAv2KHQ"/>
         <service
-            android:name=".MyHostApduService"
+            android:name="com.hce_flutter.MyHostApduService"
             android:exported="true"
             android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.neonweb.dralitherapy_patientapp;
+package com.hce_flutter;
 
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
@@ -20,4 +20,23 @@ public class MyHostApduService extends HostApduService {
         byte[] response = new byte[dataBytes.length + 2];
         System.arraycopy(dataBytes, 0, response, 0, dataBytes.length);
         response[response.length - 2] = (byte) 0x90;
-        response[response.leng
+        response[response.length - 1] = (byte) 0x00;
+
+        return response;
+    }
+
+    @Override
+    public void onDeactivated(int reason) {
+        Log.d("HCE", "HCE Deactivated: " + reason);
+    }
+
+    // Helper function
+    private String bytesToHex(byte[] bytes) {
+        if (bytes == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
+        }
+        return sb.toString();
+    }
+}
