@@ -258,8 +258,7 @@ class _SessionRecordState extends State<SessionRecord> {
                                                           CustomText(
                                                             text:
                                                                 currentPatientData!
-                                                                    .patient!
-                                                                    .packages
+                                                                    .therapySessions
                                                                     .isNotEmpty
                                                                 ? DateAndTimeFormater.dateFormat(
                                                                     currentPatientData!
@@ -342,7 +341,6 @@ class _SessionRecordState extends State<SessionRecord> {
                                                         color: AppColors
                                                             .firstTextBlackColor,
                                                       ),
-
                                                       const CustomText(
                                                         text: 'Physiotherapist',
                                                         fontSize: 12,

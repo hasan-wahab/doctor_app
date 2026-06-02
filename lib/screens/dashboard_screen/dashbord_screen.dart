@@ -610,22 +610,21 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                           text: 'Next Session Date',
                                           fontSize: 15,
                                         ),
-                                        CustomText(
-                                          text:
-                                              currentPatientData!
-                                                  .therapySessions[index]
-                                                  .displayNextSessionDate!
-                                                  .isNotEmpty
-                                              ? DateAndTimeFormater.dateFormat(
+                                        currentPatientData!
+                                                .therapySessions
+                                                .isNotEmpty
+                                            ? CustomText(
+                                                text: DateAndTimeFormater.dateFormat(
                                                   // currentPatientData!
                                                   currentPatientData!
                                                       .therapySessions[index]
                                                       .displayNextSessionDate
                                                       .toString(),
-                                                )
-                                              : 'No data',
-                                          fontSize: 12,
-                                        ),
+                                                ),
+
+                                                fontSize: 12,
+                                              )
+                                            : Container(),
                                       ],
                                     ),
                                   ],

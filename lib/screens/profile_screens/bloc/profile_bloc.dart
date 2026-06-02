@@ -41,6 +41,7 @@ class ProfileBloc extends Bloc<ProfileEvents, ProfileState> {
     }
     if (patientData != null && profileData != null) {
       List<VisitModel> visits = List.from(patientData!.patient!.visits);
+      print(visits.length);
       var therapySessions = List.from(patientData!.therapySessions);
 
       visits.sort((a, b) => a.displayVisitAt!.compareTo(b.displayVisitAt));
