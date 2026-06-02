@@ -3,7 +3,8 @@ package com.hce_flutter;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
 import android.util.Log;
-import java.nio.charset.StandardCharsets;
+
+import java.io.UnsupportedEncodingException;
 
 public class MyHostApduService extends HostApduService {
 
@@ -13,8 +14,14 @@ public class MyHostApduService extends HostApduService {
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
         Log.d("HCE", "Received APDU: " + bytesToHex(commandApdu));
 
-        // Convert virtualData to bytes
-        byte[] dataBytes = virtualData.getBytes(StandardCharsets.UTF_8);
+        // UTF-8: getBytes(String) works on all API levels Android supports (StandardCharsets overload is API 19+).
+        byte[] dataBytes;
+        try {
+            dataBytes = virtualData.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Single-arg AssertionError — compatible with all API levels for IDE checks.
+            throw new AssertionError(e);
+        }
 
         // Append SW1 SW2 = 0x90 0x00 (success)
         byte[] response = new byte[dataBytes.length + 2];
