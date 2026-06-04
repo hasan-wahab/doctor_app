@@ -249,8 +249,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                               allTherapistModel!.totalSessionCount,
                               (index) {
                                 TherapistVisitGroupModel completedVisitsModel =
-                                    allTherapistModel!.completedVisits[0];
-                               print(completedVisitsModel.sessionCount);
+                                    allTherapistModel!.completedVisits[index];
+                                print(completedVisitsModel.sessionCount);
                                 return Card(
                                   color: AppColors.secondaryColor,
                                   margin: EdgeInsets.only(top: 15.h),
@@ -330,11 +330,14 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                         ),
                                         RowText(
                                           firstText: 'Next session date',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displayNextSessionDate,
+                                          secondText:
+                                              DateAndTimeFormater.dateFormat(
+                                                allTherapistModel!
+                                                    .allSessions[index]
+                                                    .displayNextSessionDate,
+                                              ),
                                         ),
-                                       // Complete visit model
+                                        // Complete visit model
                                         RowText(
                                           firstText: 'Visit Status',
                                           secondText: completedVisitsModel
@@ -355,9 +358,12 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                         ),
                                         RowText(
                                           firstText: 'Visit Date',
-                                          secondText: completedVisitsModel
-                                              .visitSummary!
-                                              .displayVisitDate,
+                                          secondText:
+                                              DateAndTimeFormater.dateFormat(
+                                                completedVisitsModel
+                                                    .visitSummary!
+                                                    .displayVisitDate,
+                                              ),
                                         ),
                                         RowText(
                                           firstText: 'Visit Id',

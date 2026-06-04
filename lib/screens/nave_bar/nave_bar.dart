@@ -81,46 +81,48 @@ class _NaveBarState extends State<NaveBar> {
                   padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
                   height: Platform.isIOS ? 701.h : 100.h,
                   color: AppColors.secondaryColor,
-                  child: SafeArea(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List.generate((iconText.length), (index) {
-                        return InkWell(
-                          onTap: () {
-                            if (token == '') {
-                              context.read<NaveBarBloc>().add(
-                                NaveBarIndexEvent(
-                                  index: index == 0 ? index : 3,
-                                ),
-                              );
-                            } else {
-                              context.read<NaveBarBloc>().add(
-                                NaveBarIndexEvent(index: index),
-                              );
-                            }
-                          },
+                  child: SingleChildScrollView(
+                    child: SafeArea(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate((iconText.length), (index) {
+                          return InkWell(
+                            onTap: () {
+                              if (token == '') {
+                                context.read<NaveBarBloc>().add(
+                                  NaveBarIndexEvent(
+                                    index: index == 0 ? index : 3,
+                                  ),
+                                );
+                              } else {
+                                context.read<NaveBarBloc>().add(
+                                  NaveBarIndexEvent(index: index),
+                                );
+                              }
+                            },
 
-                          child: Column(
-                            children: [
-                              Icon(
-                                icons[index],
-                                color: currentIndex == index
-                                    ? AppColors.primaryColor
-                                    : AppColors.blackIconColor,
-                              ),
-                              CustomText(
-                                text: iconText[index],
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: currentIndex == index
-                                    ? AppColors.primaryColor
-                                    : AppColors.blackIconColor,
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  icons[index],
+                                  color: currentIndex == index
+                                      ? AppColors.primaryColor
+                                      : AppColors.blackIconColor,
+                                ),
+                                CustomText(
+                                  text: iconText[index],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: currentIndex == index
+                                      ? AppColors.primaryColor
+                                      : AppColors.blackIconColor,
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
                     ),
                   ),
                 ),
