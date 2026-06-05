@@ -2,7 +2,6 @@ import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/core/app_keys/api_keys.dart';
 import 'package:doctor_app/data/api_service/base_api/base_api.dart';
 import 'package:doctor_app/data/models/all_packages_model.dart';
-import 'package:doctor_app/data/models/all_therapist_model.dart';
 import 'package:doctor_app/repos/all_packages_repo/all_packages_local_repo.dart';
 import 'package:flutter/foundation.dart';
 

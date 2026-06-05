@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:doctor_app/core/app_exceptions/app_exceptions.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
 import 'package:doctor_app/data/models/all_therapist_model.dart';
 import 'package:flutter/foundation.dart';

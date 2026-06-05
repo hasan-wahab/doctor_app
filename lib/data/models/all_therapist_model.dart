@@ -19,6 +19,13 @@ String _safe(dynamic value) {
   return str.isEmpty ? 'No data' : str;
 }
 
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
+}
+
 // 🔥 KEY FIX: sessions can be [] (List) OR {} (Map) depending on patient
 // If List  → parse each item as TherapistSessionModel
 // If Map   → parse each map value as TherapistSessionModel
@@ -121,8 +128,8 @@ class TherapistSessionModel {
             .toList();
 
     return TherapistSessionModel(
-      sessionId: json['Session ID'] as int?,
-      sessionNumber: json['Session Number'] as int?,
+      sessionId: _parseInt(json['Session ID']),
+      sessionNumber: _parseInt(json['Session Number']),
       packageUsed: json['Package Used'] as String?,
       therapist: json['Therapist'] as String?,
       activeTime: json['Active Time'] as String?,
@@ -180,7 +187,7 @@ class TherapistVisitSummaryModel {
 
   factory TherapistVisitSummaryModel.fromJson(Map<String, dynamic> json) {
     return TherapistVisitSummaryModel(
-      visitId: json['Visit ID'] as int?,
+      visitId: _parseInt(json['Visit ID']),
       visitDate: json['Visit Date'] as String?,
       clinic: json['Clinic'] as String?,
       visitStatus: json['Visit Status'] as String?,
@@ -254,12 +261,48 @@ class TherapistVisitGroupModel {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6. AllTherapistModel — wraps the full response
+// 6. Optional API metadata: type_hints
+// ─────────────────────────────────────────────────────────────────────────────
+class AllTherapistTypeHintsModel {
+  final List<String> arrays;
+  final List<String> strings;
+  final List<String> integers;
+
+  AllTherapistTypeHintsModel({
+    required this.arrays,
+    required this.strings,
+    required this.integers,
+  });
+
+  factory AllTherapistTypeHintsModel.fromJson(Map<String, dynamic> json) {
+    return AllTherapistTypeHintsModel(
+      arrays: _parseStringList(json['Arrays']),
+      strings: _parseStringList(json['Strings']),
+      integers: _parseStringList(json['Integers']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Arrays': arrays,
+    'Strings': strings,
+    'Integers': integers,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. AllTherapistModel — wraps the full response
 // ─────────────────────────────────────────────────────────────────────────────
 class AllTherapistModel {
+  /// Server-reported total (e.g. visit count); may differ from [visitGroups].length.
+  final int? total;
   final List<TherapistVisitGroupModel> visitGroups;
+  final AllTherapistTypeHintsModel? typeHints;
 
-  AllTherapistModel({required this.visitGroups});
+  AllTherapistModel({
+    required this.visitGroups,
+    this.total,
+    this.typeHints,
+  });
 
   bool get isEmpty => visitGroups.isEmpty;
   int get totalGroups => visitGroups.length;
@@ -272,16 +315,21 @@ class AllTherapistModel {
   List<TherapistVisitGroupModel> get completedVisits =>
       visitGroups.where((g) => g.visitSummary?.isCompleted == true).toList();
 
-  // 🔥 FIX: API returns { "total": 2, "visit_wise_sessions": [...] }
-  // So we read from 'visit_wise_sessions' key, not raw list
+  /// Full envelope: `{ "total", "visit_wise_sessions", "type_hints" }`,
+  /// or a bare list (legacy cache / old API).
   factory AllTherapistModel.fromJson(dynamic json) {
+    int? totalVal;
+    AllTherapistTypeHintsModel? hintsVal;
     List<dynamic> list = [];
 
     if (json is List) {
-      // fallback: if API ever returns plain list
       list = json;
     } else if (json is Map<String, dynamic>) {
-      // normal case: { "total": 2, "visit_wise_sessions": [...] }
+      totalVal = _parseInt(json['total']);
+      final hintsRaw = json['type_hints'];
+      if (hintsRaw is Map<String, dynamic>) {
+        hintsVal = AllTherapistTypeHintsModel.fromJson(hintsRaw);
+      }
       final raw = json['visit_wise_sessions'];
       if (raw is List) {
         list = raw;
@@ -293,14 +341,24 @@ class AllTherapistModel {
         .map((e) => TherapistVisitGroupModel.fromJson(e))
         .toList();
 
-    return AllTherapistModel(visitGroups: parsed);
+    return AllTherapistModel(
+      visitGroups: parsed,
+      total: totalVal,
+      typeHints: hintsVal,
+    );
   }
 
-  List<Map<String, dynamic>> toJson() {
-    return visitGroups.map((g) => g.toJson()).toList();
+  /// Persists full API shape for local cache round-trip.
+  Map<String, dynamic> toJson() {
+    return {
+      if (total != null) 'total': total,
+      'visit_wise_sessions': visitGroups.map((g) => g.toJson()).toList(),
+      if (typeHints != null) 'type_hints': typeHints!.toJson(),
+    };
   }
 
   @override
   String toString() =>
-      'AllTherapistModel(totalGroups: $totalGroups, totalSessions: $totalSessionCount)';
+      'AllTherapistModel(total: $total, totalGroups: $totalGroups, '
+      'totalSessions: $totalSessionCount)';
 }

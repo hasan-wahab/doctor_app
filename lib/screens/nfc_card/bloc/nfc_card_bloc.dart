@@ -41,7 +41,7 @@ class NfcCardBloc extends Bloc<NfcCardEvent, NfcCardState> {
             emit(NfcMessageState(message: 'NFC is not available'));
           }
         } on PlatformException catch (e) {
-         // print(e.message);
+          // print(e.message);
           emit(NfcMessageState(message: e.message.toString()));
         } catch (e, st) {
           debugPrint('HCE setData failed: $e\n$st');

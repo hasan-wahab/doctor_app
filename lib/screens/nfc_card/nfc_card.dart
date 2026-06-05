@@ -496,7 +496,6 @@ class _NfcCardPageState extends State<NfcCardPage> {
           if (state is NfcMessageState) {
             message = state.message.toString();
             AppMsg.showSnackBar(context, message: state.message.toString());
-            print(message);
           }
           if (state is NfcCardDataState) {
             patientModel = state.patientModel;
@@ -580,7 +579,7 @@ class _NfcCardPageState extends State<NfcCardPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       CustomText(
-                                        text: 'DR. ALI THARAPY',
+                                        text: 'DR. ALI THERAPY',
                                         style: TextStyle(
                                           color: AppColors.textWhiteColor,
                                           fontSize: 14.sp,

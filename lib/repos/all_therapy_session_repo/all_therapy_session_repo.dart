@@ -24,9 +24,12 @@ class AllTherapySessionRepo {
       if (kDebugMode) {
         print('From $jsonResponse');
       }
-      model = AllTherapistModel.fromJson(
-        jsonResponse['data']['visit_wise_sessions'],
-      );
+      final dynamic visitWiseSessions =
+          jsonResponse['data']?['visit_wise_sessions'];
+      if (visitWiseSessions == null) {
+        throw AppExceptions(message: 'Json response data is null');
+      }
+      model = AllTherapistModel.fromJson(visitWiseSessions);
       await localRepo.deleteAllTherapySession();
       await localRepo.saveAllTherapySession(model: model);
 
