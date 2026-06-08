@@ -24,6 +24,6 @@ class SessionLoadedFromRecordsState extends TherapySessionState {
 class SessionFromHomeLoaded extends TherapySessionState {
   CurrentPatientModel? patientData;
   LoginModel1? profileData;
-  AllTherapistModel? allTherapistModel;
+  AllTerapistModle? allTherapistModel;
   SessionFromHomeLoaded({this.patientData, this.profileData,this.allTherapistModel});
 }

@@ -333,14 +333,19 @@ class _SessionRecordState extends State<SessionRecord> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      CustomText(
-                                                        text: visits[index]
-                                                            .therapist!
-                                                            .displayName,
-                                                        fontSize: 20,
-                                                        color: AppColors
-                                                            .firstTextBlackColor,
-                                                      ),
+                                                      visits[index].therapist !=
+                                                              null
+                                                          ? CustomText(
+                                                              text: visits[index]
+                                                                  .therapist!
+                                                                  .displayName,
+                                                              fontSize: 20,
+                                                              color: AppColors
+                                                                  .firstTextBlackColor,
+                                                            )
+                                                          : CustomText(
+                                                              text: 'No Data',
+                                                            ),
                                                       const CustomText(
                                                         text: 'Physiotherapist',
                                                         fontSize: 12,

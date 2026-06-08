@@ -10,7 +10,7 @@ class AllTherapySessionLocalRepo {
   LocalCurdBase localCurdBase;
   AllTherapySessionLocalRepo({required this.localCurdBase});
 
-  Future saveAllTherapySession({required AllTherapistModel model}) async {
+  Future saveAllTherapySession({required AllTerapistModle model}) async {
     await localCurdBase.saveData(
       tableName: TableName.allTherapistSession,
       key: LocalKeys.allTherapistSessionKey,
@@ -18,7 +18,7 @@ class AllTherapySessionLocalRepo {
     );
   }
 
-  Future<AllTherapistModel> getAllTherapySession() async {
+  Future<AllTerapistModle> getAllTherapySession() async {
     var result = await localCurdBase.getData(
       tableName: TableName.allTherapistSession,
     );
@@ -27,7 +27,7 @@ class AllTherapySessionLocalRepo {
       if (kDebugMode) {
         print(' No local therapist data found');
       }
-      return AllTherapistModel(visitGroups: []);
+      return AllTerapistModle(total: 0,typeHints: TypeHints(),visitWiseSessions: []);
     }
     var allTherapySessionJsonString =
         result.first[LocalKeys.allTherapistSessionKey];
@@ -35,9 +35,9 @@ class AllTherapySessionLocalRepo {
       if (kDebugMode) {
         print('All Therapist Key is null');
       }
-      return AllTherapistModel(visitGroups: []);
+      return AllTerapistModle(total: 0,typeHints: TypeHints(),visitWiseSessions: []);
     }
-    AllTherapistModel model = AllTherapistModel.fromJson(
+    AllTerapistModle model = AllTerapistModle.fromJson(
       jsonDecode(allTherapySessionJsonString as String),
     );
     return model;

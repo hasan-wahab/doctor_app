@@ -41,7 +41,7 @@ class TherapySessionBloc
   TherapySessionsResponseModel? therapySessionsResponseModel;
   CurrentPatientModel? patientData;
   LoginModel1? profileData;
-  AllTherapistModel? allTherapistModel;
+  AllTerapistModle? allTherapistModel;
   FutureOr _onAllTherapySessionEvent(
     TherapySessionEvent event,
     Emitter<TherapySessionState> emit,
@@ -80,7 +80,7 @@ class TherapySessionBloc
               .getAllTherapySession();
 
           if (allTherapistModel != null &&
-              allTherapistModel!.visitGroups.isNotEmpty) {
+              allTherapistModel!.visitWiseSessions!.isNotEmpty) {
             print('From Local All Thrapist');
             allTherapistModel = await allTherapySessionLocalRepo
                 .getAllTherapySession();
