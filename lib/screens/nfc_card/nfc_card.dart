@@ -437,6 +437,7 @@
 // // }
 //
 
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:doctor_app/core/app_exceptions/base_exceptions.dart';
 import 'package:doctor_app/data/models/current_patient_model.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
@@ -465,15 +466,23 @@ class NfcCardPage extends StatefulWidget {
   State<NfcCardPage> createState() => _NfcCardPageState();
 }
 
-class _NfcCardPageState extends State<NfcCardPage> {
+class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
   PatientModel? patientModel;
   bool isLoading = false;
   bool isNfcOn = false;
   String message = '';
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<NfcCardBloc>().add(NfcCardEvent());
+    }
+  }
+
+  @override
   void initState() {
     context.read<NfcCardBloc>().add(NfcCardEvent());
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
@@ -489,19 +498,21 @@ class _NfcCardPageState extends State<NfcCardPage> {
         return false;
       },
       child: BlocConsumer<NfcCardBloc, NfcCardState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is NfcLoadingState) {
             isLoading = true;
           }
           if (state is NfcMessageState) {
             message = state.message.toString();
-            AppMsg.showSnackBar(context, message: state.message.toString());
+
+            AppMsg.showSnackBar(context, message: message);
             print(message);
           }
           if (state is NfcCardDataState) {
             patientModel = state.patientModel;
             final uid = patientModel?.cardUid;
             if (uid != null && uid.isNotEmpty) {}
+            isNfcOn = await NfcManager.instance.isAvailable();
           }
         },
         builder: (context, state) {
@@ -941,16 +952,36 @@ class _NfcCardPageState extends State<NfcCardPage> {
 
                       SizedBox(height: 20.h),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
                         children: [
-                          Text(
-                            "Hold phone close to the NFC reader",
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 18.sp,
-                            ),
-                          ),
+                          SizedBox(height: 20.h),
+
+                          !isNfcOn
+                              ? InkWell(
+                                  onTap: () async {
+                                    const intent = AndroidIntent(
+                                      action: 'android.settings.NFC_SETTINGS',
+                                    );
+
+                                    await intent.launch();
+                                  },
+                                  child: CustomText(
+                                    text: 'Click Here To Open The NFC Settings',
+                                    color: AppColors.primaryColor,
+                                    fontSize: 19.sp,
+                                  ),
+                                )
+                              : SizedBox(
+                                  width: MediaQuery.sizeOf(context).width,
+                                  child: Center(
+                                    child: CustomText(
+                                      text:
+                                          'Hold phone close to the NFC reader',
+                                      color: AppColors.primaryColor,
+                                      fontSize: 19.sp,
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
                     ],
