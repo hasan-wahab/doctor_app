@@ -31,7 +31,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   String? id;
 
   bool isLoading = false;
-  AllTherapistModel? allTherapistModel;
+  AllTerapistModle? allTherapistModel;
   @override
   Future<void> didChangeDependencies() async {
     id = ModalRoute.of(context)!.settings.arguments as String?;
@@ -48,9 +48,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         if (state is SessionMessageState) {
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message.toString());
-        }
-        if (state is SessionFromHomeLoaded) {
-          print(state.allTherapistModel!.totalSessionCount);
         }
       },
       builder: (context, state) {
@@ -235,150 +232,105 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                           horizontal: 20.w,
                           vertical: 10.h,
                         ),
-                        children: [
-                          CustomText(
-                            maxLines: 3,
-                            text: 'Therapy Sessions',
-                            fontSize: 20,
-                            color: AppColors.primaryColor,
-                          ),
+                        children: allTherapistModel!.visitWiseSessions!.expand((
+                          items,
+                        ) {
+                          final summary = items.summary!.visitSummary;
+                          final sessions = items.sessions;
+                          return sessions!.map((session) {
+                            return Card(
+                              // color: duplicateIds.contains(summary!.visitID)
+                              //     ? AppColors.primaryColor
+                              //     : AppColors.secondaryColor,
+                              //color: AppColors.secondaryColor,
+                              margin: EdgeInsets.only(top: 15.h),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 15.w,
+                                  vertical: 20.h,
+                                ),
 
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: List.generate(
-                              allTherapistModel!.totalSessionCount,
-                              (index) {
-                                TherapistVisitGroupModel completedVisitsModel =
-                                    allTherapistModel!.completedVisits[index];
-                                print(completedVisitsModel.sessionCount);
-                                return Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.only(top: 15.h),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 15.w,
-                                      vertical: 20.h,
+                                //   height: 178.h,
+                                width: 360.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                                ),
+
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // All Session model
+                                    RowText(
+                                      firstText: 'Sessions#',
+                                      secondText: session.sessionID.toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Next session date',
+                                      secondText:
+                                          DateAndTimeFormater.dateFormat(
+                                            session.nextSessionDate,
+                                          ),
+                                    ),
+                                    RowText(
+                                      firstText: 'Therapist',
+                                      secondText: session.therapist,
                                     ),
 
-                                    //   height: 178.h,
-                                    width: 360.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
+                                    RowText(
+                                      firstText: 'Duration',
+                                      secondText: session.sessionDurationTotal,
                                     ),
-
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // All Session model
-                                        RowText(
-                                          firstText: 'Sessions#',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displaySessionId
-                                              .toString(),
-                                        ),
-                                        RowText(
-                                          firstText: 'Next session date',
-                                          secondText:
-                                              DateAndTimeFormater.dateFormat(
-                                                allTherapistModel!
-                                                    .allSessions[index]
-                                                    .displayNextSessionDate
-                                                    .toString(),
-                                              ),
-                                        ),
-                                        RowText(
-                                          firstText: 'Therapist',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displayTherapist
-                                              .toString(),
-                                        ),
-
-                                        RowText(
-                                          firstText: 'Duration',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .sessionDurationTotal
-                                              .toString(),
-                                        ),
-                                        RowText(
-                                          firstText: 'Notes',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .clinicalNotes,
-                                        ),
-                                        RowText(
-                                          firstText: 'Package',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displayPackageUsed,
-                                        ),
-                                        RowText(
-                                          firstText: 'Active time',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displayActiveTime,
-                                        ),
-                                        RowText(
-                                          firstText: 'Created at',
-                                          secondText: allTherapistModel!
-                                              .allSessions[index]
-                                              .displayCreatedAt,
-                                        ),
-                                        RowText(
-                                          firstText: 'Next session date',
-                                          secondText:
-                                              DateAndTimeFormater.dateFormat(
-                                                allTherapistModel!
-                                                    .allSessions[index]
-                                                    .displayNextSessionDate,
-                                              ),
-                                        ),
-                                        // Complete visit model
-                                        RowText(
-                                          firstText: 'Visit Status',
-                                          secondText: completedVisitsModel
-                                              .visitSummary!
-                                              .displayVisitStatus,
-                                        ),
-                                        RowText(
-                                          firstText: 'Current Stage',
-                                          secondText: completedVisitsModel
-                                              .visitSummary!
-                                              .displayCurrentStage,
-                                        ),
-                                        RowText(
-                                          firstText: 'Clinic',
-                                          secondText: completedVisitsModel
-                                              .visitSummary!
-                                              .displayClinic,
-                                        ),
-                                        RowText(
-                                          firstText: 'Visit Date',
-                                          secondText:
-                                              DateAndTimeFormater.dateFormat(
-                                                completedVisitsModel
-                                                    .visitSummary!
-                                                    .displayVisitDate,
-                                              ),
-                                        ),
-                                        RowText(
-                                          firstText: 'Visit Id',
-                                          secondText: completedVisitsModel
-                                              .visitSummary!
-                                              .displayVisitId,
-                                        ),
-                                      ],
+                                    RowText(
+                                      firstText: 'Notes',
+                                      secondText: session.clinicalNotes,
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                                    RowText(
+                                      firstText: 'Package',
+                                      secondText: session.packageUsed,
+                                    ),
+                                    RowText(
+                                      firstText: 'Active time',
+                                      secondText: session.activeTime,
+                                    ),
+                                    RowText(
+                                      firstText: 'Created at',
+                                      secondText:
+                                          DateAndTimeFormater.dateFormat(
+                                            session.createdAt,
+                                          ),
+                                    ),
+                                    // Complete visit model
+                                    RowText(
+                                      firstText: 'Visit Status',
+                                      secondText: summary!.visitStatus,
+                                    ),
+                                    RowText(
+                                      firstText: 'Current Stage',
+                                      secondText: summary.currentStage,
+                                    ),
+                                    RowText(
+                                      firstText: 'Clinic',
+                                      secondText: summary.clinic,
+                                    ),
+                                    RowText(
+                                      firstText: 'Visit Date',
+                                      secondText:
+                                          DateAndTimeFormater.dateFormat(
+                                            summary.visitDate,
+                                          ),
+                                    ),
+                                    RowText(
+                                      firstText: 'Visit Id',
+                                      secondText: summary.visitID.toString(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                        }).toList(),
                       )
                     : Center(child: CircularProgressIndicator()),
               ),
@@ -396,3 +348,26 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     );
   }
 }
+
+// CustomText(
+// maxLines: 3,
+// text: 'Therapy Sessions',
+// fontSize: 20,
+// color: AppColors.primaryColor,
+// ),
+//
+// Column(
+// crossAxisAlignment: CrossAxisAlignment.stretch,
+// children: List.generate(
+// allTherapistModel!.visitWiseSessions!.length,
+// (index) {
+// final completedVisitsModel = allTherapistModel!
+//     .visitWiseSessions![index];
+// final sessionData =
+// completedVisitsModel.sessions![index];
+// final summary =
+// completedVisitsModel.summary!.visitSummary;
+// return
+// },
+// ),
+// ),

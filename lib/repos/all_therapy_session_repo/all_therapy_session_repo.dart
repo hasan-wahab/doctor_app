@@ -10,11 +10,11 @@ class AllTherapySessionRepo {
   AllTherapySessionLocalRepo localRepo;
   AllTherapySessionRepo({required this.api, required this.localRepo});
 
-  Future<AllTherapistModel> getAllTherapySession({
+  Future<AllTerapistModle> getAllTherapySession({
     required String token,
     required String patientId,
   }) async {
-    AllTherapistModel model;
+    AllTerapistModle model;
     final jsonResponse = await api.getApi(
       url: ApiKeys.allTherapistKey,
       token: token,
@@ -24,8 +24,8 @@ class AllTherapySessionRepo {
       if (kDebugMode) {
         print('From $jsonResponse');
       }
-      model = AllTherapistModel.fromJson(
-        jsonResponse['data']['visit_wise_sessions'],
+      model = AllTerapistModle.fromJson(
+        jsonResponse['data'],
       );
       await localRepo.deleteAllTherapySession();
       await localRepo.saveAllTherapySession(model: model);
