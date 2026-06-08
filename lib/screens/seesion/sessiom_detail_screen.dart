@@ -207,6 +207,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           print('From Home /..............');
           allTherapistModel = state.allTherapistModel;
           currentPatientData = state.patientData;
+
           return Scaffold(
             appBar: AppBar(
               backgroundColor: AppColors.bgColor,
@@ -237,11 +238,13 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                         ) {
                           final summary = items.summary!.visitSummary;
                           final sessions = items.sessions;
+                          List visitId=[];
+
                           return sessions!.map((session) {
+                            visitId.add(summary!.visitID);
+                            print(visitId);
                             return Card(
-                              // color: duplicateIds.contains(summary!.visitID)
-                              //     ? AppColors.primaryColor
-                              //     : AppColors.secondaryColor,
+
                               color: AppColors.secondaryColor,
                               margin: EdgeInsets.only(top: 15.h),
                               child: Container(
