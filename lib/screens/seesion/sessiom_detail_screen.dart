@@ -238,13 +238,28 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                         ) {
                           final summary = items.summary!.visitSummary;
                           final sessions = items.sessions;
+
                           List visitId = [];
 
+                          final allVisitsIds = allTherapistModel!
+                              .visitWiseSessions!
+                              .expand(
+                                (e) => e.sessions!.map(
+                                  (_) => e.summary!.visitSummary!.visitID,
+                                ),
+                              )
+                              .toList();
+                          bool isDup =
+                              allVisitsIds
+                                  .where((id) => id == summary!.visitID)
+                                  .toList()
+                                  .length >
+                              1;
                           return sessions!.map((session) {
-                            visitId.add(summary!.visitID);
-                            print(visitId);
                             return Card(
-                              color: AppColors.secondaryColor,
+                              color: !isDup
+                                  ? AppColors.secondaryColor
+                                  : AppColors.bgColor,
                               margin: EdgeInsets.only(top: 15.h),
                               child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -265,8 +280,12 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                   children: [
                                     // All Session model
                                     RowText(
-                                      firstText: 'Sessions#',
+                                      firstText: 'Sessions Id',
                                       secondText: session.sessionID.toString(),
+                                    ),
+                                    RowText(
+                                      firstText: 'Visit Id',
+                                      secondText: summary?.visitID.toString(),
                                     ),
                                     RowText(
                                       firstText: 'Next session date',
@@ -322,10 +341,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                           DateAndTimeFormater.dateFormat(
                                             summary.visitDate,
                                           ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Visit Id',
-                                      secondText: summary.visitID.toString(),
                                     ),
                                   ],
                                 ),
