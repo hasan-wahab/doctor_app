@@ -238,13 +238,12 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                         ) {
                           final summary = items.summary!.visitSummary;
                           final sessions = items.sessions;
-                          List visitId=[];
+                          List visitId = [];
 
                           return sessions!.map((session) {
                             visitId.add(summary!.visitID);
                             print(visitId);
                             return Card(
-
                               color: AppColors.secondaryColor,
                               margin: EdgeInsets.only(top: 15.h),
                               child: Container(
