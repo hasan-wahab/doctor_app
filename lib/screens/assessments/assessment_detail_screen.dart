@@ -46,7 +46,6 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
     context.read<ConsultantAssessmentBloc>().add(
       ConsultantAssessmentEvent(id: id),
     );
-    print("Id was ${id}");
   }
 
   @override

@@ -114,6 +114,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
           totalAmount = state.patientData.stats!.totalAmount;
           totalSpend = state.patientData.stats!.totalSpend;
           patientModel = state.patientData.patient;
+          remaining = state.patientData.stats!.remaining;
         }
       },
       builder: (context, state) {
@@ -367,8 +368,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                             : SizedBox(),
                                         remaining != null
                                             ? CustomText(
-                                                text:
-                                                    'Remaining: ${totalAmount! - totalSpend!}',
+                                                text: 'Remaining: $remaining',
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textWhiteColor,

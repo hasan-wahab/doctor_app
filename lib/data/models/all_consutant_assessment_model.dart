@@ -261,6 +261,7 @@ class Exercise {
   Map<String, dynamic> toJson() {
     return {'Name': name, 'Dosage': dosage};
   }
+
 }
 
 // ─────────────────────────────────────────────────────────────
