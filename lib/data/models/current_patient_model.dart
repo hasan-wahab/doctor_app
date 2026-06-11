@@ -1220,6 +1220,7 @@ class PatientStatsModel {
   final double? totalSpend;
   final double? totalAmount;
   final double? totalSpent;
+  final double? remaining;
 
   PatientStatsModel({
     this.totalVisits,
@@ -1230,6 +1231,7 @@ class PatientStatsModel {
     this.totalSpend,
     this.totalAmount,
     this.totalSpent,
+    this.remaining
   });
 
   String get displayTotalVisits => _display(totalVisits);
@@ -1237,11 +1239,13 @@ class PatientStatsModel {
   String get displayTherapyVisits => _display(therapyVisits);
   String get displayActivePackages => _display(activePackages);
   String get displayCompletedPackages => _display(completedPackages);
+  String get remainingAmount => _display(remaining);
   String get displayTotalSpent =>
       _display(totalSpent ?? totalAmount ?? totalSpend);
 
   factory PatientStatsModel.fromJson(Map<String, dynamic> json) =>
       PatientStatsModel(
+        remaining: _dbl(json['remaining_amount']),
         totalVisits: _int(json['total_visits']),
         consultationVisits: _int(json['consultation_visits']),
         therapyVisits: _int(json['therapy_visits']),
@@ -1261,6 +1265,7 @@ class PatientStatsModel {
     'total_paid': totalSpend,
     'total_billed': totalAmount,
     'total_spent': totalSpent,
+    'remaining_amount': remaining,
   };
 }
 

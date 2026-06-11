@@ -8,6 +8,7 @@ import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/heding_text.dart';
 import 'package:doctor_app/widgets/outline_button.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -118,20 +119,173 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: AppColors.bgColor,
           floatingActionButton: InkWell(
             onTap: () async {
-              String number = '+923489446989';
-              String message = Uri.encodeComponent("I need help");
-              try {
-                if (Platform.isAndroid) {
-                  String androidUrl =
-                      'whatsapp://send?phone=$number&text=$message';
-                  await launchUrl(Uri.parse(androidUrl));
-                } else if (Platform.isIOS) {
-                  String iosUrl = 'https://wa.me/$number?text=$message';
-                  await launchUrl(Uri.parse(iosUrl));
-                }
-              } on Exception catch (e) {
-                print(e.toString());
-              }
+              showCupertinoModalPopup(
+                context: context,
+                builder: (context) => Material(
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.r),
+                    child: SizedBox(
+                      height: MediaQuery.sizeOf(context).height / 2.5,
+                      width: MediaQuery.sizeOf(context).width,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20.r),
+                            child: Row(
+                              children: [
+                                CustomText(
+                                  text: 'Please Select WhatsApp',
+                                  style: TextStyle(
+                                    color: AppColors.primaryColor,
+                                    fontSize: 18.sp,
+                                  ),
+                                ),
+                                Spacer(),
+                                InkWell(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Icon(
+                                    Icons.close,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 5.h),
+
+                          Divider(),
+                          SizedBox(height: 10.h),
+
+                          InkWell(
+                            onTap: () => _launchWhatsApp(
+                              message: "I need help",
+                              number: "+92334 8199990",
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20.r),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 40.h,
+                                    width: 40.h,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                          'assets/images/what_app_image.png',
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  CustomText(
+                                    text: 'Clinic 1 Near IDC F8',
+                                    style: TextStyle(
+                                      color: AppColors.firstTextBlackColor,
+                                      fontSize: 18.sp,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 18.r,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                          InkWell(
+                            onTap: () => _launchWhatsApp(
+                              message: "I need help",
+                              number: "+923086776666",
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20.r),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 40.h,
+                                    width: 40.h,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                          'assets/images/what_app_image.png',
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  CustomText(
+                                    text: 'Clinic 2 PMC Plaza F8',
+                                    style: TextStyle(
+                                      color: AppColors.firstTextBlackColor,
+                                      fontSize: 18.sp,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 18.r,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                          InkWell(
+                            onTap: () => _launchWhatsApp(
+                              message: "I need help",
+                              number: "+92331 8181681",
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20.r),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 40.h,
+                                    width: 40.h,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                          'assets/images/what_app_image.png',
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  CustomText(
+                                    text: 'Clinic 3 Neuro Stroke PMC F8',
+                                    style: TextStyle(
+                                      color: AppColors.firstTextBlackColor,
+                                      fontSize: 18.sp,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 18.r,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
             },
             child: Container(
               height: 68.h,
@@ -167,6 +321,24 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
     });
+  }
+
+  void _launchWhatsApp({
+    required String message,
+    required String number,
+  }) async {
+    var newMessage = Uri.encodeComponent(message);
+    try {
+      if (Platform.isAndroid) {
+        String androidUrl = 'whatsapp://send?phone=$number&text=$newMessage';
+        await launchUrl(Uri.parse(androidUrl));
+      } else if (Platform.isIOS) {
+        String iosUrl = 'https://wa.me/$number?text=$newMessage';
+        await launchUrl(Uri.parse(iosUrl));
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
