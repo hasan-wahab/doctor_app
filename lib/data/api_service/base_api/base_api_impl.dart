@@ -23,21 +23,26 @@ class BaseApiImpl implements BaseApi {
     String? phone,
     String? birthDate,
     String? gender,
+    Map? body,
   }) async {
     var urL = Uri.parse(url);
+
     try {
       http.Response response = await http
           .post(
             urL,
-            body: jsonEncode({
-              "email": email,
-              "password": password,
-              if (name != null) "name": name,
-              if (cnic != null) "cnic": cnic,
-              if (phone != null) "phone": phone,
-              if (birthDate != null) "birth_date": birthDate,
-              if (gender != null) "gender": gender,
-            }),
+            body: jsonEncode(
+              body ??
+                  {
+                    "email": email,
+                    "password": password,
+                    if (name != null) "name": name,
+                    if (cnic != null) "cnic": cnic,
+                    if (phone != null) "phone": phone,
+                    if (birthDate != null) "birth_date": birthDate,
+                    if (gender != null) "gender": gender,
+                  },
+            ),
             headers: {
               "Content-Type": "application/json",
               "Accept": "application/json",

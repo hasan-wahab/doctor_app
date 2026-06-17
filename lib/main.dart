@@ -15,8 +15,10 @@ import 'package:doctor_app/repos/consultant_assasment_repo/consultant_assesment_
 import 'package:doctor_app/repos/history_tracker_repo/history_tracker_repo_Impl.dart';
 import 'package:doctor_app/repos/patient_local_repo/patient_local_repo.dart';
 import 'package:doctor_app/repos/patient_repo/patient_repo_impl.dart';
+import 'package:doctor_app/repos/post_review_repo/post_review_repo.dart';
 
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
+import 'package:doctor_app/repos/question_repo/question_repo.dart';
 import 'package:doctor_app/repos/session_detail_repo/sessions_detail_repo.dart';
 import 'package:doctor_app/repos/slider_repo/slider_local_repo.dart';
 import 'package:doctor_app/repos/slider_repo/slider_repo.dart';
@@ -88,6 +90,8 @@ class _MyAppState extends State<MyApp> {
   late AllPackagesRepo allPackagesRepo;
   late SliderImagesLocalRepo sliderImagesLocalRepo;
   late SliderRepo sliderRepo;
+  late QuestionRepo questionRepo;
+  late PostReviewRepo postReviewRepo;
 
   @override
   void initState() {
@@ -153,6 +157,8 @@ class _MyAppState extends State<MyApp> {
     );
     sliderImagesLocalRepo = SliderImagesLocalRepo(localCurdBase: curdImpl);
     sliderRepo = SliderRepo(api: apiImpl, localRepo: sliderImagesLocalRepo);
+    questionRepo = QuestionRepo(api: apiImpl);
+    postReviewRepo = PostReviewRepo(api: apiImpl);
   }
 
   @override
@@ -230,6 +236,8 @@ class _MyAppState extends State<MyApp> {
             profileLocalRepo: profileLocalRepo,
             allVisitLocalRepo: allVisitLocalRepo,
             allVisitRepo: allVisitRepo,
+            questionRepo: questionRepo,
+            postReviewRepo: postReviewRepo,
           ),
         ),
         BlocProvider(

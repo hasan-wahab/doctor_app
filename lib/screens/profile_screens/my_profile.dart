@@ -103,16 +103,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                                         stackTrace,
                                                       ) {
                                                         err = error;
-                                                        return profileData!
-                                                                    .user !=
-                                                                null
-                                                            ? Image.network(
-                                                                profileData!
-                                                                    .user!
-                                                                    .profilePicture
-                                                                    .toString(),
-                                                              )
-                                                            : Container();
+                                                        return Container();
                                                       },
                                                 ),
                                               )
@@ -153,7 +144,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                   fontSize: 20,
                                 ),
                                 CustomText(
-                                  text: 'Patient ID : ${currentPatientData!.patient!.displayId}',
+                                  text:
+                                      'Patient ID : ${currentPatientData!.patient!.displayId}',
                                   color: AppColors.secondaryTextColor,
                                 ),
                               ],

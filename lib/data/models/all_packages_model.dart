@@ -45,7 +45,7 @@ class PackageItemModel {
   String get displayId => id?.toString() ?? 'No data';
   String get displayName => _safe(name);
   String get displaySessions => sessions?.toString() ?? 'No data';
-  String get displayPrice => _safe(price);
+  String get displayPrice => _safe(price).toString();
   String get displayImage => _safe(image);
   String get displayCreatedAt => _safe(createdAt);
   String get displayUpdatedAt => _safe(updatedAt);
