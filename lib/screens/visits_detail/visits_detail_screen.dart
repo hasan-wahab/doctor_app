@@ -493,188 +493,198 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.bgColor,
-            leading: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios_new),
-            ),
-            centerTitle: true,
-            title: const Text('My visit'),
+        return RefreshIndicator(
+          onRefresh: () async => context.read<VisitDetailBloc>().add(
+            VisitDetailJustFromServerEvent(),
           ),
-          backgroundColor: AppColors.bgColor,
-          body: SafeArea(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : allVisitsModel == null
-                ? const SizedBox()
-                : ListView(
-                    padding: EdgeInsets.all(16.w),
-                    children: List.generate(allVisitsModel!.visits.length, (
-                      visitIndex,
-                    ) {
-                      final visit = allVisitsModel!.visits[visitIndex];
-                      isExpended.add(false);
-                      return Card(
-                        margin: EdgeInsets.only(bottom: 12.h),
-                        color: AppColors.secondaryColor,
-                        child: Padding(
-                          padding: EdgeInsets.all(12.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              RowText(
-                                firstText: 'Date',
-                                secondText: DateAndTimeFormater.dateFormat(
-                                  visit.displayDate,
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColors.bgColor,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back_ios_new),
+              ),
+              centerTitle: true,
+              title: Text('My visit'),
+              automaticallyImplyLeading: false,
+            ),
+            backgroundColor: AppColors.bgColor,
+            body: SafeArea(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : allVisitsModel == null
+                  ? const SizedBox()
+                  : ListView(
+                      padding: EdgeInsets.all(16.w),
+                      children: List.generate(allVisitsModel!.visits.length, (
+                        visitIndex,
+                      ) {
+                        final visit = allVisitsModel!.visits[visitIndex];
+                        isExpended.add(false);
+                        return Card(
+                          margin: EdgeInsets.only(bottom: 12.h),
+                          color: AppColors.secondaryColor,
+                          child: Padding(
+                            padding: EdgeInsets.all(12.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RowText(
+                                  firstText: 'Date',
+                                  secondText: DateAndTimeFormater.dateFormat(
+                                    visit.displayDate,
+                                  ),
                                 ),
-                              ),
-                              RowText(
-                                firstText: 'Type',
-                                buttonText: visit.displayType.toString(),
-                              ),
-                              RowText(
-                                firstText: 'Doctor',
-                                secondText: visit.displayDoctor,
-                              ),
-                              RowText(
-                                firstText: 'Stage',
-                                secondText: visit.displayStage,
-                              ),
-                              RowText(
-                                firstText: 'Amount',
-                                secondText: visit.displayConsultationFee,
-                              ),
-                              RowText(
-                                firstText: 'Status',
-                                secondText: visit.displayStatus,
-                              ),
+                                RowText(
+                                  firstText: 'Type',
+                                  buttonText: visit.displayType.toString(),
+                                ),
+                                RowText(
+                                  firstText: 'Doctor',
+                                  secondText: visit.displayDoctor,
+                                ),
+                                RowText(
+                                  firstText: 'Stage',
+                                  secondText: visit.displayStage,
+                                ),
+                                RowText(
+                                  firstText: 'Amount',
+                                  secondText: visit.displayConsultationFee,
+                                ),
+                                RowText(
+                                  firstText: 'Status',
+                                  secondText: visit.displayStatus,
+                                ),
 
-                              const Divider(),
+                                const Divider(),
 
-                              /// QUESTIONS
-                              isExpended[visitIndex] && visit.isCompleted
-                                  ? Column(
-                                      spacing: 10,
-                                      children: List.generate(questionModel!.length, (
-                                        questionIndex,
-                                      ) {
-                                        final q = questionModel![questionIndex];
-                                        final ans =
-                                            answers[visitIndex]![questionIndex]!;
+                                /// QUESTIONS
+                                isExpended[visitIndex] && visit.isCompleted
+                                    ? Column(
+                                        spacing: 10,
+                                        children: List.generate(questionModel!.length, (
+                                          questionIndex,
+                                        ) {
+                                          final q =
+                                              questionModel![questionIndex];
+                                          final ans =
+                                              answers[visitIndex]![questionIndex]!;
 
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 10.h),
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 10.h),
 
-                                            CustomText(
-                                              text:
-                                                  q.questionText.toSentenceCase,
-                                              color: AppColors.primaryColor,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                              CustomText(
+                                                text: q
+                                                    .questionText
+                                                    .toSentenceCase,
+                                                color: AppColors.primaryColor,
+                                                fontWeight: FontWeight.bold,
+                                              ),
 
-                                            /// ⭐ RATING
-                                            if (q.type == 'rating')
-                                              Row(
-                                                children: List.generate(
-                                                  5,
-                                                  (i) => InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        ans.rating = i + 1;
-                                                      });
-                                                    },
-                                                    child: Icon(
-                                                      Icons.star,
-                                                      color: ans.rating > i
-                                                          ? Colors.amber
-                                                          : Colors.grey,
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            /// OPTIONS
-                                            else if (q.type == 'options')
-                                              Wrap(
-                                                spacing: 10,
-                                                children: List.generate(
-                                                  q.options.length,
-                                                  (i) {
-                                                    return CheckCircle(
-                                                      text: q
-                                                          .options[i]
-                                                          .toSentenceCase,
-                                                      isSelected: ans
-                                                          .selectedOptions[i],
-                                                      onChange: () {
+                                              /// ⭐ RATING
+                                              if (q.type == 'rating')
+                                                Row(
+                                                  children: List.generate(
+                                                    5,
+                                                    (i) => InkWell(
+                                                      onTap: () {
                                                         setState(() {
-                                                          ans.selectedOptions[i] =
-                                                              !ans.selectedOptions[i];
+                                                          ans.rating = i + 1;
                                                         });
                                                       },
-                                                    );
-                                                  },
-                                                ),
-                                              )
-                                            /// COMMENT
-                                            else
-                                              TextField(
-                                                controller: ans.controller,
-                                                maxLines: 2,
-                                                decoration:
-                                                    const InputDecoration(
-                                                      hintText:
-                                                          "Write feedback...",
-                                                      border:
-                                                          OutlineInputBorder(),
+                                                      child: Icon(
+                                                        Icons.star,
+                                                        color: ans.rating > i
+                                                            ? Colors.amber
+                                                            : Colors.grey,
+                                                      ),
                                                     ),
-                                              ),
-                                          ],
-                                        );
-                                      }),
-                                    )
-                                  : SizedBox(),
-                              SizedBox(height: 20.h),
+                                                  ),
+                                                )
+                                              /// OPTIONS
+                                              else if (q.type == 'options')
+                                                Wrap(
+                                                  spacing: 10,
+                                                  children: List.generate(
+                                                    q.options.length,
+                                                    (i) {
+                                                      return CheckCircle(
+                                                        text: q
+                                                            .options[i]
+                                                            .toSentenceCase,
+                                                        isSelected: ans
+                                                            .selectedOptions[i],
+                                                        onChange: () {
+                                                          setState(() {
+                                                            ans.selectedOptions[i] =
+                                                                !ans.selectedOptions[i];
+                                                          });
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                )
+                                              /// COMMENT
+                                              else
+                                                TextField(
+                                                  controller: ans.controller,
+                                                  maxLines: 2,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                        hintText:
+                                                            "Write feedback...",
+                                                        border:
+                                                            OutlineInputBorder(),
+                                                      ),
+                                                ),
+                                            ],
+                                          );
+                                        }),
+                                      )
+                                    : SizedBox(),
+                                SizedBox(height: 20.h),
 
-                              /// BUTTON
-                              visit.isCompleted
-                                  ? AppButton(
-                                      onTap: () {
-                                        if (isExpended[visitIndex]) {
-                                          submitData(visitIndex);
-                                        }
-                                        setState(() {
-                                          isExpended[visitIndex] =
-                                              !isExpended[visitIndex];
-                                        });
-                                        print(isExpended);
-                                      },
-                                      text: isExpended[visitIndex]
-                                          ? 'Submit'
-                                          : 'Give Feedback',
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CustomText(
-                                          color: AppColors.primaryColor,
+                                /// BUTTON
+                                visit.isCompleted
+                                    ? AppButton(
+                                        onTap: () {
+                                          if (isExpended[visitIndex]) {
+                                            submitData(visitIndex);
+                                          }
+                                          setState(() {
+                                            isExpended[visitIndex] =
+                                                !isExpended[visitIndex];
+                                          });
+                                          print(isExpended);
+                                        },
+                                        text: isExpended[visitIndex]
+                                            ? 'Submit'
+                                            : 'Give Feedback',
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          CustomText(
+                                            color: AppColors.primaryColor,
 
-                                          text:
-                                              'You can only review completed visits.',
-                                        ),
-                                      ],
-                                    ),
-                            ],
+                                            text:
+                                                'You can only review completed visits.',
+                                          ),
+                                        ],
+                                      ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
-                  ),
+                        );
+                      }),
+                    ),
+            ),
           ),
         );
       },
