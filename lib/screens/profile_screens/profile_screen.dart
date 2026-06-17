@@ -126,16 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               error,
                                                               stackTrace,
                                                             ) {
-                                                              return profileData!
-                                                                          .user !=
-                                                                      null
-                                                                  ? Image.network(
-                                                                      profileData!
-                                                                          .user!
-                                                                          .profilePicture
-                                                                          .toString(),
-                                                                    )
-                                                                  : Container();
+                                                              return Container();
                                                             },
                                                       ),
                                                 )

@@ -97,11 +97,7 @@
     <!-- INTERNET -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- LOCATION -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
 
     <!-- NFC (OPTIONAL) -->
     <uses-permission android:name="android.permission.NFC"/>
@@ -151,11 +147,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
-        <!-- Google Maps API -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDRBRBNInrOt9pKz-ANgHZXh7PupAv2KHQ"/>
 
         <!-- NFC HCE SERVICE - disabled by default, enabled via code on NFC devices -->
         <service

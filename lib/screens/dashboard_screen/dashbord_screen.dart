@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:doctor_app/core/app_keys/api_keys.dart';
+import 'package:doctor_app/core/extentions/context_extentions.dart';
 import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/models/all_visits_model.dart';
+import 'package:doctor_app/data/models/post_review_model.dart';
 import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
 import 'package:doctor_app/repos/all_packages_repo/all_packages_repo.dart';
 import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
 import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
+import 'package:doctor_app/repos/post_review_repo/post_review_repo.dart';
 import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
 import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
@@ -187,22 +190,17 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         fontSize: 18,
                                       ),
                                     ),
-                                    CustomText(
-                                      text:
-                                          '0${DateTime.now().day.toString()}/${DateTime.now().month.toString()}/${DateTime.now().year.toString()}',
-                                      fontSize: 12,
-                                      color: AppColors.secondaryTextColor,
-                                    ),
+                                    CustomText(text: DateTime.now().toReadDate),
                                   ],
                                 ),
                               ],
                             ),
                             InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  AppRoutes.searchScreen,
-                                );
+                              onTap: () async {
+                                // Navigator.pushNamed(
+                                //   context,
+                                //   AppRoutes.searchScreen,
+                                // );
                               },
                               child: CircleAvatar(
                                 backgroundColor: AppColors.secondaryColor,
