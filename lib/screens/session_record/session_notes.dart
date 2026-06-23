@@ -57,7 +57,6 @@ class _SessionNotesState extends State<SessionNotes> {
         }
       },
       builder: (context, state) {
-
         if (isLoading != true) {
           return Scaffold(
             appBar: AppBar(
@@ -86,14 +85,8 @@ class _SessionNotesState extends State<SessionNotes> {
                                   ? Container()
                                   : InkWell(
                                       onTap: () {
-                                        context.read<HistoryTrackerBloc>().add(
-                                          HistoryTrackerEvent(
-                                            visitId: visitID!,
-                                            token: profileData!.accessToken
-                                                .toString(),
-                                          ),
-                                        );
                                         Navigator.pushNamed(
+                                          arguments: {'VisitId': visitID ?? ''},
                                           context,
                                           AppRoutes.historyTrackerScreen,
                                         );

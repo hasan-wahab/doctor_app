@@ -104,9 +104,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
 
     return YoutubePlayerBuilder(
-      onExitFullScreen: () {
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-      },
       player: YoutubePlayer(
         aspectRatio: 16 / 9,
         controller: _yControllers[_currentIndex],
@@ -119,8 +116,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         key: ValueKey(_videoIds[_currentIndex]),
         topActions: [
           IconButton(
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              if (!context.mounted) return;
+              final orientation = MediaQuery.orientationOf(context);
+              if (orientation == Orientation.portrait) {
+                Navigator.pop(context);
+              } else {
+                await SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                ]);
+              }
             },
             icon: Icon(
               Icons.arrow_back_ios_new,

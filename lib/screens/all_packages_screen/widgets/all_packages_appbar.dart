@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/app_styles/app_colors.dart';
 
 class AllPackagesAppbar extends StatefulWidget implements PreferredSizeWidget {
-
   final Function(String? value) onChanged;
   const AllPackagesAppbar({super.key, required this.onChanged});
 
@@ -73,7 +72,7 @@ class _AllPackagesAppbarState extends State<AllPackagesAppbar> {
               borderRadius: BorderRadius.circular(30.r),
             ),
             child: TextFormField(
-              onChanged: (value) =>widget.onChanged(value),
+              onChanged: (value) => widget.onChanged(value),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 prefixIcon: Padding(

@@ -57,19 +57,23 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AllPackagesAppbar(
-            onChanged: (value) {
-              // var searchQuery = data.where((test) {
-              //   final name = test?.name!.toLowerCase();
-              //   final result = name.contains(value!.toLowerCase());
-              //   return result;
-              // });
-              // searchResult = searchQuery.toList();
-            },
+          backgroundColor: AppColors.bgColor,
+          appBar: AppBar(
+            backgroundColor: AppColors.bgColor,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back_ios_new),
+            ),
+            foregroundColor: AppColors.primaryColor,
+            centerTitle: true,
+            title: Text('All packages'),
+            automaticallyImplyLeading: false,
           ),
-          body: SafeArea(
-            child: isLoading != true && allPackagesModel != null
-                ? Padding(
+          body: isLoading != true && allPackagesModel != null
+              ? SafeArea(
+                  child: Padding(
                     padding: EdgeInsets.only(
                       top: 36.h,
                       left: 20.w,
@@ -139,9 +143,21 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
 
                             AppOutlineButton(
                               onTap: () {
-                                Navigator.pushReplacementNamed(
+                                AppMsg.showErrorMsg(
                                   context,
-                                  AppRoutes.loginScreen,
+                                  msg:
+                                      'Please sign in first to book this therapy package.',
+                                  msgTitle: 'Info',
+                                  actionText: 'Cancel',
+                                  actionText2: 'Login',
+                                  action: () => Navigator.pop(context),
+                                  action2: () {
+                                    Navigator.pop(context);
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.loginScreen,
+                                    );
+                                  },
                                 );
                               },
                               text: 'Book',
@@ -150,9 +166,9 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                         );
                       },
                     ),
-                  )
-                : Center(child: CircularProgressIndicator()),
-          ),
+                  ),
+                )
+              : Center(child: CircularProgressIndicator()),
         );
       },
     );

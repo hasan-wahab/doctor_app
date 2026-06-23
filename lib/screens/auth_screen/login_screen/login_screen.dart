@@ -98,23 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               hintText: 'Enter your password',
             ),
-            SizedBox(height: 10.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.restPassword);
-                  },
-                  child: Text(
-                    'Forget password?',
-                    style: TextStyle(color: AppColors.primaryColor),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30.h),
+            SizedBox(height: 50.h),
 
             BlocConsumer<LoginBloc, LoginState>(
               listener: (context, state) {

@@ -1,5 +1,6 @@
 import 'package:doctor_app/data/models/current_patient_model.dart';
 import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_bloc.dart';
+import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_event.dart';
 import 'package:doctor_app/screens/history_tracker_screen/bloc/history_tracker_state.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +22,10 @@ class HistoryTrackerScreen extends StatefulWidget {
 }
 
 class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
-  HistoryTrackerModel? historyTrackerModel;
+  bool isLoading = false;
+  String visitId = '';
 
+  HistoryTrackerModel? historyTrackerModel;
   ForMenOnlyModel? forMenOnlyModel;
   PatientInformationModel? patientInformationModel;
   PainLocationModel? painLocationModel;
@@ -42,18 +45,30 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
   RedFlagsModel? redFlagsModel;
 
   @override
+  void didChangeDependencies() {
+    var data = ModalRoute.settingsOf(context)!.arguments as Map;
+
+    visitId = data['VisitId'];
+    context.read<HistoryTrackerBloc>().add(
+      HistoryTrackerEvent(visitId: visitId),
+    );
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bool isLoading = false;
-    return BlocConsumer<HistoryTrackerBloc, HistoryTrackerState>(
-      listener: (context, state) {
-        if (state is HistoryTrackerLoadingState) {
+    return BlocListener<HistoryTrackerBloc, HistoryTrackerState>(
+      listener: (context, state) async {
+        if (state is HistoryTLoadingState) {
           isLoading = true;
-        } else if (state is HistoryTrackerMessageState) {
+        }
+        if (state is HistoryTrackerMessageState) {
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message);
-        } else if (state is HistoryTrackerGetState) {
+          print(state);
+        }
+        if (state is HistoryTrackerGetState) {
           isLoading = false;
-
           historyTrackerModel = state.historyTrackerModel;
           forMenOnlyModel = state.historyTrackerModel.forMenOnly;
           patientInformationModel =
@@ -81,506 +96,529 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
           redFlagsModel = state.historyTrackerModel.redFlags;
         }
       },
-      builder: (context, state) {
-        return isLoading == false
-            ? Scaffold(
-                appBar: AppBar(
-                  backgroundColor: AppColors.bgColor,
-                  leading: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back_ios_new),
+      child: BlocBuilder<HistoryTrackerBloc, HistoryTrackerState>(
+        builder: (context, state) {
+          return isLoading == false
+              ? Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: AppColors.bgColor,
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.arrow_back_ios_new),
+                    ),
+                    centerTitle: true,
+                    title: Text('History Tracker'),
+                    automaticallyImplyLeading: false,
                   ),
-                  centerTitle: true,
-                  title: Text('History Tracker'),
-                  automaticallyImplyLeading: false,
-                ),
-                backgroundColor: AppColors.bgColor,
+                  backgroundColor: AppColors.bgColor,
 
-                body: historyTrackerModel != null
-                    ? ListView(
-                        padding: EdgeInsets.only(
-                          left: 20.w,
-                          right: 20.w,
-                          top: 10.h,
-                          bottom: 60.h,
-                        ),
-                        children: [
-                          CustomText(
-                            text: 'History Tracker',
-                            fontSize: 20,
-                            color: AppColors.primaryColor,
+                  body: historyTrackerModel != null
+                      ? ListView(
+                          padding: EdgeInsets.only(
+                            left: 20.w,
+                            right: 20.w,
+                            top: 10.h,
+                            bottom: 60.h,
                           ),
-                          SizedBox(height: 20.h),
+                          children: [
+                            CustomText(
+                              text: 'History Tracker',
+                              fontSize: 20,
+                              color: AppColors.primaryColor,
+                            ),
+                            SizedBox(height: 20.h),
 
-                          ...List.generate((1), (index) {
-                            return Card(
-                              color: AppColors.secondaryColor,
-                              child: Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                //  height: 404.h,
-                                width: 350.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                      ),
-                                      height: 40.h,
-                                      width: 350.w,
-                                      decoration: BoxDecoration(
-                                        border: Border(bottom: BorderSide()),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width:
-                                                MediaQuery.sizeOf(
-                                                      context,
-                                                    ).width /
-                                                    1.3 -
-                                                15,
-                                            child: Stack(
-                                              alignment: Alignment.centerLeft,
-                                              children: [
-                                                CustomText(text: ''),
-                                                Align(
-                                                  alignment: Alignment.topRight,
+                            ...List.generate((1), (index) {
+                              return Card(
+                                color: AppColors.secondaryColor,
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 20),
+                                  //  height: 404.h,
+                                  width: 350.w,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                        ),
+                                        height: 40.h,
+                                        width: 350.w,
+                                        decoration: BoxDecoration(
+                                          border: Border(bottom: BorderSide()),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width:
+                                                  MediaQuery.sizeOf(
+                                                        context,
+                                                      ).width /
+                                                      1.3 -
+                                                  15,
+                                              child: Stack(
+                                                alignment: Alignment.centerLeft,
+                                                children: [
+                                                  CustomText(text: ''),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.topRight,
 
-                                                  child: Container(
-                                                    margin: EdgeInsets.only(
-                                                      top: 5.h,
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    height: 16.h,
-                                                    width: 31.w,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            3.r,
-                                                          ),
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                    child: CustomText(
-                                                      text: 'abds',
-                                                      fontSize: 12,
-                                                      color: AppColors
-                                                          .textWhiteColor,
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                        top: 5.h,
+                                                      ),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      height: 16.h,
+                                                      width: 31.w,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              3.r,
+                                                            ),
+                                                        color: AppColors
+                                                            .primaryColor,
+                                                      ),
+                                                      child: CustomText(
+                                                        text: 'abds',
+                                                        fontSize: 12,
+                                                        color: AppColors
+                                                            .textWhiteColor,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
+                                      SizedBox(height: 10.h),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Patient Information',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
-                                      child: CustomText(
-                                        text: 'Patient Information',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
+                                      patientInformationModel != null
+                                          ? _text(
+                                              firstText: 'Name',
+                                              secondText:
+                                                  patientInformationModel!
+                                                      .displayName,
+                                            )
+                                          : SizedBox(),
+
+                                      patientInformationModel != null
+                                          ? _text(
+                                              firstText: 'Age',
+                                              secondText:
+                                                  patientInformationModel!
+                                                      .displayAge,
+                                            )
+                                          : SizedBox(),
+
+                                      patientInformationModel != null
+                                          ? _text(
+                                              firstText: 'Occupation',
+                                              secondText:
+                                                  patientInformationModel!
+                                                      .displayOccupation,
+                                            )
+                                          : SizedBox(),
+
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Chief Complaint',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
-                                    ),
-                                    patientInformationModel != null
-                                        ? _text(
-                                            firstText: 'Name',
-                                            secondText: patientInformationModel!
-                                                .displayName,
-                                          )
-                                        : SizedBox(),
 
-                                    patientInformationModel != null
-                                        ? _text(
-                                            firstText: 'Age',
-                                            secondText: patientInformationModel!
-                                                .displayAge,
-                                          )
-                                        : SizedBox(),
+                                      chiefComplaintModel != null
+                                          ? _text(
+                                              firstText: 'Deviation',
+                                              secondText: chiefComplaintModel!
+                                                  .displayDeviation,
+                                            )
+                                          : SizedBox(),
 
-                                    patientInformationModel != null
-                                        ? _text(
-                                            firstText: 'Occupation',
-                                            secondText: patientInformationModel!
-                                                .displayOccupation,
-                                          )
-                                        : SizedBox(),
+                                      chiefComplaintModel != null
+                                          ? _text(
+                                              firstText: 'Complaints',
+                                              secondText: chiefComplaintModel!
+                                                  .complaints
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
+                                      chiefComplaintModel != null
+                                          ? _text(
+                                              firstText: 'Side Affected',
+                                              secondText: chiefComplaintModel!
+                                                  .sideAffected
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      aggravatingFactorsModel != null
+                                          ? _text(
+                                              firstText: 'Factors',
+                                              secondText:
+                                                  aggravatingFactorsModel!
+                                                      .factors
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      associatedSymptomsModel != null
+                                          ? _text(
+                                              firstText: 'Symptoms',
+                                              secondText:
+                                                  associatedSymptomsModel!
+                                                      .symptoms
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      forMenOnlyModel != null
+                                          ? _text(
+                                              firstText:
+                                                  'Bladder Or Sexual Worsening',
+                                              secondText: forMenOnlyModel!
+                                                  .displayBladderOrSexualWorsening
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      forMenOnlyModel != null
+                                          ? _text(
+                                              firstText: 'Genital Numbness',
+                                              secondText: forMenOnlyModel!
+                                                  .displayGenitalNumbness
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      forMenOnlyModel != null
+                                          ? _text(
+                                              firstText: 'Urine Leakage',
+                                              secondText: forMenOnlyModel!
+                                                  .displayUrineLeakage
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      forMenOnlyModel != null
+                                          ? _text(
+                                              firstText: 'Urination Pain',
+                                              secondText: forMenOnlyModel!
+                                                  .displayUrinationPain
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      forMenOnlyModel != null
+                                          ? _text(
+                                              firstText: 'Nocturia',
+                                              secondText: forMenOnlyModel!
+                                                  .displayNocturia
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      functionalLimitationsModel != null
+                                          ? _text(
+                                              firstText: 'Limited Activities',
+                                              secondText:
+                                                  functionalLimitationsModel!
+                                                      .limitedActivities
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      gaitAnalysisModel != null
+                                          ? _text(
+                                              firstText: 'Analysis',
+                                              secondText: gaitAnalysisModel!
+                                                  .displayAnalysis,
+                                            )
+                                          : SizedBox(),
+
+                                      movementRelatedPainModel != null
+                                          ? _text(
+                                              firstText: 'Movements',
+                                              secondText:
+                                                  movementRelatedPainModel!
+                                                      .movements
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      onsetAndCauseModel != null
+                                          ? _text(
+                                              firstText: 'How Did It Start',
+                                              secondText: onsetAndCauseModel!
+                                                  .displayHowDidItStart
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+
+                                      onsetAndCauseModel != null
+                                          ? _text(
+                                              firstText: 'Possible Cause',
+                                              secondText: onsetAndCauseModel!
+                                                  .possibleCause
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      Divider(
+                                        thickness: 1,
+                                        color: Colors.black,
                                       ),
-                                      child: CustomText(
-                                        text: 'Chief Complaint',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
+
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Pain Details',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
-                                    ),
 
-                                    chiefComplaintModel != null
-                                        ? _text(
-                                            firstText: 'Deviation',
-                                            secondText: chiefComplaintModel!
-                                                .displayDeviation,
-                                          )
-                                        : SizedBox(),
+                                      painDetailsModel != null
+                                          ? _text(
+                                              firstText: 'Duration',
+                                              secondText: painDetailsModel!
+                                                  .displayDuration
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    chiefComplaintModel != null
-                                        ? _text(
-                                            firstText: 'Complaints',
-                                            secondText: chiefComplaintModel!
-                                                .complaints
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
+                                      painDetailsModel != null
+                                          ? _text(
+                                              firstText: 'Pain Intensity Vas',
+                                              secondText: painDetailsModel!
+                                                  .displayPainIntensity
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    chiefComplaintModel != null
-                                        ? _text(
-                                            firstText: 'Side Affected',
-                                            secondText: chiefComplaintModel!
-                                                .sideAffected
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
+                                      painDetailsModel != null
+                                          ? _text(
+                                              firstText: 'Pain Timing',
+                                              secondText: painDetailsModel!
+                                                  .painTiming
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    aggravatingFactorsModel != null
-                                        ? _text(
-                                            firstText: 'Factors',
-                                            secondText: aggravatingFactorsModel!
-                                                .factors
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    associatedSymptomsModel != null
-                                        ? _text(
-                                            firstText: 'Symptoms',
-                                            secondText: associatedSymptomsModel!
-                                                .symptoms
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    forMenOnlyModel != null
-                                        ? _text(
-                                            firstText:
-                                                'Bladder Or Sexual Worsening',
-                                            secondText: forMenOnlyModel!
-                                                .displayBladderOrSexualWorsening
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    forMenOnlyModel != null
-                                        ? _text(
-                                            firstText: 'Genital Numbness',
-                                            secondText: forMenOnlyModel!
-                                                .displayGenitalNumbness
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    forMenOnlyModel != null
-                                        ? _text(
-                                            firstText: 'Urine Leakage',
-                                            secondText: forMenOnlyModel!
-                                                .displayUrineLeakage
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    forMenOnlyModel != null
-                                        ? _text(
-                                            firstText: 'Urination Pain',
-                                            secondText: forMenOnlyModel!
-                                                .displayUrinationPain
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    forMenOnlyModel != null
-                                        ? _text(
-                                            firstText: 'Nocturia',
-                                            secondText: forMenOnlyModel!
-                                                .displayNocturia
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    functionalLimitationsModel != null
-                                        ? _text(
-                                            firstText: 'Limited Activities',
-                                            secondText:
-                                                functionalLimitationsModel!
-                                                    .limitedActivities
-                                                    .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    gaitAnalysisModel != null
-                                        ? _text(
-                                            firstText: 'Analysis',
-                                            secondText: gaitAnalysisModel!
-                                                .displayAnalysis,
-                                          )
-                                        : SizedBox(),
-
-                                    movementRelatedPainModel != null
-                                        ? _text(
-                                            firstText: 'Movements',
-                                            secondText:
-                                                movementRelatedPainModel!
-                                                    .movements
-                                                    .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    onsetAndCauseModel != null
-                                        ? _text(
-                                            firstText: 'How Did It Start',
-                                            secondText: onsetAndCauseModel!
-                                                .displayHowDidItStart
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    onsetAndCauseModel != null
-                                        ? _text(
-                                            firstText: 'Possible Cause',
-                                            secondText: onsetAndCauseModel!
-                                                .possibleCause
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    Divider(thickness: 1, color: Colors.black),
-
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
+                                      painDetailsModel != null
+                                          ? _text(
+                                              firstText: 'Type Of Pain',
+                                              secondText: painDetailsModel!
+                                                  .typeOfPain
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      Divider(
+                                        thickness: 1,
+                                        color: Colors.black,
                                       ),
-                                      child: CustomText(
-                                        text: 'Pain Details',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
+
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                        ),
+                                        child: CustomText(
+                                          text: 'Past Medical History',
+                                          fontSize: 14,
+                                          color: AppColors.primaryColor,
+                                        ),
                                       ),
-                                    ),
 
-                                    painDetailsModel != null
-                                        ? _text(
-                                            firstText: 'Duration',
-                                            secondText: painDetailsModel!
-                                                .displayDuration
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
+                                      pastMedicalHistoryModel != null
+                                          ? _text(
+                                              firstText: 'Surgical History',
+                                              secondText:
+                                                  pastMedicalHistoryModel!
+                                                      .displaySurgicalHistory
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    painDetailsModel != null
-                                        ? _text(
-                                            firstText: 'Pain Intensity Vas',
-                                            secondText: painDetailsModel!
-                                                .displayPainIntensity
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
+                                      pastMedicalHistoryModel != null
+                                          ? _text(
+                                              firstText: 'Medical History',
+                                              secondText:
+                                                  pastMedicalHistoryModel!
+                                                      .medicalHistory
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    painDetailsModel != null
-                                        ? _text(
-                                            firstText: 'Pain Timing',
-                                            secondText: painDetailsModel!
-                                                .painTiming
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
+                                      pastMedicalHistoryModel != null
+                                          ? _text(
+                                              firstText:
+                                                  'Medical History Details',
+                                              secondText:
+                                                  pastMedicalHistoryModel!
+                                                      .medicalHistoryDetails
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    painDetailsModel != null
-                                        ? _text(
-                                            firstText: 'Type Of Pain',
-                                            secondText: painDetailsModel!
-                                                .typeOfPain
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    Divider(thickness: 1, color: Colors.black),
+                                      pastMedicalHistoryModel != null
+                                          ? _text(
+                                              firstText: 'Previous Treatments',
+                                              secondText:
+                                                  pastMedicalHistoryModel!
+                                                      .previousTreatments
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0,
-                                      ),
-                                      child: CustomText(
-                                        text: 'Past Medical History',
-                                        fontSize: 14,
-                                        color: AppColors.primaryColor,
-                                      ),
-                                    ),
+                                      pastMedicalHistoryModel != null
+                                          ? _text(
+                                              firstText: 'Treatment Responses',
+                                              secondText:
+                                                  pastMedicalHistoryModel!
+                                                      .treatmentResponses
+                                                      .values
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
 
-                                    pastMedicalHistoryModel != null
-                                        ? _text(
-                                            firstText: 'Surgical History',
-                                            secondText: pastMedicalHistoryModel!
-                                                .displaySurgicalHistory
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    pastMedicalHistoryModel != null
-                                        ? _text(
-                                            firstText: 'Medical History',
-                                            secondText: pastMedicalHistoryModel!
-                                                .medicalHistory
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    pastMedicalHistoryModel != null
-                                        ? _text(
-                                            firstText:
-                                                'Medical History Details',
-                                            secondText: pastMedicalHistoryModel!
-                                                .medicalHistoryDetails
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    pastMedicalHistoryModel != null
-                                        ? _text(
-                                            firstText: 'Previous Treatments',
-                                            secondText: pastMedicalHistoryModel!
-                                                .previousTreatments
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    pastMedicalHistoryModel != null
-                                        ? _text(
-                                            firstText: 'Treatment Responses',
-                                            secondText: pastMedicalHistoryModel!
-                                                .treatmentResponses
-                                                .values
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-
-                                    painLocationModel != null
-                                        ? _text(
-                                            firstText: 'Pain Location',
-                                            secondText: painLocationModel!
-                                                .painLocation
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    previousInvestigationsModel != null
-                                        ? _text(
-                                            firstText: 'Investigations Done',
-                                            secondText:
-                                                previousInvestigationsModel!
-                                                    .investigationsDone
-                                                    .toString(),
-                                          )
-                                        : SizedBox(),
-                                    redFlagsModel != null
-                                        ? _text(
-                                            firstText: 'Red Flags',
-                                            buttonText: redFlagsModel!.flags
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    radiatingPainModel != null
-                                        ? _text(
-                                            firstText: 'Radiating Status',
-                                            buttonText: radiatingPainModel!
-                                                .displayRadiatingStatus
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    radiatingPainModel != null
-                                        ? _text(
-                                            firstText: 'Radiating Side',
-                                            buttonText: radiatingPainModel!
-                                                .displayRadiationSide
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    radiatingPainModel != null
-                                        ? _text(
-                                            firstText: 'Radiating Path',
-                                            buttonText: radiatingPainModel!
-                                                .radiationPath
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    functionalLimitationsModel != null
-                                        ? _text(
-                                            firstText: 'Limited Activities',
-                                            buttonText:
-                                                functionalLimitationsModel!
-                                                    .limitedActivities
-                                                    .toString(),
-                                          )
-                                        : SizedBox(),
-                                    onsetAndCauseModel != null
-                                        ? _text(
-                                            firstText: 'How Did It Start',
-                                            buttonText: onsetAndCauseModel!
-                                                .displayHowDidItStart
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    onsetAndCauseModel != null
-                                        ? _text(
-                                            firstText: 'Possible Cause',
-                                            buttonText: onsetAndCauseModel!
-                                                .possibleCause
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    previousInvestigationsModel != null
-                                        ? _text(
-                                            firstText: 'Investigations Done',
-                                            buttonText:
-                                                previousInvestigationsModel!
-                                                    .investigationsDone
-                                                    .toString(),
-                                          )
-                                        : SizedBox(),
-                                    gaitAnalysisModel != null
-                                        ? _text(
-                                            firstText: 'Display Analysis',
-                                            buttonText: gaitAnalysisModel!
-                                                .displayAnalysis
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                    relievingFactorsModel != null
-                                        ? _text(
-                                            firstText: 'Factors',
-                                            buttonText: relievingFactorsModel!
-                                                .factors
-                                                .toString(),
-                                          )
-                                        : SizedBox(),
-                                  ],
+                                      painLocationModel != null
+                                          ? _text(
+                                              firstText: 'Pain Location',
+                                              secondText: painLocationModel!
+                                                  .painLocation
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      previousInvestigationsModel != null
+                                          ? _text(
+                                              firstText: 'Investigations Done',
+                                              secondText:
+                                                  previousInvestigationsModel!
+                                                      .investigationsDone
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+                                      redFlagsModel != null
+                                          ? _text(
+                                              firstText: 'Red Flags',
+                                              buttonText: redFlagsModel!.flags
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      radiatingPainModel != null
+                                          ? _text(
+                                              firstText: 'Radiating Status',
+                                              buttonText: radiatingPainModel!
+                                                  .displayRadiatingStatus
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      radiatingPainModel != null
+                                          ? _text(
+                                              firstText: 'Radiating Side',
+                                              buttonText: radiatingPainModel!
+                                                  .displayRadiationSide
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      radiatingPainModel != null
+                                          ? _text(
+                                              firstText: 'Radiating Path',
+                                              buttonText: radiatingPainModel!
+                                                  .radiationPath
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      functionalLimitationsModel != null
+                                          ? _text(
+                                              firstText: 'Limited Activities',
+                                              buttonText:
+                                                  functionalLimitationsModel!
+                                                      .limitedActivities
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+                                      onsetAndCauseModel != null
+                                          ? _text(
+                                              firstText: 'How Did It Start',
+                                              buttonText: onsetAndCauseModel!
+                                                  .displayHowDidItStart
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      onsetAndCauseModel != null
+                                          ? _text(
+                                              firstText: 'Possible Cause',
+                                              buttonText: onsetAndCauseModel!
+                                                  .possibleCause
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      previousInvestigationsModel != null
+                                          ? _text(
+                                              firstText: 'Investigations Done',
+                                              buttonText:
+                                                  previousInvestigationsModel!
+                                                      .investigationsDone
+                                                      .toString(),
+                                            )
+                                          : SizedBox(),
+                                      gaitAnalysisModel != null
+                                          ? _text(
+                                              firstText: 'Display Analysis',
+                                              buttonText: gaitAnalysisModel!
+                                                  .displayAnalysis
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                      relievingFactorsModel != null
+                                          ? _text(
+                                              firstText: 'Factors',
+                                              buttonText: relievingFactorsModel!
+                                                  .factors
+                                                  .toString(),
+                                            )
+                                          : SizedBox(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
-                        ],
-                      )
-                    : Center(child: Center(child: CircularProgressIndicator())),
-              )
-            : Scaffold(
-                body: Center(child: CustomText(text: 'No data found')),
-              );
-      },
+                              );
+                            }),
+                          ],
+                        )
+                      : Center(
+                          child: Center(
+                            child: CustomText(text: 'No data found'),
+                          ),
+                        ),
+                )
+              : Scaffold(body: Center(child: CircularProgressIndicator()));
+        },
+      ),
     );
   }
 }

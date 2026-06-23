@@ -1,8 +1,6 @@
 import 'package:doctor_app/data/models/history_traker_model.dart';
 
-class HistoryTrackerState {
-  HistoryTrackerState();
-}
+class HistoryTrackerState {}
 
 class HistoryTrackerGetState extends HistoryTrackerState {
   HistoryTrackerModel historyTrackerModel;
@@ -10,7 +8,7 @@ class HistoryTrackerGetState extends HistoryTrackerState {
   HistoryTrackerGetState({required this.historyTrackerModel});
 }
 
-class HistoryTrackerLoadingState extends HistoryTrackerState {}
+class HistoryTLoadingState extends HistoryTrackerState {}
 
 class HistoryTrackerMessageState extends HistoryTrackerState {
   String message;

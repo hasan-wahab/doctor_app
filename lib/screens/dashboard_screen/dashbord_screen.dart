@@ -2,43 +2,24 @@ import 'dart:convert';
 
 import 'package:doctor_app/core/app_keys/api_keys.dart';
 import 'package:doctor_app/core/extentions/context_extentions.dart';
-import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
-import 'package:doctor_app/data/models/all_visits_model.dart';
-import 'package:doctor_app/data/models/post_review_model.dart';
-import 'package:doctor_app/repos/all_consultant_assessment_repo/all_consultant_assessmant_repo.dart';
-import 'package:doctor_app/repos/all_packages_repo/all_packages_repo.dart';
-import 'package:doctor_app/repos/all_therapy_session_repo/all_therapy_session_repo.dart';
-import 'package:doctor_app/repos/all_visits_repo/all_visits_local_repo.dart';
-import 'package:doctor_app/repos/all_visits_repo/all_visits_repo.dart';
-import 'package:doctor_app/repos/post_review_repo/post_review_repo.dart';
-import 'package:doctor_app/repos/profile_local_repo/profile_local_repo.dart';
-import 'package:doctor_app/screens/auth_screen/bloc/login_bloc.dart';
-import 'package:doctor_app/screens/auth_screen/bloc/login_events.dart';
-import 'package:doctor_app/screens/auth_screen/bloc/login_states.dart';
+
 import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboad_states.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
-import 'package:doctor_app/screens/dashboard_screen/dashboard_chart.dart';
-import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
-import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
-import 'package:doctor_app/widgets/app_t_field.dart';
+
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
-import 'package:doctor_app/widgets/feed_back_dilog.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../core/functions.dart';
-import '../../data/api_service/api_service.dart';
-import '../../data/local_storage/local_curd_base/local_curd_impl.dart';
-import '../../data/local_storage/local_storage.dart';
+
 import '../../data/models/current_patient_model.dart';
-import '../../repos/all_consultant_assessment_repo/all_consultant_assessmant_local_repo.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/show_msg.dart';
 
@@ -195,43 +176,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                 ),
                               ],
                             ),
-                            InkWell(
-                              onTap: () async {
-                                // Navigator.pushNamed(
-                                //   context,
-                                //   AppRoutes.searchScreen,
-                                // );
-                              },
-                              child: CircleAvatar(
-                                backgroundColor: AppColors.secondaryColor,
-                                child: Icon(
-                                  CupertinoIcons.search,
-                                  color: AppColors.primaryColor,
-                                ),
-                              ),
-                            ),
-
-                            Stack(
-                              alignment: Alignment.topRight,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: AppColors.secondaryColor,
-
-                                  child: Icon(
-                                    CupertinoIcons.bell,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ),
-                                Container(
-                                  height: 10.h,
-                                  width: 10.h,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
 
@@ -257,92 +201,65 @@ class _DashbordScreenState extends State<DashbordScreen> {
                               ),
                               borderRadius: BorderRadius.circular(12.r),
                               color: AppColors.whiteIconColor,
-                              // border: Border.fromBorderSide(
-                              //   BorderSide(color: AppColors.primaryColor),
-                              // ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    spacing: 10.h,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CustomText(
-                                        text: 'Balance',
-                                        fontSize: 16,
-                                        color: AppColors.textWhiteColor,
-                                      ),
+                                Column(
+                                  spacing: 10.h,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: 'Balance',
+                                      fontSize: 16,
+                                      color: AppColors.textWhiteColor,
+                                    ),
 
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        spacing: 10,
-                                        children: [
-                                          walletBalance != null
-                                              ? CustomText(
-                                                  text:
-                                                      isObscureBalanceText !=
-                                                          true
-                                                      ? 'PKR $walletBalance'
-                                                      : '* * * * * *',
-                                                  fontSize: 13,
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      spacing: 10,
+                                      children: [
+                                        walletBalance != null
+                                            ? CustomText(
+                                                text:
+                                                    isObscureBalanceText != true
+                                                    ? 'PKR $walletBalance'
+                                                    : '* * * * * *',
+                                                fontSize: 13,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : CustomText(
+                                                text: '0.0',
+                                                fontSize: 13,
+                                                color: AppColors.textWhiteColor,
+                                              ),
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              isObscureBalanceText =
+                                                  !isObscureBalanceText;
+                                            });
+                                          },
+                                          child: isObscureBalanceText
+                                              ? Icon(
+                                                  Icons.visibility_off,
+                                                  size: 18.r,
                                                   color:
-                                                      AppColors.textWhiteColor,
+                                                      AppColors.whiteIconColor,
                                                 )
-                                              : CustomText(
-                                                  text: '0.0',
-                                                  fontSize: 13,
+                                              : Icon(
+                                                  Icons.visibility,
+                                                  size: 18.r,
                                                   color:
-                                                      AppColors.textWhiteColor,
+                                                      AppColors.whiteIconColor,
                                                 ),
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                isObscureBalanceText =
-                                                    !isObscureBalanceText;
-                                              });
-                                            },
-                                            child: isObscureBalanceText
-                                                ? Icon(
-                                                    Icons.visibility_off,
-                                                    size: 18.r,
-                                                    color: AppColors
-                                                        .whiteIconColor,
-                                                  )
-                                                : Icon(
-                                                    Icons.visibility,
-                                                    size: 18.r,
-                                                    color: AppColors
-                                                        .whiteIconColor,
-                                                  ),
-                                          ),
-                                        ],
-                                      ),
-                                      AppButton(
-                                        borderRadius: BorderRadius.circular(
-                                          8.r,
                                         ),
-                                        text: 'Recharge wallet',
-                                        width: 110,
-                                        isColor: false,
-                                        height: 34,
-                                        textSize: 11,
-                                        onTap: () async {},
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: SizedBox(
-                                    height: 100.h,
-                                    child: Column(
+                                      ],
+                                    ),
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -374,52 +291,50 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                             : SizedBox(),
                                       ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: 80.h,
-                                        width: 80.w,
-                                        child: CircularProgressIndicator(
-                                          value:
-                                              totalAmount != null &&
-                                                  totalSpend != null
-                                              ? getTotalPaymentProgress(
-                                                  total: totalAmount,
-                                                  paid: totalSpend,
-                                                )
-                                              : 0.0,
-                                          strokeWidth: 12,
-                                          backgroundColor: Colors.grey.shade300,
-                                          valueColor: AlwaysStoppedAnimation(
-                                            AppColors.primaryColor,
-                                          ),
+
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: 80.h,
+                                      width: 80.w,
+                                      child: CircularProgressIndicator(
+                                        value:
+                                            totalAmount != null &&
+                                                totalSpend != null
+                                            ? getTotalPaymentProgress(
+                                                total: totalAmount,
+                                                paid: totalSpend,
+                                              )
+                                            : 0.0,
+                                        strokeWidth: 12,
+                                        backgroundColor: Colors.grey.shade300,
+                                        valueColor: AlwaysStoppedAnimation(
+                                          AppColors.primaryColor,
                                         ),
                                       ),
-                                      Column(
-                                        children: [
-                                          totalAmount != null
-                                              ? CustomText(
-                                                  text:
-                                                      "${(getTotalPaymentProgress(total: totalAmount, paid: totalSpend) * 100).toStringAsFixed(0)}%",
-                                                  fontWeight: FontWeight.bold,
-                                                )
-                                              : SizedBox(),
-                                          const SizedBox(height: 4),
-                                          CustomText(
-                                            text: "Completed",
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryColor,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    Column(
+                                      children: [
+                                        totalAmount != null
+                                            ? CustomText(
+                                                text:
+                                                    "${(getTotalPaymentProgress(total: totalAmount, paid: totalSpend) * 100).toStringAsFixed(0)}%",
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                            : SizedBox(),
+                                        const SizedBox(height: 4),
+                                        CustomText(
+                                          text: "Completed",
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

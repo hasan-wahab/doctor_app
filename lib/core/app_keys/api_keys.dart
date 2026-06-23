@@ -1,7 +1,7 @@
 class ApiKeys {
   ApiKeys._();
   // old for testing
-  //static String baseUrl = 'https://alitherapy.neonweb.tech/api';
+  // static String baseUrl = 'https://alitherapy.neonweb.tech/api';
   // new url
   static String baseUrl = 'http://cms.dralitherapy.com/api';
 

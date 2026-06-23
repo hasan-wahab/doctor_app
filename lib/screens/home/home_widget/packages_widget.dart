@@ -12,6 +12,7 @@ import '../../../data/models/all_packages_model.dart';
 import '../../../widgets/custom_text.dart';
 import '../../../widgets/heding_text.dart';
 import '../../../widgets/outline_button.dart';
+import '../../../widgets/show_msg.dart';
 
 class AllPackagesWidget extends StatefulWidget {
   AllPackagesModel packages;
@@ -81,7 +82,19 @@ class _AllPackagesWidgetState extends State<AllPackagesWidget> {
 
                   AppOutlineButton(
                     onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.loginScreen);
+                      AppMsg.showErrorMsg(
+                        context,
+                        msg:
+                            'Please sign in first to book this therapy package.',
+                        msgTitle: 'Info',
+                        actionText: 'Cancel',
+                        actionText2: 'Login',
+                        action: () => Navigator.pop(context),
+                        action2: () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(context, AppRoutes.loginScreen);
+                        },
+                      );
                     },
                     text: 'Book',
                   ),

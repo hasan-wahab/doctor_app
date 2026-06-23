@@ -1,3 +1,4 @@
+import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,15 +25,16 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   // Profile image
                   Container(
+                    alignment: Alignment.center,
                     height: 50.h,
                     width: 50.h,
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/circle_avatar.png'),
-                        fit: BoxFit.cover,
-                      ),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primaryColor
+                      )
                     ),
+                    child: CustomText(text: 'GU',color: AppColors.primaryColor,fontWeight: FontWeight.w500,fontSize: 22.sp,),
                   ),
 
                   // Name

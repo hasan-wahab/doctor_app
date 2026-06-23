@@ -2,7 +2,6 @@ import 'package:doctor_app/core/app_routes/routes_name.dart';
 import 'package:doctor_app/screens/all_packages_screen/all_packages_screen.dart';
 import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
-import 'package:doctor_app/screens/auth_screen/reset_password_screen.dart';
 import 'package:doctor_app/screens/history_tracker_screen/history_tracker_screen.dart';
 import 'package:doctor_app/screens/location/location_screen.dart';
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
@@ -48,15 +47,7 @@ class AppGenerateRoute {
       routeName: AppRoutes.videoPlayerScreen,
       screen: VideoPlayerScreen(),
     ),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.selectDateScreen,
-    //   screen: SelectDateScreen(),
-    // ),
     AppGenerateRoute(routeName: AppRoutes.loginScreen, screen: LoginScreen()),
-    AppGenerateRoute(
-      routeName: AppRoutes.restPassword,
-      screen: ResetPasswordScreen(),
-    ),
 
     AppGenerateRoute(
       routeName: AppRoutes.myNFCCardScreen,
@@ -85,10 +76,6 @@ class AppGenerateRoute {
       screen: AssessmentDetailScreen(),
     ),
     AppGenerateRoute(routeName: AppRoutes.searchScreen, screen: SearchScreen()),
-    // AppGenerateRoute(
-    //   routeName: AppRoutes.assistantManagerScreen,
-    //   screen: AssistantManagerScreen(),
-    // ),
     AppGenerateRoute(
       routeName: AppRoutes.sessionsDetailScreen,
       screen: SessionDetailScreen(),

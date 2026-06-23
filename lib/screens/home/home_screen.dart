@@ -43,12 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     context.read<HomeBloc>().add(HomeLoadEvent());
-    super.initState();
+
     _pageController1 = PageController(initialPage: currentValue1);
     _pageController2 = PageController(initialPage: currentValue2);
 
     sliderController(_pageController1, currentValue1);
     sliderController(_pageController2, currentValue2);
+    super.initState();
   }
 
   @override

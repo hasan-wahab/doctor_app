@@ -410,21 +410,19 @@ class _SessionRecordState extends State<SessionRecord> {
                                                     onTap: () async {
                                                       String id = visits[index]
                                                           .displayId;
-                                                      print(
-                                                        visits[index]
-                                                            .displayType,
-                                                      );
+                                                      var type =
+                                                          visits[index]
+                                                                  .consultant ==
+                                                              null
+                                                          ? false
+                                                          : true;
                                                       Navigator.push(
                                                         context,
                                                         CupertinoPageRoute(
                                                           builder: (context) =>
                                                               SessionNotes(
                                                                 isConsultation:
-                                                                    visits[index]
-                                                                            .consultant ==
-                                                                        null
-                                                                    ? false
-                                                                    : true,
+                                                                    type,
                                                                 visitId: id,
                                                               ),
                                                         ),

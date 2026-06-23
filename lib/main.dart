@@ -56,7 +56,7 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.black, // 👈 background color
+      // systemNavigationBarColor: Colors.black, // 👈 background color
       systemNavigationBarIconBrightness: Brightness.light, // 👈 icons color
     ),
   );
@@ -207,6 +207,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => HistoryTrackerBloc(
             historyTrackerRepoImpl: historyTrackerRepoImpl,
+            profileLocalRepo: profileLocalRepo,
           ),
         ),
 
