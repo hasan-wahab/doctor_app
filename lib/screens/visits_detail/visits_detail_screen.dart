@@ -427,7 +427,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   /// ======================
   /// SUBMIT DATA (FIXED ONLY HERE)
   /// ======================
-  Future<void> submitData(int visitIndex) async {
+  Future submitData(int visitIndex) async {
     final visitAnswers = answers[visitIndex]!;
 
     int? rating;
@@ -650,32 +650,143 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                 SizedBox(height: 20.h),
 
                                 /// BUTTON
-                                visit.isCompleted
-                                    ? AppButton(
-                                        onTap: () {
-                                          if (isExpended[visitIndex]) {
-                                            submitData(visitIndex);
-                                          }
-                                          setState(() {
-                                            isExpended[visitIndex] =
-                                                !isExpended[visitIndex];
-                                          });
-                                          print(isExpended);
-                                        },
-                                        text: isExpended[visitIndex]
-                                            ? 'Submit'
-                                            : 'Give Feedback',
-                                      )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          CustomText(
-                                            color: AppColors.primaryColor,
+                                !visit.hasReview
+                                    ? visit.isCompleted
+                                          ? AppButton(
+                                              onTap: () async {
+                                                if (isExpended[visitIndex]) {
+                                                  await submitData(visitIndex);
+                                                }
+                                                setState(() {
+                                                  isExpended[visitIndex] =
+                                                      !isExpended[visitIndex];
+                                                });
+                                                print(isExpended);
+                                              },
+                                              text: isExpended[visitIndex]
+                                                  ? 'Submit'
+                                                  : 'Give Feedback',
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                CustomText(
+                                                  color: AppColors.primaryColor,
 
-                                            text:
-                                                'You can only review completed visits.',
+                                                  text:
+                                                      'You can only review completed visits.',
+                                                ),
+                                              ],
+                                            )
+                                    : Column(
+                                        spacing: 10.h,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText(
+                                                text: 'Rating',
+                                                color: AppColors.primaryColor,
+                                              ),
+
+                                              Row(
+                                                children: List.generate(
+                                                  int.parse(
+                                                    visit.displayRating,
+                                                  ),
+                                                  (ratingInd) {
+                                                    return Icon(
+                                                      Icons.star,
+                                                      color: Colors.amber,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CustomText(
+                                                text: 'Comment',
+                                                color: AppColors.primaryColor,
+                                              ),
+                                              CustomText(
+                                                maxLines: 10,
+                                                text: visit.displayComment,
+                                              ),
+                                            ],
+                                          ),
+
+                                          visit.review != null
+                                              ? Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    CustomText(
+                                                      text: 'Answers',
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+
+                                                    Wrap(
+                                                      runSpacing: 10.h,
+                                                      spacing: 10.w,
+                                                      children: List.generate(
+                                                        visit.review!.hasAnswers
+                                                            ? visit
+                                                                  .review!
+                                                                  .answers!
+                                                                  .length
+                                                            : 1,
+                                                        (ind) {
+                                                          var count = ind + 1;
+                                                          return Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            spacing: 5.w,
+                                                            children: [
+                                                              Container(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                height: 20.h,
+                                                                width: 20.h,
+                                                                decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  border: Border.all(
+                                                                    color: AppColors
+                                                                        .primaryColor,
+                                                                  ),
+                                                                ),
+                                                                child: CustomText(
+                                                                  fontSize:
+                                                                      12.sp,
+                                                                  text: count
+                                                                      .toString(),
+                                                                ),
+                                                              ),
+                                                              CustomText(
+                                                                text: visit
+                                                                    .review!
+                                                                    .answers![ind]
+                                                                    .displayAnswer,
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Container(),
                                         ],
                                       ),
                               ],

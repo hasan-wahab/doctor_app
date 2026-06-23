@@ -135,8 +135,32 @@ class VisitDetailBloc extends Bloc<VisitDetailEvent, VisitDetailState> {
         model: event.postReviewModel,
         token: token ?? '',
       );
-      emit(VisitDetailMessageState(message: 'Review Submitted'));
+      debugPrint('All Visit Data From Server');
+      emit(VisitDetailLoadingState());
+      // Here we will get data from server
+      CurrentPatientModel? currentPatientModel = await patientLocalRepo
+          .getPatientDataLocal();
+      if (currentPatientModel == null) return;
+      if (currentPatientModel.patient == null) return;
+      String patientId = currentPatientModel.patient?.id.toString() ?? '';
+      if (token != null && patientId.isNotEmpty && patientId != '') {
+        allVisitsModel = await allVisitRepo.allVisits(
+          token: token,
+          patientId: patientId,
+        );
+        List<QuestionModel> question = await questionRepo.getQuestions(
+          token: token,
+        );
+        emit(
+          AllVisitDatilsListState(question: question, model: allVisitsModel),
+        );
+      } else {
+        if (kDebugMode) {
+          print('Token Or PatientID Was Null');
+        }
+      }
 
+      emit(VisitDetailMessageState(message: 'Review Submitted'));
     } catch (e) {
       emit(VisitDetailMessageState(message: e.toString()));
     }
