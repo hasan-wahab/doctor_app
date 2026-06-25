@@ -3,80 +3,79 @@ class AppRoutes {
   // Initial Screen
   static const String splashScreen = '/';
   // Nave Bar
-  static const String naveBar = 'naveBar';
+  static const String naveBar = '/naveBar';
   // Home Screen
-  static const String homeScreen = 'homeScreen';
+  static const String homeScreen = '/homeScreen';
   // Map Screen
-  static const String mapScreen = 'mapScreen';
+  static const String mapScreen = '/mapScreen';
   // Information Screen
-  static const String infoScreen = 'infoScreen';
+  static const String infoScreen = '/infoScreen';
   // View All Packages Screen
-  static const String allPackagesScreen = 'allPackagesScreen';
+  static const String allPackagesScreen = '/allPackagesScreen';
   // Video Player Screen
-  static const String videoPlayerScreen = 'videoPlayerScreen';
+  static const String videoPlayerScreen = '/videoPlayerScreen';
   // Update Profile Screen
-  static const String updateProfile = 'updateProfile';
+  static const String updateProfile = '/updateProfile';
   // Profile Screen
-  static const String profileScreen = 'profileScreen';
+  static const String profileScreen = '/profileScreen';
   // Login Screen
-  static const String loginScreen = 'loginScreen';
+  static const String loginScreen = '/loginScreen';
   // SignUp Screen
-  static const String signUpScreen = 'signUpScreen';
+  static const String signUpScreen = '/signUpScreen';
   // Reset Password Screen
-  static const String restPassword = 'restPassword';
+  static const String restPassword = '/restPassword';
   // Wallet Screen
-  static const String walletScreen = 'walletScreen';
+  static const String walletScreen = '/walletScreen';
   // Transaction History Screen
-  static const String transactionHistoryScreen = 'transactionHistoryScreen';
+  static const String transactionHistoryScreen = '/transactionHistoryScreen';
   // Recharge Wallet Screen
-  static const String rechargeScreen = 'rechargeScreen';
+  static const String rechargeScreen = '/rechargeScreen';
   // Payment Methode Screen
-  static const String paymentMethodeScreen = 'paymentMethodeScreen';
+  static const String paymentMethodeScreen = '/paymentMethodeScreen';
   // Appointment Detail Screen
-  static const String appointmentDetailScreen = 'appointmentDetailScreen';
+  static const String appointmentDetailScreen = '/appointmentDetailScreen';
   // Book Appointment Screen
-  static const String bookAppointmentScreen = 'bookAppointmentScreen';
+  static const String bookAppointmentScreen = '/bookAppointmentScreen';
   // Select Date Screen
-  static const String selectDateScreen = 'selectDateScreen';
+  static const String selectDateScreen = '/selectDateScreen';
   // Confirm Appointment Screen
-  static const String confirmAppointment = 'confirmAppointment';
+  static const String confirmAppointment = '/confirmAppointment';
   // Payment option screen
-  static const String paymentOptionScreen = 'paymentOptionScreen';
+  static const String paymentOptionScreen = '/paymentOptionScreen';
   // Wallet payment Screen
-  static const String walletPaymentScreen = 'walletPaymentScreen';
+  static const String walletPaymentScreen = '/walletPaymentScreen';
   // Bank Payment Screen
-  static const String bankPaymentScreen = 'bankPaymentScreen';
+  static const String bankPaymentScreen = '/bankPaymentScreen';
   // Easy Paisa Payment Screen
-  static const String easyPaisaPaymentScreen = 'easyPaisaPaymentScreen';
+  static const String easyPaisaPaymentScreen = '/easyPaisaPaymentScreen';
   // Credit Card or Debit payment Screen
-  static const String creditCardPaymentScreen = 'creditCardPaymentScreen';
+  static const String creditCardPaymentScreen = '/creditCardPaymentScreen';
   // Payment Success Screen
-  static const String successPaymentScreen = 'successPaymentScreen';
+  static const String successPaymentScreen = '/successPaymentScreen';
   // Session Notes Screen
-  static const String notesScreen = 'notesScreen';
+  static const String notesScreen = '/notesScreen';
   // Session Record Screen
-  static const String sessionRecordScreen = 'sessionRecordScreen';
+  static const String sessionRecordScreen = '/sessionRecordScreen';
   // My NFC Card Screemn
-  static const String myNFCCardScreen = 'myNFCCardScreen';
+  static const String myNFCCardScreen = '/myNFCCardScreen';
   // My Profile Screen
 
-  static const String myProfileScreen = 'myProfileScreen';
+  static const String myProfileScreen = '/myProfileScreen';
 
   // Visit Details Screen
-  static const String visitsDetailScreen = 'visitsDetailScreen';
+  static const String visitsDetailScreen = '/visitsDetailScreen';
   // Packages Detail Screen
-  static const String packagesDetailScreen = 'packagesDetailScreen';
+  static const String packagesDetailScreen = '/packagesDetailScreen';
   // Assessments Detail Screen
-  static const String assessmentScreen = 'assessmentScreen';
+  static const String assessmentScreen = '/assessmentScreen';
   // Invoice Detail Screen
-  static const String invoiceDetailScreen = 'invoiceDetailScreen';
+  static const String invoiceDetailScreen = '/invoiceDetailScreen';
   // Sessions Detail Screen
-  static const String sessionsDetailScreen = 'sessionsDetailScreen';
+  static const String sessionsDetailScreen = '/sessionsDetailScreen';
   // Assistant Manager Screen
-  static const String assistantManagerScreen = 'assistantManagerScreen';
+  static const String assistantManagerScreen = '/assistantManagerScreen';
   // Search Screen
-  static const String searchScreen = 'searchScreen';
 
   // History Tracker Screen
-  static const String historyTrackerScreen = 'historyTrackerScreen';
+  static const String historyTrackerScreen = '/historyTrackerScreen';
 }

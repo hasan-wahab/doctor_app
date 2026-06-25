@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_routes/routes_name.dart';
@@ -39,14 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   AllPackagesModel? allPackagesModel;
   SliderModel? sliderModel;
   bool isLoading = false;
+  String? message;
 
   @override
   void initState() {
     context.read<HomeBloc>().add(HomeLoadEvent());
-
     _pageController1 = PageController(initialPage: currentValue1);
     _pageController2 = PageController(initialPage: currentValue2);
-
     sliderController(_pageController1, currentValue1);
     sliderController(_pageController2, currentValue2);
     super.initState();
@@ -61,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         if (state is HomeMessageState) {
           isLoading = false;
+          message = state.message;
+          print(state.message?.isEmpty);
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
         if (state is HomeLoadState) {
@@ -92,10 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         HeadingText(text: 'Therapy Session Packages'),
                         InkWell(
                           onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.allPackagesScreen,
-                            );
+                            context.push(AppRoutes.allPackagesScreen);
                           },
                           child: CustomText(
                             text: 'View all',
@@ -115,7 +114,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 )
-              : Center(child: CircularProgressIndicator()),
+              : isLoading
+              ? Center(child: CircularProgressIndicator())
+              : SizedBox(
+                  width: MediaQuery.sizeOf(context).width,
+                  child: Column(
+                    spacing: 10.h,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomText(
+                        text: message == 'No internet connection!'
+                            ? message!
+                            : 'No data',
+                      ),
+                      InkWell(
+                        onTap: () =>
+                            context.read<HomeBloc>().add(HomeLoadEvent()),
+                        child: Icon(Icons.refresh),
+                      ),
+                    ],
+                  ),
+                ),
 
           backgroundColor: AppColors.bgColor,
           floatingActionButton: InkWell(
@@ -145,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Spacer(),
                                 InkWell(
-                                  onTap: () => Navigator.pop(context),
+                                  onTap: () => context.pop(context),
                                   child: Icon(
                                     Icons.close,
                                     color: AppColors.primaryColor,

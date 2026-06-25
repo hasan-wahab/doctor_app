@@ -247,7 +247,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: ScreenUtilInit(
         designSize: Size(390, 844),
-        child: MaterialApp(
+        child: MaterialApp.router(
           builder: (context, child) {
             return AnnotatedRegion<SystemUiOverlayStyle>(
               value: AppSystemUi.light,
@@ -259,9 +259,7 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           ),
-          onGenerateRoute: (RouteSettings settings) {
-            return AppGenerateRoute.onGenerateRoute(settings, context);
-          },
+          routerConfig: RouteGenerator.route,
         ),
       ),
     );

@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_routes/routes_name.dart';
@@ -163,10 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     InkWell(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          AppRoutes.myProfileScreen,
-                                        );
+                                        context.push(AppRoutes.myProfileScreen);
                                       },
                                       child: Card(
                                         color: AppColors.secondaryColor,
@@ -206,12 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(
-                                            builder: (context) =>
-                                                NfcCardPage(fromProfile: true),
-                                          ),
+                                        context.push(
+                                          AppRoutes.myNFCCardScreen,
+                                          extra: true,
                                         );
                                       },
                                       child: Card(
@@ -249,10 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          AppRoutes.mapScreen,
-                                        );
+                                        context.push(AppRoutes.mapScreen);
                                       },
                                       child: Card(
                                         color: AppColors.secondaryColor,

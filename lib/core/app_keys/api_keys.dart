@@ -1,7 +1,7 @@
 class ApiKeys {
   ApiKeys._();
   // old for testing
-  // static String baseUrl = 'https://alitherapy.neonweb.tech/api';
+  //static String baseUrl = 'https://alitherapy.neonweb.tech/api';
   // new url
   static String baseUrl = 'http://cms.dralitherapy.com/api';
 
@@ -52,4 +52,8 @@ class ApiKeys {
 
   /// Post Review Key
   static String postReviewKey = "${ApiKeys.baseUrl}/patient/reviews";
+
+  /// All Packages Images url
+  static String allPackegesImagesUrl =
+      "https://alitherapy.neonweb.tech/storage";
 }

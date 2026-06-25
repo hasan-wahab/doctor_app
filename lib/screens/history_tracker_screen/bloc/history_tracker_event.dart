@@ -1,5 +1,5 @@
 class HistoryTrackerEvent {
-  String visitId;
+  String? visitId;
 
 
   HistoryTrackerEvent({required this.visitId,});

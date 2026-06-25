@@ -38,6 +38,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
   }
 
   bool isLoading = false;
+  String? message;
   AllPackagesModel? allPackagesModel;
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
         }
         if (state is HomeMessageState) {
           isLoading = false;
+          message = state.message.toString();
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
         if (state is HomeLoadState) {
@@ -103,12 +105,11 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
 
                                     borderRadius: BorderRadius.circular(10.sp),
                                   ),
-                                  child: ClipOval(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.sp),
                                     child: Image.network(
-                                      headers: {
-                                        'Authorization': 'Bearer sdfsadf',
-                                      },
-                                      "${ApiKeys.baseUrl}/${allPackagesModel!.packages[index].displayImage}",
+                                      fit: BoxFit.cover,
+                                      "${ApiKeys.allPackegesImagesUrl}/${allPackagesModel!.packages[index].displayImage}",
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
                                             if (loadingProgress == null) {
@@ -120,9 +121,12 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                                             );
                                           },
                                       errorBuilder: (context, obj, err) {
-                                        return Icon(
-                                          Icons.image,
-                                          color: AppColors.primaryColor,
+                                        return Center(
+                                          child: CustomText(
+                                            text: 'Image not\nfound!',
+                                            color: AppColors.secondaryTextColor,
+                                            align: TextAlign.center,
+                                          ),
                                         );
                                       },
                                     ),
@@ -133,9 +137,6 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                                   text: allPackagesModel!
                                       .packages[index]
                                       .displayName,
-                                  // text: searchResult.isEmpty
-                                  //     ? packages[index]
-                                  //     : searchResult[index].name.toString(),
                                   fontSize: 12,
                                 ),
                               ],
@@ -147,7 +148,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                                   context,
                                   msg:
                                       'Please sign in first to book this therapy package.',
-                                  msgTitle: 'Info',
+                                  msgTitle: 'Confirmation',
                                   actionText: 'Cancel',
                                   actionText2: 'Login',
                                   action: () => Navigator.pop(context),
@@ -168,7 +169,28 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
                     ),
                   ),
                 )
-              : Center(child: CircularProgressIndicator()),
+              : isLoading
+              ? Center(child: CircularProgressIndicator())
+              : SizedBox(
+                  width: MediaQuery.sizeOf(context).width,
+                  child: Column(
+                    spacing: 10.h,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomText(
+                        text: message == 'No internet connection!'
+                            ? message!
+                            : 'No data',
+                      ),
+                      InkWell(
+                        onTap: () =>
+                            context.read<HomeBloc>().add(HomeLoadEvent()),
+                        child: Icon(Icons.refresh),
+                      ),
+                    ],
+                  ),
+                ),
         );
       },
     );

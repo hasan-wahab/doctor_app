@@ -3,6 +3,7 @@ import 'package:doctor_app/data/models/current_patient_model.dart';
 import 'package:doctor_app/repos/patient_local_repo/patient_local_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/app_routes/routes_name.dart';
 import '../../../core/app_styles/app_colors.dart';
@@ -48,20 +49,26 @@ class _AllPackagesWidgetState extends State<AllPackagesWidget> {
                           borderRadius: BorderRadius.circular(10.sp),
                           color: AppColors.secondaryColor,
                         ),
-                        child: ClipOval(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.sp),
                           child: Image.network(
-                            headers: {'Authorization': 'Bearer sdfsadf'},
-                            "${ApiKeys.baseUrl}/${widget.packages.packages[index].displayImage}",
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) {
-                                return child;
+                            fit: BoxFit.cover,
+                            "${ApiKeys.allPackegesImagesUrl}/${widget.packages.packages[index].displayImage}",
+                            loadingBuilder: (context, child, loading) {
+                              if (loading != null) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
                               }
-                              return Center(child: CircularProgressIndicator());
+                              return child;
                             },
                             errorBuilder: (context, obj, err) {
-                              return Icon(
-                                Icons.image,
-                                color: AppColors.primaryColor,
+                              return Center(
+                                child: CustomText(
+                                  text: 'Image not\nfound!',
+                                  color: AppColors.secondaryTextColor,
+                                  align: TextAlign.center,
+                                ),
                               );
                             },
                           ),
@@ -86,13 +93,13 @@ class _AllPackagesWidgetState extends State<AllPackagesWidget> {
                         context,
                         msg:
                             'Please sign in first to book this therapy package.',
-                        msgTitle: 'Info',
+                        msgTitle: 'Confirmation',
                         actionText: 'Cancel',
                         actionText2: 'Login',
-                        action: () => Navigator.pop(context),
+                        action: () => context.pop(context),
                         action2: () {
-                          Navigator.pop(context);
-                          Navigator.pushNamed(context, AppRoutes.loginScreen);
+                          context.pop(context);
+                          context.push(AppRoutes.loginScreen);
                         },
                       );
                     },

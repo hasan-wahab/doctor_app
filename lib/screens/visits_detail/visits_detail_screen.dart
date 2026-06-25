@@ -387,6 +387,7 @@ class VisitsDetailScreen extends StatefulWidget {
 }
 
 class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
+  String? message;
   AllVisitsModel? allVisitsModel;
   List<QuestionModel>? questionModel;
 
@@ -482,6 +483,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
 
         if (state is VisitDetailMessageState) {
           isLoading = false;
+          message = state.message.toString();
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
 
@@ -515,7 +517,29 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : allVisitsModel == null
-                  ? const SizedBox()
+                  ? Center(
+                      child: SizedBox(
+                        width: MediaQuery.sizeOf(context).width,
+                        child: Column(
+                          spacing: 10.h,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CustomText(
+                              text: message == 'No internet connection!'
+                                  ? message!
+                                  : 'No data',
+                            ),
+                            InkWell(
+                              onTap: () => context.read<VisitDetailBloc>().add(
+                                VisitDetailApiAndLocalEvent(),
+                              ),
+                              child: Icon(Icons.refresh),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   : ListView(
                       padding: EdgeInsets.all(16.w),
                       children: List.generate(allVisitsModel!.visits.length, (
@@ -563,6 +587,8 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                 /// QUESTIONS
                                 isExpended[visitIndex] && visit.isCompleted
                                     ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         spacing: 10,
                                         children: List.generate(questionModel!.length, (
                                           questionIndex,

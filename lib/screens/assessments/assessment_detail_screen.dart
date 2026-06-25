@@ -20,7 +20,8 @@ import 'bloc/consultant_assesment_event.dart';
 import 'bloc/consultant_assesment_state.dart';
 
 class AssessmentDetailScreen extends StatefulWidget {
-  const AssessmentDetailScreen({super.key});
+  final String? visitId;
+  const AssessmentDetailScreen({super.key, this.visitId = ''});
 
   @override
   State<AssessmentDetailScreen> createState() => _AssessmentDetailScreenState();
@@ -38,13 +39,20 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
 
   String? id;
   bool isLoading = false;
+  String? message;
 
   @override
   Future<void> didChangeDependencies() async {
-    id = ModalRoute.of(context)!.settings.arguments as String?;
     super.didChangeDependencies();
     context.read<ConsultantAssessmentBloc>().add(
-      ConsultantAssessmentEvent(id: id),
+      ConsultantAssessmentEvent(id: widget.visitId),
+    );
+    print(
+      ''''''
+      ''''''
+      'Isd${widget.visitId}'
+      ''''''
+      '''''',
     );
   }
 
@@ -55,6 +63,7 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
         if (state is ConsultantMessageState) {
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message.toString());
+          message = state.message;
         }
         if (kDebugMode) {
           print(state);
@@ -62,9 +71,6 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
       },
 
       builder: (context, state) {
-        if (state is ConsultantMessageState) {
-          print(state.message.toString());
-        }
         if (state is ConsultantFromHomeLoaded) {
           allConsultantAssessmentModel = state.allConsultantAssessmentModel;
 
@@ -87,7 +93,8 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
               ),
               backgroundColor: AppColors.bgColor,
               body: SafeArea(
-                child: allConsultantAssessmentModel != null
+                child:
+                    isLoading == false && allConsultantAssessmentModel != null
                     ? ListView(
                         padding: EdgeInsets.only(
                           left: 20.w,
@@ -112,7 +119,11 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                                   allConsultantAssessmentModel![index]
                                       .muscleAssessments;
                               List<Exercise> exercies =
-                                  muscleAssessments[index].prescribedExercises;
+                                  muscleAssessments[index]
+                                      .prescribedExercises
+                                      .isNotEmpty
+                                  ? muscleAssessments[index].prescribedExercises
+                                  : [];
 
                               return Card(
                                 color: AppColors.secondaryColor,
@@ -396,11 +407,35 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                           ),
                         ],
                       )
-                    : Center(child: CustomText(text: 'text')),
+                    : isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : SizedBox(
+                        width: MediaQuery.sizeOf(context).width,
+                        child: Column(
+                          spacing: 10.h,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CustomText(
+                              text: message == 'No internet connection!'
+                                  ? message!
+                                  : 'No data',
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  context.read<ConsultantAssessmentBloc>().add(
+                                    ConsultantAssessmentEvent(isRefresh: true),
+                                  ),
+                              child: Icon(Icons.refresh),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ),
           );
         }
+
         if (state is ConsultantLoadedFromRecordsState) {
           consultantAssessments = state.model;
           return Scaffold(
@@ -417,254 +452,288 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
               automaticallyImplyLeading: false,
             ),
             backgroundColor: AppColors.bgColor,
-            body: ListView(
-              padding: EdgeInsets.only(
-                left: 20.w,
-                right: 20.w,
-                top: 10.h,
-                bottom: 60.h,
-              ),
-              children: [
-                CustomText(
-                  text: 'Consultant Assessments',
-                  fontSize: 20,
-                  color: AppColors.primaryColor,
+            body: SafeArea(
+              child: ListView(
+                padding: EdgeInsets.only(
+                  left: 20.w,
+                  right: 20.w,
+                  top: 10.h,
+                  bottom: 60.h,
                 ),
-                SizedBox(height: 30.h),
-                Card(
-                  color: AppColors.secondaryColor,
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 20),
-                    //   height: 404.h,
-                    width: 350.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 10.h),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: CustomText(
-                            text: 'Clinical Finding',
-                            fontSize: 14,
-                            color: AppColors.primaryColor,
+                children: [
+                  CustomText(
+                    text: 'Consultant Assessments',
+                    fontSize: 20,
+                    color: AppColors.primaryColor,
+                  ),
+                  SizedBox(height: 30.h),
+                  Card(
+                    color: AppColors.secondaryColor,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      //   height: 404.h,
+                      width: 350.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 10.h),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            child: CustomText(
+                              text: 'Clinical Finding',
+                              fontSize: 14,
+                              color: AppColors.primaryColor,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 10.h),
+                          SizedBox(height: 10.h),
 
-                        RowText(
-                          firstText: 'Diagnosis',
-                          secondText: consultantAssessments!
-                              .clinicalFindings!
-                              .displayDiagnosis
-                              .toString(),
-                        ),
-                        SizedBox(height: 7.h),
-
-                        RowText(
-                          firstText: 'Note',
-                          secondText: consultantAssessments!
-                              .clinicalFindings!
-                              .displayNote
-                              .toString(),
-                        ),
-                        Divider(thickness: 1, color: Colors.black),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: CustomText(
-                            text: 'Advice',
-                            fontSize: 14,
-                            color: AppColors.primaryColor,
+                          RowText(
+                            firstText: 'Diagnosis',
+                            secondText: consultantAssessments!
+                                .clinicalFindings!
+                                .displayDiagnosis
+                                .toString(),
                           ),
-                        ),
-                        SizedBox(height: 10.h),
+                          SizedBox(height: 7.h),
 
-                        RowText(
-                          firstText: 'Investigations Done',
-                          secondText: consultantAssessments!
-                              .advice!
-                              .displayInvestigationsDone
-                              .toString(),
-                        ),
-                        SizedBox(height: 7.h),
-
-                        RowText(
-                          firstText: 'Other Investigations Advice',
-                          secondText: consultantAssessments!
-                              .advice!
-                              .displayOtherInvestigationsAdvice
-                              .toString(),
-                        ),
-
-                        Divider(thickness: 1, color: Colors.black),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: CustomText(
-                            text: 'General Therapeutic Prescription',
-                            fontSize: 14,
-                            color: AppColors.primaryColor,
+                          RowText(
+                            firstText: 'Note',
+                            secondText: consultantAssessments!
+                                .clinicalFindings!
+                                .displayNote
+                                .toString(),
                           ),
-                        ),
-                        SizedBox(height: 10.h),
+                          Divider(thickness: 1, color: Colors.black),
 
-                        RowText(
-                          firstText: 'Advanced Techniques',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayAdvancedTechniques
-                              .toString(),
-                        ),
-                        SizedBox(height: 7.h),
-
-                        RowText(
-                          firstText: 'Anti Inflammatory Modalities',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayAntiInflammatoryModalities
-                              .toString(),
-                        ),
-
-                        SizedBox(height: 7.h),
-
-                        RowText(
-                          firstText: 'Electrotherapy',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayElectrotherapy
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Medications',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayMedications
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Thermo Cryotherapy',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayThermoCryotherapy
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Topicals',
-                          secondText: consultantAssessments!
-                              .generalTherapeuticPrescription!
-                              .displayTopicals
-                              .toString(),
-                        ),
-                        Divider(thickness: 1, color: Colors.black),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: CustomText(
-                            text: 'Muscle Assessments',
-                            fontSize: 14,
-                            color: AppColors.primaryColor,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            child: CustomText(
+                              text: 'Advice',
+                              fontSize: 14,
+                              color: AppColors.primaryColor,
+                            ),
                           ),
-                        ),
-                        ...List.generate(
-                          (consultantAssessments!.muscleAssessments.length),
-                          (index) {
-                            return Column(
-                              children: [
-                                RowText(
-                                  firstText: 'Other Treatment',
-                                  secondText: consultantAssessments!
-                                      .muscleAssessments[index]
-                                      .displayOtherTreatment
-                                      .toString(),
-                                ),
-                                RowText(
-                                  firstText: 'Muscle',
-                                  secondText: consultantAssessments!
-                                      .muscleAssessments[index]
-                                      .displayMuscle
-                                      .toString(),
-                                ),
-                                RowText(
-                                  firstText: 'Manual Treatment',
-                                  secondText: consultantAssessments!
-                                      .muscleAssessments[index]
-                                      .displayManualTreatment
-                                      .toString(),
-                                ),
-                                RowText(
-                                  firstText: 'Condition Status',
-                                  secondText: consultantAssessments!
-                                      .muscleAssessments[index]
-                                      .conditionStatus
-                                      .toString(),
-                                ),
+                          SizedBox(height: 10.h),
 
-                                RowText(
-                                  firstText: 'ByDefaultExercise',
-                                  secondText: consultantAssessments!
-                                      .muscleAssessments[index]
-                                      .byDefaultExercises
-                                      .toString(),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        Divider(thickness: 1, color: Colors.black),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: CustomText(
-                            text: 'Session Settings',
-                            fontSize: 14,
-                            color: AppColors.primaryColor,
+                          RowText(
+                            firstText: 'Investigations Done',
+                            secondText: consultantAssessments!
+                                .advice!
+                                .displayInvestigationsDone
+                                .toString(),
                           ),
-                        ),
-                        RowText(
-                          firstText: 'PrescribedSessionDuration',
-                          secondText: consultantAssessments!
-                              .sessionSettings!
-                              .displayPrescribedSessionDuration!
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Session Settings',
-                          secondText: consultantAssessments!
-                              .sessionSettings!
-                              .displayPrescribedSessionDuration!
-                              .toString(),
-                        ),
-                        Divider(thickness: 1, color: Colors.black),
+                          SizedBox(height: 7.h),
 
-                        RowText(
-                          firstText: 'Manual Muscle Testing',
-                          secondText: consultantAssessments!
-                              .manualMuscleTesting!
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Selected Packages',
-                          secondText: consultantAssessments!.selectedPackages!
-                              .toString(),
-                        ),
-                        RowText(
-                          firstText: 'Special Examination',
-                          secondText: consultantAssessments!
-                              .specialTestsExamination!
-                              .toString(),
-                        ),
-                      ],
+                          RowText(
+                            firstText: 'Other Investigations Advice',
+                            secondText: consultantAssessments!
+                                .advice!
+                                .displayOtherInvestigationsAdvice
+                                .toString(),
+                          ),
+
+                          Divider(thickness: 1, color: Colors.black),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            child: CustomText(
+                              text: 'General Therapeutic Prescription',
+                              fontSize: 14,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                          SizedBox(height: 10.h),
+
+                          RowText(
+                            firstText: 'Advanced Techniques',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayAdvancedTechniques
+                                .toString(),
+                          ),
+                          SizedBox(height: 7.h),
+
+                          RowText(
+                            firstText: 'Anti Inflammatory Modalities',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayAntiInflammatoryModalities
+                                .toString(),
+                          ),
+
+                          SizedBox(height: 7.h),
+
+                          RowText(
+                            firstText: 'Electrotherapy',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayElectrotherapy
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Medications',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayMedications
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Thermo Cryotherapy',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayThermoCryotherapy
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Topicals',
+                            secondText: consultantAssessments!
+                                .generalTherapeuticPrescription!
+                                .displayTopicals
+                                .toString(),
+                          ),
+                          Divider(thickness: 1, color: Colors.black),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            child: CustomText(
+                              text: 'Muscle Assessments',
+                              fontSize: 14,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                          ...List.generate(
+                            (consultantAssessments!.muscleAssessments.length),
+                            (index) {
+                              return Column(
+                                children: [
+                                  RowText(
+                                    firstText: 'Other Treatment',
+                                    secondText: consultantAssessments!
+                                        .muscleAssessments[index]
+                                        .displayOtherTreatment
+                                        .toString(),
+                                  ),
+                                  RowText(
+                                    firstText: 'Muscle',
+                                    secondText: consultantAssessments!
+                                        .muscleAssessments[index]
+                                        .displayMuscle
+                                        .toString(),
+                                  ),
+                                  RowText(
+                                    firstText: 'Manual Treatment',
+                                    secondText: consultantAssessments!
+                                        .muscleAssessments[index]
+                                        .displayManualTreatment
+                                        .toString(),
+                                  ),
+                                  RowText(
+                                    firstText: 'Condition Status',
+                                    secondText: consultantAssessments!
+                                        .muscleAssessments[index]
+                                        .conditionStatus
+                                        .toString(),
+                                  ),
+
+                                  RowText(
+                                    firstText: 'ByDefaultExercise',
+                                    secondText: consultantAssessments!
+                                        .muscleAssessments[index]
+                                        .byDefaultExercises
+                                        .toString(),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          Divider(thickness: 1, color: Colors.black),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                            ),
+                            child: CustomText(
+                              text: 'Session Settings',
+                              fontSize: 14,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                          RowText(
+                            firstText: 'PrescribedSessionDuration',
+                            secondText: consultantAssessments!
+                                .sessionSettings!
+                                .displayPrescribedSessionDuration!
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Session Settings',
+                            secondText: consultantAssessments!
+                                .sessionSettings!
+                                .displayPrescribedSessionDuration!
+                                .toString(),
+                          ),
+                          Divider(thickness: 1, color: Colors.black),
+
+                          RowText(
+                            firstText: 'Manual Muscle Testing',
+                            secondText: consultantAssessments!
+                                .manualMuscleTesting!
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Selected Packages',
+                            secondText: consultantAssessments!.selectedPackages!
+                                .toString(),
+                          ),
+                          RowText(
+                            firstText: 'Special Examination',
+                            secondText: consultantAssessments!
+                                .specialTestsExamination!
+                                .toString(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         } else if (state is ConsultantLoadingState) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         } else {
           return Scaffold(
-            body: Center(child: CustomText(text: 'No Data')),
+            body: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : SizedBox(
+                    width: MediaQuery.sizeOf(context).width,
+                    child: Column(
+                      spacing: 10.h,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomText(
+                          text: message == 'No internet connection!'
+                              ? message!
+                              : 'No data',
+                        ),
+                        InkWell(
+                          onTap: () => context
+                              .read<ConsultantAssessmentBloc>()
+                              .add(ConsultantAssessmentEvent(isRefresh: true)),
+                          child: Icon(Icons.refresh),
+                        ),
+                      ],
+                    ),
+                  ),
           );
         }
       },

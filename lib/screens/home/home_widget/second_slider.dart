@@ -1,9 +1,12 @@
+import 'package:doctor_app/core/extentions/internect_connectivity.dart';
+import 'package:doctor_app/screens/video_palyer/data/app_video_playlist.dart';
+import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/app_routes/routes_name.dart';
 import '../../../core/app_styles/app_colors.dart';
-import '../../../widgets/custom_text.dart';
 
 class SecondSlider extends StatefulWidget {
   int currentValue;
@@ -19,33 +22,33 @@ class SecondSlider extends StatefulWidget {
 }
 
 class _SecondSliderState extends State<SecondSlider> {
-  final List<String> videoImageId = [
-    'x3sKVlYFj5w',
-    'ho3Wpg1gPAQ',
-    'NuAFBlMGTwI',
-    '1Z6Iu0JcIhI',
-  ];
+  bool hasInternet = false;
 
   @override
   Widget build(BuildContext context) {
+    final videos = AppVideoPlaylist.items;
+
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.videoPlayerScreen,
-          arguments: <String, dynamic>{"currentIndex": widget.currentValue},
-        );
+      onTap: () async {
+        if (await InternetUtils.isInternetAvailable()) {
+          if (!context.mounted) return;
+          context.push(AppRoutes.videoPlayerScreen, extra: widget.currentValue);
+        } else {
+          if (!context.mounted) return;
+          AppMsg.showSnackBar(context, message: 'No Internet Connection !');
+        }
       },
       child: SizedBox(
         height: 188.h,
         child: PageView(
-          onPageChanged: (value) {
+          onPageChanged: (value) async {
+            hasInternet = await isConnected();
             widget.currentValue = value;
             setState(() {});
           },
           controller: widget.controller,
           scrollDirection: Axis.horizontal,
-          children: List.generate((4), (index) {
+          children: List.generate(videos.length, (index) {
             return Stack(
               children: [
                 Container(
@@ -64,7 +67,7 @@ class _SecondSliderState extends State<SecondSlider> {
                       borderRadius: BorderRadius.circular(12.r),
                       image: DecorationImage(
                         image: NetworkImage(
-                          'https://img.youtube.com/vi/${videoImageId[index]}/0.jpg',
+                          AppVideoPlaylist.thumbnailAt(index),
                         ),
                         fit: BoxFit.cover,
                       ),
@@ -73,7 +76,6 @@ class _SecondSliderState extends State<SecondSlider> {
                 ),
                 Align(
                   alignment: Alignment.center,
-
                   child: Icon(
                     Icons.play_circle_fill,
                     size: 50,
@@ -86,5 +88,13 @@ class _SecondSliderState extends State<SecondSlider> {
         ),
       ),
     );
+  }
+
+  isConnected() async {
+    if (await InternetUtils.isInternetAvailable()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

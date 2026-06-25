@@ -33,33 +33,33 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeLoadEvent event,
     Emitter<HomeState> emit,
   ) async {
-    // try {
-    emit(HomeLoadingState());
-    // First we will try to get data from local storage
-    allPackagesModel = await allPackagesLocalRepo.getAllPackagesFromLocal();
-    sliderModel = await sliderImagesLocalRepo.getSliderImages();
-    if (allPackagesModel != null &&
-        allPackagesModel!.packages.isNotEmpty &&
-        sliderModel != null) {
-      emit(
-        HomeLoadState(
-          allPackagesModel: allPackagesModel,
-          sliderModel: sliderModel,
-        ),
-      );
-    } else {
-      // Here we will get data from api
-      allPackagesModel = await allPackagesRepo.getAllPackages();
-      sliderModel = await sliderRepo.getSliderImages();
-      emit(
-        HomeLoadState(
-          allPackagesModel: allPackagesModel,
-          sliderModel: sliderModel,
-        ),
-      );
+    try {
+      emit(HomeLoadingState());
+      // First we will try to get data from local storage
+      allPackagesModel = await allPackagesLocalRepo.getAllPackagesFromLocal();
+      sliderModel = await sliderImagesLocalRepo.getSliderImages();
+      if (allPackagesModel != null &&
+          allPackagesModel!.packages.isNotEmpty &&
+          sliderModel != null) {
+        emit(
+          HomeLoadState(
+            allPackagesModel: allPackagesModel,
+            sliderModel: sliderModel,
+          ),
+        );
+      } else {
+        // Here we will get data from api
+        allPackagesModel = await allPackagesRepo.getAllPackages();
+        sliderModel = await sliderRepo.getSliderImages();
+        emit(
+          HomeLoadState(
+            allPackagesModel: allPackagesModel,
+            sliderModel: sliderModel,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(HomeMessageState(message: e.toString()));
     }
-    // } catch (e) {
-    //   emit(HomeMessageState(message: e.toString()));
-    // }
   }
 }

@@ -69,8 +69,8 @@ class AppMsg {
   }
 
   static showSnackBar(BuildContext context, {required String message}) {
-    return ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    return ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

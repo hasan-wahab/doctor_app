@@ -15,6 +15,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../core/functions.dart';
@@ -129,10 +130,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      AppRoutes.myProfileScreen,
-                                    );
+                                    context.push(AppRoutes.myProfileScreen);
                                   },
                                   child: Container(
                                     height: 50.h,
@@ -372,10 +370,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                 ).width;
                                 return InkWell(
                                   onTap: () async {
-                                    Navigator.pushNamed(
-                                      context,
-                                      screenNameList[index],
-                                    );
+                                    context.push(screenNameList[index]);
                                   },
                                   child: Card(
                                     color: Colors.transparent,

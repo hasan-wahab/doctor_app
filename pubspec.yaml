@@ -48,6 +48,8 @@ dependencies:
   path: ^1.9.1
   nfc_manager: ^4.1.1
   android_intent_plus: ^6.0.0
+  go_router: ^17.3.0
+  connectivity_plus: ^7.1.1
 
 
 

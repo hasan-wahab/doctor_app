@@ -5,6 +5,7 @@ import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
@@ -85,10 +86,9 @@ class _SessionNotesState extends State<SessionNotes> {
                                   ? Container()
                                   : InkWell(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                          arguments: {'VisitId': visitID ?? ''},
-                                          context,
+                                        context.push(
                                           AppRoutes.historyTrackerScreen,
+                                          extra: visitID,
                                         );
                                       },
                                       child: SizedBox(
@@ -163,10 +163,9 @@ class _SessionNotesState extends State<SessionNotes> {
                                   ? Container()
                                   : InkWell(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
+                                        context.push(
                                           AppRoutes.assessmentScreen,
-                                          arguments: visitID ?? '',
+                                          extra: visitID,
                                         );
                                       },
                                       child: SizedBox(
@@ -201,10 +200,9 @@ class _SessionNotesState extends State<SessionNotes> {
 
                               InkWell(
                                 onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
+                                  context.push(
                                     AppRoutes.sessionsDetailScreen,
-                                    arguments: visitID ?? '',
+                                    extra: visitID ?? '',
                                   );
                                 },
                                 child: SizedBox(

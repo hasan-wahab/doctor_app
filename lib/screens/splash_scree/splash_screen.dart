@@ -1,11 +1,14 @@
-
 import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../home/bloc/home_bloc.dart';
+import '../home/bloc/home_event.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -64,7 +67,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> splashScreenNavigation() async {
     await Future.delayed(Duration(seconds: 3)).then((_) {
-      Navigator.pushReplacementNamed(context, AppRoutes.naveBar);
+      if (!mounted) return;
+      context.read<HomeBloc>().add(HomeLoadEvent());
+      context.go(AppRoutes.naveBar);
     });
   }
 }

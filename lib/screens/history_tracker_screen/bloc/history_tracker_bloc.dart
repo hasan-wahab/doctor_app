@@ -30,7 +30,7 @@ class HistoryTrackerBloc
       if (token != '' && event.visitId != '') {
         historyTrackerModel = await historyTrackerRepoImpl.getHistoryTracker(
           token: token ?? "",
-          visitId: event.visitId,
+          visitId: event.visitId!,
         );
         emit(HistoryTrackerGetState(historyTrackerModel: historyTrackerModel!));
       } else {

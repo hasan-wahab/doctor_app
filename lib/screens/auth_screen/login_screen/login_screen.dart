@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/app_routes/routes_name.dart';
 import '../../../core/app_styles/app_colors.dart';
@@ -104,11 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
               listener: (context, state) {
                 if (state is LoginSuccessState) {
                   isLoading = false;
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    AppRoutes.naveBar,
-                    (Route<dynamic> route) => false,
-                  );
+                  context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
+                  context.go(AppRoutes.naveBar);
                 } else if (state is LoginErrorState) {
                   isLoading = false;
                   if (kDebugMode) {

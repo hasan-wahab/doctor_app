@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:doctor_app/data/local_storage/local_curd_base/local_curd_base.dart';
@@ -49,16 +50,15 @@ class TherapySessionBloc
     try {
       emit(SessionLoadingState());
       String token = await profileLocalRepo.getToken() ?? '';
-      if (token != '' && event.id != null) {
+      if (token != '' && event.id != null && event.id != '') {
+        print(event.id);
+
         therapySessionsResponseModel = await sessionsDetailRepo
             .getTherapySessionByVisitId(visitId: event.id!, token: token);
         emit(
           SessionLoadedFromRecordsState(model: therapySessionsResponseModel),
         );
-        print(event.id);
-      }
-      else
-      {
+      } else {
         patientData = await patientLocalRepo.getPatientDataLocal();
         profileData = await profileLocalRepo.getProfile();
 

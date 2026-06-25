@@ -19,7 +19,8 @@ import 'bloc/session_bloc.dart';
 import 'bloc/session_event.dart';
 
 class SessionDetailScreen extends StatefulWidget {
-  const SessionDetailScreen({super.key});
+  final String? visitId;
+  const SessionDetailScreen({super.key, this.visitId = ''});
 
   @override
   State<SessionDetailScreen> createState() => _SessionDetailScreenState();
@@ -28,16 +29,17 @@ class SessionDetailScreen extends StatefulWidget {
 class _SessionDetailScreenState extends State<SessionDetailScreen> {
   CurrentPatientModel? currentPatientData;
   TherapySessionsResponseModel? therapySessionsModel;
-  String? id;
+  String? id = '0';
 
   bool isLoading = false;
   AllTerapistModle? allTherapistModel;
+  String? message;
   @override
   Future<void> didChangeDependencies() async {
-    id = ModalRoute.of(context)!.settings.arguments as String?;
-    print(id);
     context.read<ProfileBloc>().add(MyProfileEvent());
-    context.read<TherapySessionBloc>().add(TherapySessionEvent(id: id));
+    context.read<TherapySessionBloc>().add(
+      TherapySessionEvent(id: widget.visitId),
+    );
     super.didChangeDependencies();
   }
 
@@ -46,6 +48,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     return BlocConsumer<TherapySessionBloc, TherapySessionState>(
       listener: (context, state) {
         if (state is SessionMessageState) {
+          message = state.message.toString();
           isLoading = false;
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
@@ -200,7 +203,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                       ),
                     ],
                   )
-                : Center(child: CircularProgressIndicator()),
+                : Center(child: CustomText(text: 'No data found!')),
           );
         }
         if (state is SessionFromHomeLoaded) {
@@ -349,7 +352,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                           });
                         }).toList(),
                       )
-                    : Center(child: CircularProgressIndicator()),
+                    : Center(child: CustomText(text: 'No data found!')),
               ),
             ),
           );
@@ -358,7 +361,27 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         } else {
           return Scaffold(
-            body: Center(child: CustomText(text: 'No Data')),
+            body: SizedBox(
+              width: MediaQuery.sizeOf(context).width,
+              child: Column(
+                spacing: 10.h,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(
+                    text: message == 'No internet connection!'
+                        ? message!
+                        : 'No data',
+                  ),
+                  InkWell(
+                    onTap: () => context.read<TherapySessionBloc>().add(
+                      TherapySessionEvent(id: widget.visitId),
+                    ),
+                    child: Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            ),
           );
         }
       },

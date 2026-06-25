@@ -69,6 +69,7 @@ class _NaveBarState extends State<NaveBar> {
           isLoading = false;
           currentIndex = state.index;
           token = state.token;
+          print(token);
         }
       },
       builder: (context, state) {
@@ -95,6 +96,12 @@ class _NaveBarState extends State<NaveBar> {
                                     index: index == 0 ? index : 3,
                                   ),
                                 );
+                                if (index != 0 && index != 3) {
+                                  AppMsg.showSnackBar(
+                                    context,
+                                    message: 'First of all you need to login',
+                                  );
+                                }
                               } else {
                                 context.read<NaveBarBloc>().add(
                                   NaveBarIndexEvent(index: index),

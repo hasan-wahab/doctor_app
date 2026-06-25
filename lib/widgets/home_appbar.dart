@@ -1,6 +1,7 @@
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/app_routes/routes_name.dart';
@@ -30,11 +31,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     width: 50.h,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.primaryColor
-                      )
+                      border: Border.all(color: AppColors.primaryColor),
                     ),
-                    child: CustomText(text: 'GU',color: AppColors.primaryColor,fontWeight: FontWeight.w500,fontSize: 22.sp,),
+                    child: CustomText(
+                      text: 'GU',
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 22.sp,
+                    ),
                   ),
 
                   // Name
@@ -71,7 +75,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.loginScreen);
+                  context.push(AppRoutes.loginScreen);
                 },
                 child: SizedBox(
                   height: 22.h,
