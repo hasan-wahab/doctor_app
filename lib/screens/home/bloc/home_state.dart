@@ -5,7 +5,7 @@ class HomeState {}
 
 class HomeLoadState extends HomeState {
   AllPackagesModel? allPackagesModel;
-  SliderModel? sliderModel;
+  List<SliderModel>? sliderModel;
   HomeLoadState({this.allPackagesModel,this.sliderModel});
 }
 

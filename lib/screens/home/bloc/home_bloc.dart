@@ -28,13 +28,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   AllPackagesModel? allPackagesModel;
-  SliderModel? sliderModel;
+  List<SliderModel>? sliderModel;
   FutureOr<void> _onHomeLoadEvent(
     HomeLoadEvent event,
     Emitter<HomeState> emit,
   ) async {
     try {
       emit(HomeLoadingState());
+      // await sliderImagesLocalRepo.deleteSliderImages();
+      // await allPackagesLocalRepo.deleteAllPackages();
       // First we will try to get data from local storage
       allPackagesModel = await allPackagesLocalRepo.getAllPackagesFromLocal();
       sliderModel = await sliderImagesLocalRepo.getSliderImages();

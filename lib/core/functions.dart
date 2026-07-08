@@ -10,3 +10,19 @@ double getSessionProgress({
 
   return progress.clamp(0.0, 1.0);
 }
+
+String getFirstTwoInitials(String name) {
+  if (name.trim().isEmpty) return "";
+
+  List<String> parts = name
+      .trim()
+      .split(" ")
+      .where((e) => e.isNotEmpty)
+      .toList();
+
+  if (parts.length == 1) {
+    return parts[0][0].toUpperCase();
+  }
+
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}

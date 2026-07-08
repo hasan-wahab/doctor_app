@@ -8,33 +8,49 @@ class SliderImagesLocalRepo {
   LocalCurdBase localCurdBase;
 
   SliderImagesLocalRepo({required this.localCurdBase});
-  Future saveSliderImages({required SliderModel model}) async {
+  Future saveSliderImages({required List<SliderModel> model}) async {
+    final modelData = model.map((e) => e.toJson()).toList();
     await localCurdBase.saveData(
       tableName: TableName.sliderImages,
       key: LocalKeys.sliderImagesKey,
-      data: model.toJson(),
+      data: modelData,
     );
   }
 
-  Future<SliderModel> getSliderImages() async {
-    SliderModel model;
+  Future<List<SliderModel>> getSliderImages() async {
     final result = await localCurdBase.getData(
       tableName: TableName.sliderImages,
     );
 
     if (result.isEmpty) {
       print('No data found in local');
-      return SliderModel.fromJson({});
+      return [];
     }
+
     var jsonParsing = result.first[LocalKeys.sliderImagesKey];
 
     if (jsonParsing == null) {
-      print('Patient null');
-      return SliderModel.fromJson({});
+      print('Data null');
+      return [];
     }
-    model = SliderModel.fromJson(jsonDecode(jsonParsing as String));
-    print(model.message);
-    return model;
+
+    // ✅ Case: already List<Map>
+    if (jsonParsing is List) {
+      return List<SliderModel>.from(
+        jsonParsing.map((e) => SliderModel.fromJson(e)),
+      );
+    }
+
+    // ✅ Case: String (fallback)
+    if (jsonParsing is String) {
+      final decoded = jsonDecode(jsonParsing);
+
+      return List<SliderModel>.from(
+        decoded.map((e) => SliderModel.fromJson(e)),
+      );
+    }
+
+    return [];
   }
 
   Future deleteSliderImages() {

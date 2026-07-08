@@ -53,6 +53,7 @@ Future<void> main() async {
     debugPrint(details.stack.toString());
   };
   runApp(const MyApp());
+
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

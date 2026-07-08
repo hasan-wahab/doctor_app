@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -18,6 +19,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/extentions/internect_connectivity.dart';
+import '../../core/functions.dart';
 import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../widgets/custom_text.dart';
@@ -32,17 +35,33 @@ class UpdateProfile extends StatefulWidget {
 }
 
 class _UpdateProfileState extends State<UpdateProfile> {
+  bool hasInternet = false;
   bool isLoading = false;
   String? selectedGender;
   DateTime? pickedData;
   CurrentPatientModel? currentPatientModel;
   LoginModel1? profileData;
+  late Timer _timer;
 
   @override
   void initState() {
     context.read<ProfileBloc>().add(MyProfileEvent());
-
+    internetController();
     super.initState();
+  }
+
+  void internetController() {
+    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
+      hasInternet = await InternetUtils.isInternetAvailable();
+      if (!mounted) return; // ✅ IMPORTANT
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   String? name, email, cnic, phone, birthDate, gender;
@@ -110,17 +129,48 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                             child: isLoading == false
                                                 ? pickImage == null
                                                       ? ClipOval(
-                                                          child: Image.network(
-                                                            fit: BoxFit.cover,
-                                                            currentPatientModel!
-                                                                .patient!
-                                                                .displayImageUrl
-                                                                .toString(),
-                                                            headers: {
-                                                              "Authorization":
-                                                                  "Bearer ${profileData!.accessToken.toString()}",
-                                                            },
-                                                          ),
+                                                          child: hasInternet
+                                                              ? Image.network(
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  currentPatientModel!
+                                                                      .patient!
+                                                                      .displayImageUrl
+                                                                      .toString(),
+                                                                  headers: {
+                                                                    "Authorization":
+                                                                        "Bearer ${profileData!.accessToken.toString()}",
+                                                                  },
+                                                                )
+                                                              : Container(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  height: 50.h,
+                                                                  width: 50.w,
+                                                                  decoration: BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    border: Border.all(
+                                                                      color: AppColors
+                                                                          .primaryColor,
+                                                                    ),
+                                                                  ),
+                                                                  child: CustomText(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        20.sp,
+                                                                    text: getFirstTwoInitials(
+                                                                      profileData!
+                                                                          .patientData!
+                                                                          .patientInfo!
+                                                                          .name
+                                                                          .toString(),
+                                                                    ),
+                                                                  ),
+                                                                ),
                                                         )
                                                       : ClipOval(
                                                           child: Image.file(

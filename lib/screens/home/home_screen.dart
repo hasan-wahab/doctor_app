@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:doctor_app/core/extentions/internect_connectivity.dart';
 import 'package:doctor_app/screens/home/bloc/home_bloc.dart';
 import 'package:doctor_app/screens/home/bloc/home_event.dart';
 import 'package:doctor_app/screens/home/bloc/home_state.dart';
@@ -38,9 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentValue2 = 0;
   late Timer _timer;
   AllPackagesModel? allPackagesModel;
-  SliderModel? sliderModel;
+  List<SliderModel>? sliderModel;
   bool isLoading = false;
   String? message;
+  bool hasInternet = false;
+  List sliderImagesList = [];
 
   @override
   void initState() {
@@ -49,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController2 = PageController(initialPage: currentValue2);
     sliderController(_pageController1, currentValue1);
     sliderController(_pageController2, currentValue2);
+    internetController();
     super.initState();
   }
 
@@ -69,6 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
           isLoading = false;
           allPackagesModel = state.allPackagesModel;
           sliderModel = state.sliderModel;
+          sliderImagesList = sliderModel != null
+              ? sliderModel!.expand((slider) => slider.images).toList()
+              : [];
         }
       },
       builder: (context, state) {
@@ -83,9 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     SizedBox(height: 15.h),
                     FirstSlider(
-                      sliderModel: sliderModel,
+                      sliderImages: sliderImagesList,
                       currentValue: currentValue1,
                       controller: _pageController1,
+                      hasInternet: hasInternet,
                     ),
                     SizedBox(height: 15.h),
                     Row(
@@ -94,7 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         HeadingText(text: 'Therapy Session Packages'),
                         InkWell(
                           onTap: () {
-                            context.push(AppRoutes.allPackagesScreen);
+                            context.push(
+                              AppRoutes.allPackagesScreen,
+                              extra: hasInternet,
+                            );
                           },
                           child: CustomText(
                             text: 'View all',
@@ -104,13 +115,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     SizedBox(height: 9.h),
-                    AllPackagesWidget(packages: allPackagesModel!),
+                    AllPackagesWidget(
+                      packages: allPackagesModel!,
+                      hasInternet: hasInternet,
+                    ),
                     SizedBox(height: 12.h),
 
                     SizedBox(height: 20.h),
                     SecondSlider(
                       controller: _pageController2,
                       currentValue: currentValue2,
+                      hasInternet: hasInternet,
                     ),
                   ],
                 )
@@ -323,6 +338,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  void internetController() {
+    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
+      hasInternet = await InternetUtils.isInternetAvailable();
+      if (!mounted) return; // ✅ IMPORTANT
+      setState(() {});
+    });
   }
 
   void sliderController(PageController controller, int currentValue) {

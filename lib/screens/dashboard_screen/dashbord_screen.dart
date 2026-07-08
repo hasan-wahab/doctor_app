@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:doctor_app/core/app_keys/api_keys.dart';
@@ -18,6 +19,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../core/extentions/internect_connectivity.dart';
 import '../../core/functions.dart';
 
 import '../../data/models/current_patient_model.dart';
@@ -32,7 +34,10 @@ class DashbordScreen extends StatefulWidget {
 }
 
 class _DashbordScreenState extends State<DashbordScreen> {
+  late Timer _timer;
+
   bool isLoading = false;
+  bool hasInternet = false;
   bool isObscureBalanceText = true;
   String totalSession = '1';
   String usedSession = '0';
@@ -43,7 +48,14 @@ class _DashbordScreenState extends State<DashbordScreen> {
   @override
   void initState() {
     context.read<DashboardBloc>().add(DashboardLoadDataEvent());
+    internetController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   final List<IconData> icons = [
@@ -138,22 +150,45 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                     ),
-                                    child: ClipOval(
-                                      child: profileImage != null
-                                          ? Image.network(
-                                              fit: BoxFit.cover,
-                                              '$profileImage',
-                                              headers: {
-                                                "Authorization":
-                                                    "Bearer ${profileData!.accessToken.toString()}",
-                                              },
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                    return CircleAvatar();
-                                                  },
-                                            )
-                                          : CircleAvatar(),
-                                    ),
+                                    child: hasInternet
+                                        ? ClipOval(
+                                            child: profileImage != null
+                                                ? Image.network(
+                                                    fit: BoxFit.cover,
+                                                    '$profileImage',
+                                                    headers: {
+                                                      "Authorization":
+                                                          "Bearer ${profileData!.accessToken.toString()}",
+                                                    },
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return CircleAvatar();
+                                                        },
+                                                  )
+                                                : CircleAvatar(),
+                                          )
+                                        : Container(
+                                            alignment: Alignment.center,
+                                            height: 50.h,
+                                            width: 50.w,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                            child: CustomText(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.sp,
+                                              text: getFirstTwoInitials(
+                                                patientName.toString(),
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 ),
                                 SizedBox(width: 10.w),
@@ -596,5 +631,13 @@ class _DashbordScreenState extends State<DashbordScreen> {
     if (progress.isNaN || progress.isInfinite) return 0.0;
 
     return progress.clamp(0.0, 1.0);
+  }
+
+  void internetController() {
+    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
+      hasInternet = await InternetUtils.isInternetAvailable();
+      if (!mounted) return; // ✅ IMPORTANT
+      setState(() {});
+    });
   }
 }

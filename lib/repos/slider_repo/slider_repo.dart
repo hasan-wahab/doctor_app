@@ -12,17 +12,18 @@ class SliderRepo {
   SliderImagesLocalRepo localRepo;
   SliderRepo({required this.api, required this.localRepo});
 
-  Future<SliderModel> getSliderImages() async {
+  Future<List<SliderModel>> getSliderImages() async {
     final jsonResponse = await api.getApi(url: ApiKeys.sliderKey);
 
     if (jsonResponse != null) {
-      SliderModel model;
-      model = SliderModel.fromJson(jsonResponse);
+      List sliderList = jsonResponse['data'] ?? [];
+      List<SliderModel> sliderModelList = sliderList
+          .map((e) => SliderModel.fromJson(e))
+          .toList();
 
       await localRepo.deleteSliderImages();
-      await localRepo.saveSliderImages(model: model);
-      print(model);
-      return model;
+      await localRepo.saveSliderImages(model: sliderModelList);
+      return sliderModelList;
     } else {
       if (kDebugMode) {
         print('Json Response null');

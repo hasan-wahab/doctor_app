@@ -182,16 +182,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                                                   .payments
                                                                   .length,
                                                               (index) {
-                                                                remainingPayments =
-                                                                    double.parse(
-                                                                      invoice
-                                                                          .amount
-                                                                          .toString(),
-                                                                    ) -
-                                                                    double.parse(
-                                                                      invoice
-                                                                          .displayAmount,
-                                                                    );
                                                                 return CustomText(
                                                                   text: double.parse(
                                                                     invoice

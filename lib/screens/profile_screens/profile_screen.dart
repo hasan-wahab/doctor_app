@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
@@ -19,6 +20,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../core/extentions/internect_connectivity.dart';
+import '../../core/functions.dart';
 import '../../data/api_service/api_service.dart';
 import '../../data/local_storage/local_storage.dart';
 import '../../data/models/current_patient_model.dart';
@@ -38,13 +41,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   LoginModel1? profileData;
   String? currentUserToken;
   CurrentPatientModel? currentPatientData;
+  late Timer _timer;
 
+  bool hasInternet = false;
   bool isLoading = false;
 
   @override
   void initState() {
     context.read<ProfileBloc>().add(MyProfileEvent());
+    internetController();
     super.initState();
+  }
+
+  void internetController() {
+    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
+      hasInternet = await InternetUtils.isInternetAvailable();
+      if (!mounted) return; // ✅ IMPORTANT
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -107,30 +127,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             shape: BoxShape.circle,
                                           ),
                                           child: currentPatientData != null
-                                              ? ClipOval(
-                                                  child:
-                                                      // profileData!.user!.profilePicture != null
-                                                      //    ?
-                                                      Image.network(
-                                                        fit: BoxFit.cover,
-                                                        currentPatientData!
-                                                            .patient!
-                                                            .displayImageUrl,
+                                              ? hasInternet
+                                                    ? ClipOval(
+                                                        child:
+                                                            // profileData!.user!.profilePicture != null
+                                                            //    ?
+                                                            Image.network(
+                                                              fit: BoxFit.cover,
+                                                              currentPatientData!
+                                                                  .patient!
+                                                                  .displayImageUrl,
 
-                                                        headers: {
-                                                          "Authorization":
-                                                              "Bearer ${profileData!.accessToken.toString()}",
-                                                        },
-                                                        errorBuilder:
-                                                            (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              return Container();
-                                                            },
-                                                      ),
-                                                )
+                                                              headers: {
+                                                                "Authorization":
+                                                                    "Bearer ${profileData!.accessToken.toString()}",
+                                                              },
+                                                              errorBuilder:
+                                                                  (
+                                                                    context,
+                                                                    error,
+                                                                    stackTrace,
+                                                                  ) {
+                                                                    return Container();
+                                                                  },
+                                                            ),
+                                                      )
+                                                    : Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        height: 50.h,
+                                                        width: 50.w,
+                                                        decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          border: Border.all(
+                                                            color: AppColors
+                                                                .primaryColor,
+                                                          ),
+                                                        ),
+                                                        child: CustomText(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 20.sp,
+                                                          text: getFirstTwoInitials(
+                                                            currentPatientData!
+                                                                .patient!
+                                                                .displayName
+                                                                .toString(),
+                                                          ),
+                                                        ),
+                                                      )
                                               : Center(
                                                   child:
                                                       CircularProgressIndicator(),

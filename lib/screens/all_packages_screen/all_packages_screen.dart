@@ -22,7 +22,8 @@ import '../../widgets/show_msg.dart';
 import '../home/home_widget/packages_widget.dart';
 
 class AllPackagesScreen extends StatefulWidget {
-  const AllPackagesScreen({super.key});
+  bool hasInternet;
+  AllPackagesScreen({super.key, this.hasInternet = false});
 
   @override
   State<AllPackagesScreen> createState() => _AllPackagesScreenState();
@@ -55,6 +56,7 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
         if (state is HomeLoadState) {
           isLoading = false;
           allPackagesModel = state.allPackagesModel;
+          print(allPackagesModel!.packages.map((e) => e.displayImage));
         }
       },
       builder: (context, state) {
@@ -105,32 +107,67 @@ class _AllPackagesScreenState extends State<AllPackagesScreen> {
 
                                     borderRadius: BorderRadius.circular(10.sp),
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.sp),
-                                    child: Image.network(
-                                      fit: BoxFit.cover,
-                                      "${ApiKeys.allPackegesImagesUrl}/${allPackagesModel!.packages[index].displayImage}",
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          },
-                                      errorBuilder: (context, obj, err) {
-                                        return Center(
-                                          child: CustomText(
-                                            text: 'Image not\nfound!',
-                                            color: AppColors.secondaryTextColor,
-                                            align: TextAlign.center,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
+                                  child: !isLoading
+                                      ? widget.hasInternet
+                                            ? Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.r,
+                                                      ),
+                                                  border: Border.all(
+                                                    color:
+                                                        AppColors.primaryColor,
+                                                  ),
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.sp,
+                                                      ),
+                                                  child: Image.network(
+                                                    fit: BoxFit.cover,
+                                                    "${ApiKeys.allPackegesImagesUrl}/${allPackagesModel?.packages[index].displayImage}",
+                                                    loadingBuilder:
+                                                        (
+                                                          context,
+                                                          child,
+                                                          loading,
+                                                        ) {
+                                                          if (loading != null) {
+                                                            return Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            );
+                                                          }
+                                                          return child;
+                                                        },
+                                                    errorBuilder: (context, obj, err) {
+                                                      return Center(
+                                                        child: CustomText(
+                                                          text:
+                                                              'Image not\nfound!',
+                                                          color: AppColors
+                                                              .secondaryTextColor,
+                                                          align:
+                                                              TextAlign.center,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              )
+                                            : Center(
+                                                child: CustomText(
+                                                  align: TextAlign.center,
+                                                  maxLines: 3,
+                                                  text:
+                                                      'No Internet\nImage not found!',
+                                                ),
+                                              )
+                                      : Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
                                 ),
                                 CustomText(
                                   maxLines: 4,

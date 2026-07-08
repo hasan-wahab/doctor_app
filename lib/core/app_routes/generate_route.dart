@@ -213,7 +213,8 @@ class RouteGenerator {
       ),
       _goRoute(
         routeName: AppRoutes.allPackagesScreen,
-        screen: (context, state) => AllPackagesScreen(),
+        screen: (context, state) =>
+            AllPackagesScreen(hasInternet: state.extra as bool),
       ),
       _goRoute(
         routeName: AppRoutes.updateProfile,
