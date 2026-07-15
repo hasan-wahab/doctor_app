@@ -25,7 +25,6 @@ class PatientRepoImpl implements PatientRepoBase {
   });
   @override
   Future<CurrentPatientModel> getPatientData() async {
-
     LoginModel1 userData = await profileLocalRepo.getProfile();
 
     dynamic jsonData = await api.getApi(
@@ -49,14 +48,11 @@ class PatientRepoImpl implements PatientRepoBase {
         debugMessage: 'jsonResponse is null',
       );
     }
-
   }
 
   @override
   Future deletePatientData() async {
-
-      await curdBase.deleteData(tableName: TableName.patientData);
-
+    await curdBase.deleteData(tableName: TableName.patientData);
   }
 
   @override

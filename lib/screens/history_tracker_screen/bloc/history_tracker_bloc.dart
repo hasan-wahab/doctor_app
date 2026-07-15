@@ -28,10 +28,12 @@ class HistoryTrackerBloc
       emit(HistoryTLoadingState());
       String? token = await profileLocalRepo.getToken();
       if (token != '' && event.visitId != '') {
+        print('from bloc${event.visitId}');
         historyTrackerModel = await historyTrackerRepoImpl.getHistoryTracker(
           token: token ?? "",
           visitId: event.visitId!,
         );
+
         emit(HistoryTrackerGetState(historyTrackerModel: historyTrackerModel!));
       } else {
         if (kDebugMode) {

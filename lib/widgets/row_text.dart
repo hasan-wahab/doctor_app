@@ -69,6 +69,7 @@ class RowText extends StatelessWidget {
           children: [
             Expanded(
               child: CustomText(
+                maxLines: 2,
                 text: firstText,
                 fontSize: 12,
                 color: firstText == 'Red Flags' ? Colors.red : Colors.black,

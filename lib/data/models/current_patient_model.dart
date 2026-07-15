@@ -1221,6 +1221,9 @@ class PatientStatsModel {
   final double? totalAmount;
   final double? totalSpent;
   final double? remaining;
+  final double? totalDiscount;
+  final double? totalInsuranceDiscount;
+  final double? totalInsuranceAndDiscount;
 
   PatientStatsModel({
     this.totalVisits,
@@ -1231,7 +1234,10 @@ class PatientStatsModel {
     this.totalSpend,
     this.totalAmount,
     this.totalSpent,
-    this.remaining
+    this.remaining,
+    this.totalDiscount,
+    this.totalInsuranceDiscount,
+    this.totalInsuranceAndDiscount,
   });
 
   String get displayTotalVisits => _display(totalVisits);
@@ -1240,6 +1246,10 @@ class PatientStatsModel {
   String get displayActivePackages => _display(activePackages);
   String get displayCompletedPackages => _display(completedPackages);
   String get remainingAmount => _display(remaining);
+  String get displayTotalDiscount => _display(totalDiscount);
+  String get displayTotalInsuranceDiscount => _display(totalInsuranceDiscount);
+  String get displayTotalInsuranceAndDiscount =>
+      _display(totalInsuranceAndDiscount);
   String get displayTotalSpent =>
       _display(totalSpent ?? totalAmount ?? totalSpend);
 
@@ -1254,6 +1264,9 @@ class PatientStatsModel {
         totalSpend: _dbl(json['total_paid']),
         totalAmount: _dbl(json['total_billed']),
         totalSpent: _dbl(json['total_spent']),
+        totalDiscount: _dbl(json['total_discount']),
+        totalInsuranceDiscount: _dbl(json['total_insurance_discount']),
+        totalInsuranceAndDiscount: _dbl(json['total_insurance_and_discount']),
       );
 
   Map<String, dynamic> toJson() => {
@@ -1266,6 +1279,9 @@ class PatientStatsModel {
     'total_billed': totalAmount,
     'total_spent': totalSpent,
     'remaining_amount': remaining,
+    'total_discount': totalDiscount,
+    'total_insurance_discount': totalInsuranceDiscount,
+    'total_insurance_and_discount': totalInsuranceAndDiscount,
   };
 }
 

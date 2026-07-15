@@ -174,6 +174,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                                           .modalitiesPerformed
                                           .length),
                                       (generate) => RowText(
+
                                         firstText: therapySessionsModel!
                                             .sessions[index]
                                             .modalitiesPerformed[generate]

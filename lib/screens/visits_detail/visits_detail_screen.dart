@@ -341,10 +341,8 @@
 //   }
 // }
 import 'package:doctor_app/core/extentions/context_extentions.dart';
-import 'package:doctor_app/data/api_service/base_api/base_api_impl.dart';
 import 'package:doctor_app/data/models/all_visits_model.dart';
 import 'package:doctor_app/data/models/reviews_question_model.dart';
-import 'package:doctor_app/repos/post_review_repo/post_review_repo.dart';
 import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/check_circle.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
@@ -403,20 +401,77 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     super.initState();
   }
 
+  void _sortVisitsOldestFirst() {
+    if (allVisitsModel == null) return;
+    final visits = List<VisitItemModel>.from(allVisitsModel!.visits);
+    visits.sort((a, b) {
+      final dateA = DateTime.tryParse(a.date ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final dateB = DateTime.tryParse(b.date ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return dateA.compareTo(dateB);
+    });
+    allVisitsModel = AllVisitsModel(visits: visits);
+  }
+
+  bool _isVisitExpanded(int visitIndex) {
+    return visitIndex >= 0 &&
+        visitIndex < isExpended.length &&
+        isExpended[visitIndex];
+  }
+
+  void _setVisitExpanded(int visitIndex, bool value) {
+    if (visitIndex < 0 || visitIndex >= isExpended.length) return;
+    isExpended[visitIndex] = value;
+  }
+
+  /// Visit position rules (1-based visit number, oldest visit first):
+  /// - Visit 1 + type consultation → consultation questions
+  /// - Visits 2,3,4,5 → therapist
+  /// - Visit 6,11,16... + type consultation → reconsultation
+  /// - Visits 7,8,9,10,12,13... (other slots) → therapist
+  String _questionCategoryForVisit(int visitIndex) {
+    final visit = allVisitsModel!.visits[visitIndex];
+    final type = visit.type?.toLowerCase().trim() ?? '';
+    final visitNumber = visitIndex + 1;
+
+    if (visitNumber == 1 && type == 'consultation') {
+      return 'consultation';
+    }
+
+    if (visitNumber > 1 &&
+        (visitNumber - 1) % 5 == 0 &&
+        type == 'consultation') {
+      return 'reconsultation';
+    }
+
+    return 'therapist';
+  }
+
+  List<QuestionModel> _questionsForVisit(int visitIndex) {
+    if (questionModel == null) return [];
+    final category = _questionCategoryForVisit(visitIndex).toLowerCase();
+    final filtered = questionModel!
+        .where((q) => q.isActive && q.category.toLowerCase().trim() == category)
+        .toList();
+    filtered.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return filtered;
+  }
+
   /// ======================
-  /// INIT ANSWERS (NO CHANGE)
+  /// INIT ANSWERS
   /// ======================
   void initAnswers() {
     answers.clear();
+    isExpended = List.generate(allVisitsModel!.visits.length, (_) => false);
 
-    for (int i = 0; i < allVisitsModel!.visits.length; i++) {
+    for (var i = 0; i < allVisitsModel!.visits.length; i++) {
       answers[i] = {};
+      final visitQuestions = _questionsForVisit(i);
 
-      for (int j = 0; j < questionModel!.length; j++) {
+      for (var j = 0; j < visitQuestions.length; j++) {
         answers[i]![j] = AnswerModel(
           rating: 0,
           selectedOptions: List.generate(
-            questionModel![j].options.length,
+            visitQuestions[j].options.length,
             (_) => false,
           ),
           controller: TextEditingController(),
@@ -426,40 +481,49 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   }
 
   /// ======================
-  /// SUBMIT DATA (FIXED ONLY HERE)
+  /// SUBMIT DATA
   /// ======================
   Future submitData(int visitIndex) async {
     final visitAnswers = answers[visitIndex]!;
+    final visitQuestions = _questionsForVisit(visitIndex);
 
+    // Top-level rating/comment: first filled values (API schema).
+    // Every answered question also goes into answers[] with question_id.
     int? rating;
     String? comment;
     List<Answers> answersList = [];
 
-    visitAnswers.forEach((questionIndex, ans) {
-      final q = questionModel![questionIndex];
+    final sortedIndexes = visitAnswers.keys.toList()..sort();
 
-      /// ⭐ RATING
-      if (q.type == 'rating') {
-        rating = ans.rating;
-      }
-      /// 📝 COMMENT (SAFE FIX)
-      else if (q.type.toLowerCase().contains('comment') ||
-          q.type.toLowerCase().contains('text') ||
-          q.type.toLowerCase().contains('feedback')) {
-        comment = ans.controller.text;
-      }
-      /// ✅ OPTIONS
-      else if (q.type == 'options') {
+    for (final questionIndex in sortedIndexes) {
+      if (questionIndex >= visitQuestions.length) continue;
+      final ans = visitAnswers[questionIndex]!;
+      final q = visitQuestions[questionIndex];
+      final type = q.type.toLowerCase();
+
+      if (type == 'rating') {
+        if (ans.rating <= 0) continue;
+        rating ??= ans.rating;
+        answersList.add(
+          Answers(questionId: q.id, answer: ans.rating.toString()),
+        );
+      } else if (type == 'text' ||
+          type.contains('comment') ||
+          type.contains('feedback')) {
+        final text = ans.controller.text.trim();
+        if (text.isEmpty) continue;
+        comment ??= text;
+        answersList.add(Answers(questionId: q.id, answer: text));
+      } else if (type == 'options') {
         for (int i = 0; i < ans.selectedOptions.length; i++) {
           if (ans.selectedOptions[i]) {
             answersList.add(Answers(questionId: q.id, answer: q.options[i]));
           }
         }
       }
-    });
+    }
 
-    /// 🔥 FINAL MODEL
-    PostReviewModel postModel = PostReviewModel(
+    final postModel = PostReviewModel(
       visitId: allVisitsModel!.visits[visitIndex].visitId,
       rating: rating,
       comment: comment,
@@ -470,8 +534,155 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     );
   }
 
+  /// Shows top-level rating/comment (old reviews) + every answers[] row.
+  Widget _buildSubmittedReview(VisitItemModel visit) {
+    final review = visit.review;
+    if (review == null) return const SizedBox.shrink();
+
+    final reviewAnswers = review.answers ?? [];
+    final widgets = <Widget>[];
+    var rowNo = 1;
+
+    bool answerLooksLikeRating(ReviewAnswerModel item) {
+      QuestionModel? question;
+      if (questionModel != null) {
+        for (final q in questionModel!) {
+          if (q.id == item.questionId) {
+            question = q;
+            break;
+          }
+        }
+      }
+      final type = (question?.type ?? '').toLowerCase();
+      final ratingValue = int.tryParse(item.displayAnswer.trim());
+      return type == 'rating' ||
+          (ratingValue != null && ratingValue >= 1 && ratingValue <= 5);
+    }
+
+    final hasRatingInAnswers = reviewAnswers.any(answerLooksLikeRating);
+    final hasTextInAnswers = reviewAnswers.any((item) {
+      QuestionModel? question;
+      if (questionModel != null) {
+        for (final q in questionModel!) {
+          if (q.id == item.questionId) {
+            question = q;
+            break;
+          }
+        }
+      }
+      final type = (question?.type ?? '').toLowerCase();
+      return type == 'text' ||
+          type.contains('comment') ||
+          type.contains('feedback');
+    });
+
+    // Old reviews: rating only on top-level fields
+    if (review.rating != null && !hasRatingInAnswers) {
+      widgets.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              maxLines: 10,
+              text: '$rowNo. Rating',
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+            SizedBox(height: 4.h),
+            Row(
+              children: List.generate(
+                5,
+                (i) => Icon(
+                  Icons.star,
+                  color: review.rating! > i ? Colors.amber : Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      rowNo++;
+    }
+
+    // Old reviews: comment only on top-level fields
+    if ((review.comment ?? '').trim().isNotEmpty && !hasTextInAnswers) {
+      widgets.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              maxLines: 10,
+              text: '$rowNo. Comment',
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+            SizedBox(height: 4.h),
+            CustomText(maxLines: 10, text: visit.displayComment),
+          ],
+        ),
+      );
+      rowNo++;
+    }
+
+    for (final item in reviewAnswers) {
+      QuestionModel? question;
+      if (questionModel != null) {
+        for (final q in questionModel!) {
+          if (q.id == item.questionId) {
+            question = q;
+            break;
+          }
+        }
+      }
+
+      final type = (question?.type ?? '').toLowerCase();
+      final title =
+          (item.question ?? question?.questionText ?? 'Answer').toSentenceCase;
+      final answerText = item.displayAnswer;
+      final ratingValue = int.tryParse(answerText.trim()) ?? 0;
+      final isRating =
+          type == 'rating' ||
+          (type.isEmpty && ratingValue >= 1 && ratingValue <= 5);
+
+      widgets.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              text: '$rowNo. $title',
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+            SizedBox(height: 4.h),
+            if (isRating)
+              Row(
+                children: List.generate(
+                  5,
+                  (i) => Icon(
+                    Icons.star,
+                    color: ratingValue > i ? Colors.amber : Colors.grey,
+                  ),
+                ),
+              )
+            else
+              CustomText(maxLines: 10, text: answerText.toSentenceCase),
+          ],
+        ),
+      );
+      rowNo++;
+    }
+
+    if (widgets.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      spacing: 12.h,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
+  }
+
   /// ======================
-  /// UI (NO CHANGE)
+  /// UI
   /// ======================
   @override
   Widget build(BuildContext context) {
@@ -491,6 +702,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
           isLoading = false;
           allVisitsModel = state.model;
           questionModel = state.question;
+          _sortVisitsOldestFirst();
           initAnswers();
         }
       },
@@ -546,7 +758,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                         visitIndex,
                       ) {
                         final visit = allVisitsModel!.visits[visitIndex];
-                        isExpended.add(false);
+                        final visitQuestions = _questionsForVisit(visitIndex);
                         return Card(
                           margin: EdgeInsets.only(bottom: 12.h),
                           color: AppColors.secondaryColor,
@@ -585,18 +797,31 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                 const Divider(),
 
                                 /// QUESTIONS
-                                isExpended[visitIndex] && visit.isCompleted
-                                    ? Column(
+                                _isVisitExpanded(visitIndex) && visit.isCompleted
+                                    ? visitQuestions.isEmpty
+                                          ? CustomText(
+                                              text:
+                                                  'No feedback questions available for this visit.',
+                                              color: AppColors.primaryColor,
+                                            )
+                                          : Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         spacing: 10,
-                                        children: List.generate(questionModel!.length, (
+                                        children: List.generate(visitQuestions.length, (
                                           questionIndex,
                                         ) {
                                           final q =
-                                              questionModel![questionIndex];
+                                              visitQuestions[questionIndex];
+                                          final visitAnswerMap =
+                                              answers[visitIndex];
+                                          if (visitAnswerMap == null ||
+                                              !visitAnswerMap
+                                                  .containsKey(questionIndex)) {
+                                            return const SizedBox.shrink();
+                                          }
                                           final ans =
-                                              answers[visitIndex]![questionIndex]!;
+                                              visitAnswerMap[questionIndex]!;
 
                                           return Column(
                                             crossAxisAlignment:
@@ -605,6 +830,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                               SizedBox(height: 10.h),
 
                                               CustomText(
+                                                maxLines: 10,
                                                 text: q
                                                     .questionText
                                                     .toSentenceCase,
@@ -672,7 +898,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                           );
                                         }),
                                       )
-                                    : SizedBox(),
+                                    : const SizedBox.shrink(),
                                 SizedBox(height: 20.h),
 
                                 /// BUTTON
@@ -680,16 +906,25 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                     ? visit.isCompleted
                                           ? AppButton(
                                               onTap: () async {
-                                                if (isExpended[visitIndex]) {
-                                                  await submitData(visitIndex);
+                                                if (_isVisitExpanded(visitIndex)) {
+                                                  if (visitQuestions.isEmpty) {
+                                                    AppMsg.showSnackBar(
+                                                      context,
+                                                      message:
+                                                          'No questions to submit for this visit.',
+                                                    );
+                                                  } else {
+                                                    await submitData(visitIndex);
+                                                  }
                                                 }
                                                 setState(() {
-                                                  isExpended[visitIndex] =
-                                                      !isExpended[visitIndex];
+                                                  _setVisitExpanded(
+                                                    visitIndex,
+                                                    !_isVisitExpanded(visitIndex),
+                                                  );
                                                 });
-                                                print(isExpended);
                                               },
-                                              text: isExpended[visitIndex]
+                                              text: _isVisitExpanded(visitIndex)
                                                   ? 'Submit'
                                                   : 'Give Feedback',
                                             )
@@ -705,116 +940,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                                 ),
                                               ],
                                             )
-                                    : Column(
-                                        spacing: 10.h,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              CustomText(
-                                                text: 'Rating',
-                                                color: AppColors.primaryColor,
-                                              ),
-
-                                              Row(
-                                                children: List.generate(
-                                                  int.parse(
-                                                    visit.displayRating,
-                                                  ),
-                                                  (ratingInd) {
-                                                    return Icon(
-                                                      Icons.star,
-                                                      color: Colors.amber,
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              CustomText(
-                                                text: 'Comment',
-                                                color: AppColors.primaryColor,
-                                              ),
-                                              CustomText(
-                                                maxLines: 10,
-                                                text: visit.displayComment,
-                                              ),
-                                            ],
-                                          ),
-
-                                          visit.review != null
-                                              ? Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    CustomText(
-                                                      text: 'Answers',
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-
-                                                    Wrap(
-                                                      runSpacing: 10.h,
-                                                      spacing: 10.w,
-                                                      children: List.generate(
-                                                        visit.review!.hasAnswers
-                                                            ? visit
-                                                                  .review!
-                                                                  .answers!
-                                                                  .length
-                                                            : 1,
-                                                        (ind) {
-                                                          var count = ind + 1;
-                                                          return Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            spacing: 5.w,
-                                                            children: [
-                                                              Container(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                                height: 20.h,
-                                                                width: 20.h,
-                                                                decoration: BoxDecoration(
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  border: Border.all(
-                                                                    color: AppColors
-                                                                        .primaryColor,
-                                                                  ),
-                                                                ),
-                                                                child: CustomText(
-                                                                  fontSize:
-                                                                      12.sp,
-                                                                  text: count
-                                                                      .toString(),
-                                                                ),
-                                                              ),
-                                                              CustomText(
-                                                                text: visit
-                                                                    .review!
-                                                                    .answers![ind]
-                                                                    .displayAnswer,
-                                                              ),
-                                                            ],
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Container(),
-                                        ],
-                                      ),
+                                    : _buildSubmittedReview(visit),
                               ],
                             ),
                           ),

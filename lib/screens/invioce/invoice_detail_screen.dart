@@ -94,6 +94,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                               children: List.generate(currentPatientData!.recentInvoices.length, (
                                 index,
                               ) {
+                                String invoiceCardNumber = (index + 1)
+                                    .toString();
                                 var invoice =
                                     currentPatientData!.recentInvoices[index];
                                 return Card(
@@ -119,11 +121,22 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                       children: [
                                         RowText(
                                           firstText: 'Invoice #',
-                                          secondText: invoice.id.toString(),
+                                          secondText: invoiceCardNumber,
+                                        ),
+                                        RowText(
+                                          firstText: 'Invoice Id',
+                                          secondText: invoice.displayId,
                                         ),
 
                                         RowText(
-                                          firstText: 'Date',
+                                          firstText: 'Create At',
+                                          secondText:
+                                              DateAndTimeFormater.dateFormat(
+                                                invoice.createdAt.toString(),
+                                              ),
+                                        ),
+                                        RowText(
+                                          firstText: 'Update At',
                                           secondText:
                                               DateAndTimeFormater.dateFormat(
                                                 invoice.createdAt.toString(),
@@ -141,6 +154,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         RowText(
                                           firstText: 'Status',
                                           buttonText: invoice.status,
+                                        ),
+                                        RowText(
+                                          firstText: 'Discount Amount',
+                                          buttonText:
+                                              invoice.displayDiscountAmount,
                                         ),
 
                                         isExpanded[index] == true

@@ -1,8 +1,8 @@
 class ApiKeys {
   ApiKeys._();
-  // old for testing
+  //  // old for testing
   // static String baseUrl = 'https://alitherapy.neonweb.tech/api';
-  // old for testing
+  // // old for testing
   // static String imageBaseUrl = 'https://alitherapy.neonweb.tech';
   // new url
   static String baseUrl = 'http://cms.dralitherapy.com/api';
@@ -25,7 +25,7 @@ class ApiKeys {
   /// Update Profile Api Key
   static String updateProfileImageKey = "$baseUrl/patient/profile-picture";
 
-  /// History Tracker Key
+  /// History Taker Key
   static String historyTrackerKey = "$baseUrl/patient/history";
 
   /// Consultant Assessment Key

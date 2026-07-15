@@ -3,6 +3,7 @@ class QuestionModel {
     required this.id,
     required this.questionText,
     required this.type,
+    required this.category,
     required this.options,
     required this.isActive,
     required this.sortOrder,
@@ -13,18 +14,22 @@ class QuestionModel {
   final int id;
   final String questionText;
   final String type;
+  final String category;
   final List<String> options;
   final bool isActive;
   final int sortOrder;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  factory QuestionModel.fromJson(Map<String, dynamic> json){
+  factory QuestionModel.fromJson(Map<String, dynamic> json) {
     return QuestionModel(
       id: json["id"] ?? 0,
       questionText: json["question_text"] ?? "",
       type: json["type"] ?? "",
-      options: json["options"] == null ? [] : List<String>.from(json["options"]!.map((x) => x)),
+      category: json["category"] ?? "",
+      options: json["options"] == null
+          ? []
+          : List<String>.from(json["options"]!.map((x) => x)),
       isActive: json["is_active"] ?? false,
       sortOrder: json["sort_order"] ?? 0,
       createdAt: DateTime.tryParse(json["created_at"] ?? ""),
@@ -38,9 +43,9 @@ class QuestionModel {
     "type": type,
     "options": options.map((x) => x).toList(),
     "is_active": isActive,
+    "category": category,
     "sort_order": sortOrder,
     "created_at": createdAt?.toIso8601String(),
     "updated_at": updatedAt?.toIso8601String(),
   };
-
 }

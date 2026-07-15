@@ -7,7 +7,7 @@ class DateAndTimeFormater {
 
     try {
       DateTime dateTime = DateTime.parse(apiDate);
-      return DateFormat('MM/dd/yyyy').format(dateTime);
+      return DateFormat('dd/MM/yyyy').format(dateTime);
     } catch (e) {
       return '';
     }

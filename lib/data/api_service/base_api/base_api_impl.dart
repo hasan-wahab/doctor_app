@@ -68,6 +68,8 @@ class BaseApiImpl implements BaseApi {
   @override
   Future getApi({required String url, String? patientId, String? token}) async {
     var urL = Uri.parse("$url/$patientId");
+    print(urL);
+    print(patientId);
     if (patientId == null) urL = Uri.parse(url);
     try {
       http.Response response = await http
@@ -79,6 +81,7 @@ class BaseApiImpl implements BaseApi {
             },
           )
           .timeout(const Duration(seconds: 50));
+
       return responseHandle(response);
     } on SocketException {
       throw NoInternetException();

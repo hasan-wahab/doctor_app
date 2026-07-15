@@ -85,6 +85,7 @@ class _DashbordScreenState extends State<DashbordScreen> {
 
   String? profileImage, patientName, walletBalance;
   double? totalAmount, totalSpend, remaining;
+  double? totalInsuranceDiscount, totalDiscount;
   PatientModel? patientModel;
 
   @override
@@ -112,6 +113,9 @@ class _DashbordScreenState extends State<DashbordScreen> {
           totalSpend = state.patientData.stats!.totalSpend;
           patientModel = state.patientData.patient;
           remaining = state.patientData.stats!.remaining;
+          totalDiscount = state.patientData.stats!.totalDiscount;
+          totalInsuranceDiscount =
+              state.patientData.stats!.totalInsuranceDiscount;
         }
       },
       builder: (context, state) {
@@ -317,6 +321,24 @@ class _DashbordScreenState extends State<DashbordScreen> {
                                         remaining != null
                                             ? CustomText(
                                                 text: 'Remaining: $remaining',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : SizedBox(),
+                                        totalDiscount != null
+                                            ? CustomText(
+                                                text:
+                                                    'Discount: $totalDiscount',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.textWhiteColor,
+                                              )
+                                            : SizedBox(),
+                                        totalInsuranceDiscount != null
+                                            ? CustomText(
+                                                text:
+                                                    'Insurance: $totalInsuranceDiscount',
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppColors.textWhiteColor,
