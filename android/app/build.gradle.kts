@@ -43,8 +43,8 @@
             // ("current min is 1") when the Flutter Gradle model is not loaded yet.
             minSdk = flutter.minSdkVersion
             targetSdk = 36
-            versionCode = 7
-            versionName = "1.0.6"
+            versionCode = 11
+            versionName = "1.0.10"
 //            ndk {
 //                abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
 //            }

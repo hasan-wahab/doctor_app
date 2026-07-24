@@ -1,3 +1,7 @@
+import 'package:doctor_app/screens/invioce/widgets/billing_header.dart';
+import 'package:doctor_app/screens/invioce/widgets/billing_invoice_card.dart';
+import 'package:doctor_app/screens/invioce/widgets/billing_payments_section.dart';
+import 'package:doctor_app/screens/invioce/widgets/billing_summary_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart'
@@ -28,6 +32,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   var isExpanded;
   double remainingPayments = 0;
   bool isLoading = false;
+  int totalInvoice = 0;
+  List<InvoiceModel> invoiceList = [];
+  List<PaymentModel> paymentList = [];
 
   @override
   void initState() {
@@ -46,15 +53,10 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           isLoading = false;
 
           currentPatientData = state.currentPatientModel;
-          isExpanded = List.generate(
-            currentPatientData!.recentInvoices.length,
-            (index) {
-              return false;
-            },
-          );
+          totalInvoice = currentPatientData?.recentInvoices.length ?? 0;
+          invoiceList = currentPatientData?.recentInvoices ?? [];
         } else if (state is ProfileMessageState) {
           isLoading = false;
-
           AppMsg.showErrorMsg(context, msg: state.message.toString());
         }
       },
@@ -75,210 +77,71 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 ),
                 backgroundColor: AppColors.bgColor,
                 body: SafeArea(
-                  child: ListView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
+                  child: RefreshIndicator(
+                    onRefresh: () async =>
+                        context.read<ProfileBloc>().add(MyProfileEvent()),
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      children: [
+                        SizedBox(height: 20.h),
+
+                        ...List.generate((totalInvoice), (index) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 12.h),
+                            child: BillingInvoiceCard(
+                              invoiceNo: invoiceList[index].id.toString(),
+                              date: DateAndTimeFormater.dateFormat(
+                                invoiceList[index].createdAt,
+                              ),
+                              type: invoiceList[index].type ?? '',
+                              amount:
+                                  invoiceList[index].amount?.toString() ??
+                                  '0.0',
+                              discount:
+                                  invoiceList[index].discountAmount
+                                      ?.toString() ??
+                                  '0.0',
+                              paid:
+                                  invoiceList[index].paidAmount?.toString() ??
+                                  '0.0',
+                              due:
+                                  invoiceList[index].remainingAmount
+                                      ?.toString() ??
+                                  '0.0',
+                              payStatus: invoiceList[index].computedStatus
+                                  .toString(),
+                              payments: List.generate(
+                                (invoiceList[index].payments.length),
+                                (generator) {
+                                  return BillingPaymentItem(
+                                    paymentId: invoiceList[index]
+                                        .payments[generator]
+                                        .displayId,
+                                    date: DateAndTimeFormater.dateFormat(
+                                      invoiceList[index]
+                                          .payments[generator]
+                                          .displayCreatedAt,
+                                    ),
+                                    amount:
+                                        invoiceList[index]
+                                            .payments[generator]
+                                            .amount
+                                            ?.toString() ??
+                                        '0.0',
+                                    method: invoiceList[index]
+                                        .payments[generator]
+                                        .displayMethod,
+                                    type: invoiceList[index]
+                                        .payments[generator]
+                                        .displayType,
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
                     ),
-                    children: [
-                      CustomText(
-                        text: 'Billing History',
-                        fontSize: 20,
-                        color: AppColors.primaryColor,
-                      ),
-                      SizedBox(height: 17.h),
-
-                      currentPatientData != null
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: List.generate(currentPatientData!.recentInvoices.length, (
-                                index,
-                              ) {
-                                String invoiceCardNumber = (index + 1)
-                                    .toString();
-                                var invoice =
-                                    currentPatientData!.recentInvoices[index];
-                                return Card(
-                                  margin: EdgeInsets.only(top: 15.h),
-                                  color: AppColors.secondaryColor,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 15.w,
-                                      right: 15.w,
-                                      top: 20.h,
-                                    ),
-
-                                    width: 360.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                                    ),
-
-                                    child: Column(
-                                      spacing: 10.h,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        RowText(
-                                          firstText: 'Invoice #',
-                                          secondText: invoiceCardNumber,
-                                        ),
-                                        RowText(
-                                          firstText: 'Invoice Id',
-                                          secondText: invoice.displayId,
-                                        ),
-
-                                        RowText(
-                                          firstText: 'Create At',
-                                          secondText:
-                                              DateAndTimeFormater.dateFormat(
-                                                invoice.createdAt.toString(),
-                                              ),
-                                        ),
-                                        RowText(
-                                          firstText: 'Update At',
-                                          secondText:
-                                              DateAndTimeFormater.dateFormat(
-                                                invoice.createdAt.toString(),
-                                              ),
-                                        ),
-                                        RowText(
-                                          firstText: 'Type',
-                                          buttonText: invoice.type,
-                                        ),
-                                        RowText(
-                                          firstText: 'Total amount',
-                                          secondText: invoice.amount!
-                                              .toString(),
-                                        ),
-                                        RowText(
-                                          firstText: 'Status',
-                                          buttonText: invoice.status,
-                                        ),
-                                        RowText(
-                                          firstText: 'Discount Amount',
-                                          buttonText:
-                                              invoice.displayDiscountAmount,
-                                        ),
-
-                                        isExpanded[index] == true
-                                            ? Column(
-                                                children: [
-                                                  Divider(
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: CustomText(
-                                                          text: 'Paid Payments',
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: CustomText(
-                                                          text:
-                                                              'Remaining Payments',
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            ...List.generate(
-                                                              invoice
-                                                                  .payments
-                                                                  .length,
-                                                              (index) {
-                                                                return CustomText(
-                                                                  text: double.parse(
-                                                                    invoice
-                                                                        .payments[index]
-                                                                        .amount
-                                                                        .toString(),
-                                                                  ).toInt().toString(),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            CustomText(
-                                                              text: remainingPayments
-                                                                  .toInt()
-                                                                  .toString(),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-
-                                                  Divider(
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                  ),
-                                                ],
-                                              )
-                                            : Container(),
-
-                                        SizedBox(height: 5.h),
-                                        invoice.status != 'paid'
-                                            ? Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  AppButton(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        isExpanded[index] =
-                                                            !isExpanded[index];
-                                                      });
-                                                    },
-                                                    text:
-                                                        isExpanded[index] ==
-                                                            true
-                                                        ? 'see less'
-                                                        : 'see more',
-                                                    width: 100,
-                                                    height: 20,
-                                                    isColor: false,
-                                                    textSize: 12,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          5,
-                                                        ),
-                                                  ),
-                                                ],
-                                              )
-                                            : Container(),
-                                        SizedBox(height: 2.h),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            )
-                          : Center(child: CircularProgressIndicator()),
-                    ],
                   ),
                 ),
               )

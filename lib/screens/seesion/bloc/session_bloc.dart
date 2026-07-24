@@ -50,15 +50,7 @@ class TherapySessionBloc
     try {
       emit(SessionLoadingState());
       String token = await profileLocalRepo.getToken() ?? '';
-      if (token != '' && event.id != null && event.id != '') {
-        print(event.id);
-
-        therapySessionsResponseModel = await sessionsDetailRepo
-            .getTherapySessionByVisitId(visitId: event.id!, token: token);
-        emit(
-          SessionLoadedFromRecordsState(model: therapySessionsResponseModel),
-        );
-      } else {
+      if (token != '') {
         patientData = await patientLocalRepo.getPatientDataLocal();
         profileData = await profileLocalRepo.getProfile();
 

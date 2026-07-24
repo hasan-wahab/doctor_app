@@ -287,10 +287,10 @@ class PatientInfo {
   });
 
   final int? id;
-   String? name;
-   String? email;
-   String? phone;
-   String? cnic;
+  String? name;
+  String? email;
+  String? phone;
+  String? cnic;
   final String? gender;
   final dynamic birthDate;
   final int? age;
@@ -351,6 +351,7 @@ class Statistics {
     required this.totalTherapySessions,
     required this.lastVisitDate,
     required this.nextAppointmentDate,
+    required this.nextSessionDate,
   });
 
   final int? totalVisits;
@@ -359,8 +360,10 @@ class Statistics {
   final int? totalTherapySessions;
   final dynamic lastVisitDate;
   final dynamic nextAppointmentDate;
+  final String nextSessionDate;
 
   factory Statistics.fromJson(Map<String, dynamic> json) {
+    print(json['next_session_date']);
     return Statistics(
       totalVisits: json["total_visits"],
       activePackages: json["active_packages"],
@@ -368,6 +371,7 @@ class Statistics {
       totalTherapySessions: json["total_therapy_sessions"],
       lastVisitDate: json["last_visit_date"],
       nextAppointmentDate: json["next_appointment_date"],
+      nextSessionDate: json["next_session_date"] ?? '',
     );
   }
 
@@ -379,6 +383,7 @@ class Statistics {
       "total_therapy_sessions": totalTherapySessions,
       "last_visit_date": lastVisitDate,
       "next_appointment_date": nextAppointmentDate,
+      "next_session_date": nextSessionDate,
     };
   }
 }

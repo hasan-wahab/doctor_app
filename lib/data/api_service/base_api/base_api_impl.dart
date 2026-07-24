@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -50,8 +51,9 @@ class BaseApiImpl implements BaseApi {
             },
           )
           .timeout(const Duration(seconds: 10));
+      print(token);
       print("STATUS CODE => ${response.statusCode}");
-      print("BODY => ${response.body}");
+      log("BODY => ${response.body}");
       return responseHandle(response);
     } on SocketException {
       throw NoInternetException();
@@ -128,7 +130,6 @@ dynamic responseHandle(http.Response response) {
         print(response.body);
       }
       return jsonDecode(response.body);
-
     case 400:
       throw BadRequestException();
     case 401:

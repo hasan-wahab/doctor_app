@@ -1118,58 +1118,116 @@ class PackagePivotModel {
 // ─────────────────────────────────────────────────────────────
 class InvoiceModel {
   final int? id;
+  final int? patientId;
+  final int? visitId;
+  final int? therapySessionId;
   final String? type;
   final double? amount;
   final String? status;
-  final double? discountAmount;
+  final int? createdBy;
+  final int? insurancePanelId;
+  final String? insurancePolicy;
+  final double? remainingAmount;
   final double? insuranceDiscountAmount;
+  final double? discountPercentage;
+  final double? discountAmount;
   final String? createdAt;
   final String? updatedAt;
+  final double? paidAmount;
+  final double? balance;
+  final String? computedStatus;
+  final VisitModel? visit;
   final List<PaymentModel> payments;
 
   InvoiceModel({
     this.id,
+    this.patientId,
+    this.visitId,
+    this.therapySessionId,
+    this.remainingAmount,
     this.type,
     this.amount,
     this.status,
-    this.discountAmount,
+    this.createdBy,
+    this.insurancePanelId,
+    this.insurancePolicy,
     this.insuranceDiscountAmount,
+    this.discountPercentage,
+    this.discountAmount,
     this.createdAt,
     this.updatedAt,
+    this.paidAmount,
+    this.balance,
+    this.computedStatus,
+    this.visit,
     this.payments = const [],
   });
 
   String get displayId => _display(id);
   String get displayType => _display(type);
   String get displayAmount => _display(amount);
-  String get displayStatus => _display(status);
+  String get displayStatus => _display(computedStatus ?? status);
   String get displayDiscountAmount => _display(discountAmount);
+  String get displayDiscountPercentage => _display(discountPercentage);
+  String get displayPaidAmount => _display(paidAmount);
+  String get displayBalance => _display(balance);
   String get displayCreatedAt => _display(createdAt);
+  String get displayRemainingAmount => _display(remainingAmount);
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) => InvoiceModel(
     id: _int(json['id']),
+    patientId: _int(json['patient_id']),
+    visitId: _int(json['visit_id']),
+    therapySessionId: _int(json['therapy_session_id']),
     type: _str(json['type']),
     amount: _dbl(json['amount']),
-    status: _str(json['computed_status']) ?? _str(json['status']),
-    discountAmount: _dbl(json['discount_amount']),
+    status: _str(json['status']),
+    createdBy: _int(json['created_by']),
+    insurancePanelId: _int(json['insurance_panel_id']),
+    insurancePolicy: _str(json['insurance_policy']),
     insuranceDiscountAmount: _dbl(json['insurance_discount_amount']),
+    discountPercentage: _dbl(json['discount_percentage']),
+    discountAmount: _dbl(json['discount_amount']),
     createdAt: _str(json['created_at']),
     updatedAt: _str(json['updated_at']),
+    paidAmount: _dbl(json['paid_amount']),
+    balance: _dbl(json['balance']),
+    computedStatus: _str(json['computed_status']),
+    remainingAmount: _dbl(json['remaining_amount']),
+    visit: json['visit'] is Map
+        ? VisitModel.fromJson(Map<String, dynamic>.from(json['visit'] as Map))
+        : null,
     payments: (json['payments'] as List<dynamic>? ?? [])
-        .map((e) => PaymentModel.fromJson(e as Map<String, dynamic>))
+        .map(
+          (e) => PaymentModel.fromJson(
+            e is Map ? Map<String, dynamic>.from(e) : <String, dynamic>{},
+          ),
+        )
         .toList(),
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'patient_id': patientId,
+    'visit_id': visitId,
+    'therapy_session_id': therapySessionId,
     'type': type,
     'amount': amount,
     'status': status,
-    'discount_amount': discountAmount,
+    'created_by': createdBy,
+    'insurance_panel_id': insurancePanelId,
+    'insurance_policy': insurancePolicy,
     'insurance_discount_amount': insuranceDiscountAmount,
+    'discount_percentage': discountPercentage,
+    'discount_amount': discountAmount,
     'created_at': createdAt,
     'updated_at': updatedAt,
+    'paid_amount': paidAmount,
+    'balance': balance,
+    'computed_status': computedStatus,
+    'visit': visit?.toJson(),
     'payments': payments.map((e) => e.toJson()).toList(),
+    'remaining_amount': remainingAmount,
   };
 }
 
@@ -1178,33 +1236,72 @@ class InvoiceModel {
 // ─────────────────────────────────────────────────────────────
 class PaymentModel {
   final int? id;
+  final int? invoiceId;
+  final int? cashRegisterId;
+  final int? patientId;
+  final int? clinicId;
+  final int? createdBy;
   final double? amount;
   final String? method;
-  final String? type;
+  final String? tid;
+  final String? receiptAttachment;
   final String? createdAt;
+  final String? updatedAt;
+  final String? type;
 
-  PaymentModel({this.id, this.amount, this.method, this.type, this.createdAt});
+  PaymentModel({
+    this.id,
+    this.invoiceId,
+    this.cashRegisterId,
+    this.patientId,
+    this.clinicId,
+    this.createdBy,
+    this.amount,
+    this.method,
+    this.tid,
+    this.receiptAttachment,
+    this.createdAt,
+    this.updatedAt,
+    this.type,
+  });
 
   String get displayId => _display(id);
   String get displayAmount => _display(amount);
   String get displayMethod => _display(method);
+  String get displayTid => _display(tid);
   String get displayType => _display(type);
   String get displayCreatedAt => _display(createdAt);
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) => PaymentModel(
     id: _int(json['id']),
+    invoiceId: _int(json['invoice_id']),
+    cashRegisterId: _int(json['cash_register_id']),
+    patientId: _int(json['patient_id']),
+    clinicId: _int(json['clinic_id']),
+    createdBy: _int(json['created_by']),
     amount: _dbl(json['amount']),
     method: _str(json['method']),
-    type: _str(json['type']),
+    tid: _str(json['tid']),
+    receiptAttachment: _str(json['receipt_attachment']),
     createdAt: _str(json['created_at']),
+    updatedAt: _str(json['updated_at']),
+    type: _str(json['type']),
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'invoice_id': invoiceId,
+    'cash_register_id': cashRegisterId,
+    'patient_id': patientId,
+    'clinic_id': clinicId,
+    'created_by': createdBy,
     'amount': amount,
     'method': method,
-    'type': type,
+    'tid': tid,
+    'receipt_attachment': receiptAttachment,
     'created_at': createdAt,
+    'updated_at': updatedAt,
+    'type': type,
   };
 }
 

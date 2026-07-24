@@ -4,6 +4,8 @@ import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
 import 'package:doctor_app/screens/seesion/bloc/session_state.dart';
+import 'package:doctor_app/screens/seesion/widgets/session_report_session_body.dart';
+import 'package:doctor_app/screens/seesion/widgets/session_report_session_card.dart';
 import 'package:doctor_app/widgets/app_t_field.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/material.dart';
@@ -54,163 +56,20 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         }
       },
       builder: (context, state) {
-        if (state is SessionLoadedFromRecordsState) {
-          print('From Record /..............');
-          therapySessionsModel = state.model;
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
-              ),
-              centerTitle: true,
-              title: Text('Sessions'),
-              automaticallyImplyLeading: false,
-            ),
-            backgroundColor: AppColors.bgColor,
-            body: therapySessionsModel != null
-                ? ListView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    children: [
-                      CustomText(
-                        text: 'Therapy Sessions',
-                        fontSize: 20,
-                        color: AppColors.primaryColor,
-                      ),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: List.generate(
-                          therapySessionsModel!.sessions.length,
-                          (index) {
-                            return Card(
-                              color: AppColors.secondaryColor,
-                              margin: EdgeInsets.only(top: 15.h),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w,
-                                  vertical: 20.h,
-                                ),
-
-                                //  height: 178.h,
-                                width: 360.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                                ),
-
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    RowText(
-                                      firstText: 'Sessions#',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displaySessionNumber
-                                          .toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Next session date',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
-                                            therapySessionsModel!
-                                                .sessions[index]
-                                                .nextSessionDate,
-                                          ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Therapist',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displayTherapist,
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Duration',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .sessionDurationTotal,
-                                    ),
-                                    RowText(
-                                      firstText: 'Notes',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displayClinicalNotes,
-                                    ),
-                                    RowText(
-                                      firstText: 'CrateAt',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displayCreatedAt,
-                                    ),
-                                    RowText(
-                                      firstText: 'Active time',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displayActiveTime,
-                                    ),
-                                    RowText(
-                                      firstText: 'Package Used',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displayPackageUsed,
-                                    ),
-                                    RowText(
-                                      firstText: 'Duration Total',
-                                      secondText: therapySessionsModel!
-                                          .sessions[index]
-                                          .displaySessionDurationTotal,
-                                    ),
-                                    ...List.generate(
-                                      (therapySessionsModel!
-                                          .sessions[index]
-                                          .modalitiesPerformed
-                                          .length),
-                                      (generate) => RowText(
-
-                                        firstText: therapySessionsModel!
-                                            .sessions[index]
-                                            .modalitiesPerformed[generate]
-                                            .displayModality,
-                                        secondText: therapySessionsModel!
-                                            .sessions[index]
-                                            .modalitiesPerformed[generate]
-                                            .displayDuration,
-                                      ),
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Visit Summary',
-                                      secondText: therapySessionsModel!
-                                          .summary!
-                                          .visitSummary!
-                                          .toJson()
-                                          .values
-                                          .toString(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                : Center(child: CustomText(text: 'No data found!')),
-          );
-        }
         if (state is SessionFromHomeLoaded) {
           print('From Home /..............');
           allTherapistModel = state.allTherapistModel;
           currentPatientData = state.patientData;
+          final sessions = allTherapistModel!.visitWiseSessions;
+          List filteredVisits;
+          if (widget.visitId != null && widget.visitId != '') {
+            filteredVisits = sessions!.where((item) {
+              return item.summary!.visitSummary?.visitID.toString() ==
+                  widget.visitId;
+            }).toList();
+          } else {
+            filteredVisits = sessions!;
+          }
 
           return Scaffold(
             appBar: AppBar(
@@ -226,6 +85,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               automaticallyImplyLeading: false,
             ),
             backgroundColor: AppColors.bgColor,
+
             body: SafeArea(
               child: RefreshIndicator(
                 onRefresh: () async => context.read<TherapySessionBloc>().add(
@@ -233,125 +93,65 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 ),
                 child: allTherapistModel != null
                     ? ListView(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.w,
-                          vertical: 10.h,
-                        ),
-                        children: allTherapistModel!.visitWiseSessions!.expand((
-                          items,
-                        ) {
-                          final summary = items.summary!.visitSummary;
-                          final sessions = items.sessions;
+                        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
+                        children: [
+                          SizedBox(height: 16.h),
+                          ...filteredVisits.expand((items) {
+                            final summary = items.summary!.visitSummary;
+                            final sessions = items.sessions;
+                            final allVisitsIds = allTherapistModel!
+                                .visitWiseSessions!
+                                .expand(
+                                  (e) => e.sessions!.map(
+                                    (_) => e.summary!.visitSummary!.visitID,
+                                  ),
+                                )
+                                .toList();
+                            bool isDup =
+                                allVisitsIds
+                                    .where((id) => id == summary!.visitID)
+                                    .toList()
+                                    .length >
+                                1;
+                            return sessions!.map((session) {
+                              return SessionReportSessionCard(
+                                terapistName: session.therapist ?? '',
+                                patientName:
+                                    currentPatientData!.patient?.name ?? '',
+                                cnic: currentPatientData!.patient?.cnic ?? '',
+                                ageGender:
+                                    currentPatientData!.patient?.gender ?? '',
+                                startedAt: '10:30',
 
-                          List visitId = [];
-
-                          final allVisitsIds = allTherapistModel!
-                              .visitWiseSessions!
-                              .expand(
-                                (e) => e.sessions!.map(
-                                  (_) => e.summary!.visitSummary!.visitID,
+                                endedAt: '10:40',
+                                packageUsed: session.packageUsed ?? '',
+                                sessionDuration:
+                                    session.sessionDurationTotal ?? '',
+                                sessionNumber: session.sessionID.toString(),
+                                visitDate: DateAndTimeFormater.dateFormat(
+                                  summary?.visitDate,
                                 ),
-                              )
-                              .toList();
-                          bool isDup =
-                              allVisitsIds
-                                  .where((id) => id == summary!.visitID)
-                                  .toList()
-                                  .length >
-                              1;
-                          return sessions!.map((session) {
-                            return Card(
-                              color: !isDup
-                                  ? AppColors.secondaryColor
-                                  : AppColors.bgColor,
-                              margin: EdgeInsets.only(top: 15.h),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w,
-                                  vertical: 20.h,
+                                modalities: List.generate(
+                                  (session.modalitiesPerformed?.length ?? 0),
+                                  (index2) {
+                                    return ModalityEntity(
+                                      title:
+                                          session
+                                              .modalitiesPerformed![index2]
+                                              .modality ??
+                                          '',
+                                      duration:
+                                          session
+                                              .modalitiesPerformed![index2]
+                                              .duration ??
+                                          '',
+                                    );
+                                  },
                                 ),
-
-                                //   height: 178.h,
-                                width: 360.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  //  border: Border.all(color: AppColors.primaryColor, width: 2),
-                                ),
-
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // All Session model
-                                    RowText(
-                                      firstText: 'Sessions Id',
-                                      secondText: session.sessionID.toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Visit Id',
-                                      secondText: summary?.visitID.toString(),
-                                    ),
-                                    RowText(
-                                      firstText: 'Next session date',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
-                                            session.nextSessionDate,
-                                          ),
-                                    ),
-                                    RowText(
-                                      firstText: 'Therapist',
-                                      secondText: session.therapist,
-                                    ),
-
-                                    RowText(
-                                      firstText: 'Duration',
-                                      secondText: session.sessionDurationTotal,
-                                    ),
-                                    RowText(
-                                      firstText: 'Notes',
-                                      secondText: session.clinicalNotes,
-                                    ),
-                                    RowText(
-                                      firstText: 'Package',
-                                      secondText: session.packageUsed,
-                                    ),
-                                    RowText(
-                                      firstText: 'Active time',
-                                      secondText: session.activeTime,
-                                    ),
-                                    RowText(
-                                      firstText: 'Created at',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
-                                            session.createdAt,
-                                          ),
-                                    ),
-                                    // Complete visit model
-                                    RowText(
-                                      firstText: 'Visit Status',
-                                      secondText: summary!.visitStatus,
-                                    ),
-                                    RowText(
-                                      firstText: 'Current Stage',
-                                      secondText: summary.currentStage,
-                                    ),
-                                    RowText(
-                                      firstText: 'Clinic',
-                                      secondText: summary.clinic,
-                                    ),
-                                    RowText(
-                                      firstText: 'Visit Date',
-                                      secondText:
-                                          DateAndTimeFormater.dateFormat(
-                                            summary.visitDate,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                        }).toList(),
+                              );
+                            });
+                          }).toList(),
+                        ],
                       )
                     : Center(child: CustomText(text: 'No data found!')),
               ),

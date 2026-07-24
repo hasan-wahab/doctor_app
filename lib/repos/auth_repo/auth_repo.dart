@@ -150,7 +150,6 @@ class AuthRepoImpl implements AuthRepoBase {
         }
       }
     } else {
-
       var jsonResponse = await api.postApi(
         url: ApiKeys.updateProfileKey,
         token: token,

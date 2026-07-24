@@ -1,4 +1,6 @@
 class HistoryTrackerModel {
+  final int? visitId;
+  final String? visitDate;
   final PatientInformationModel? patientInformation;
   final PainLocationModel? painLocation;
   final RegionInvolvedModel? regionInvolved;
@@ -15,9 +17,17 @@ class HistoryTrackerModel {
   final PastMedicalHistoryModel? pastMedicalHistory;
   final PreviousInvestigationsModel? previousInvestigations;
   final RedFlagsModel? redFlags;
+  final FaceOnsetCourseModel? faceOnsetCourse;
+  final FaceEyeInvolvementModel? faceEyeInvolvement;
+  final SpeechEatingDrinkingModel? speechEatingDrinking;
+  final FaceSpecificPainModel? faceSpecificPain;
+  final HouseholdWorkModel? householdWork;
+  final ForWomenOnlyModel? forWomenOnly;
   final ForMenOnlyModel? forMenOnly;
 
   HistoryTrackerModel({
+    this.visitId,
+    this.visitDate,
     this.patientInformation,
     this.painLocation,
     this.regionInvolved,
@@ -34,103 +44,146 @@ class HistoryTrackerModel {
     this.pastMedicalHistory,
     this.previousInvestigations,
     this.redFlags,
+    this.faceOnsetCourse,
+    this.faceEyeInvolvement,
+    this.speechEatingDrinking,
+    this.faceSpecificPain,
+    this.householdWork,
+    this.forWomenOnly,
     this.forMenOnly,
   });
 
+  String get displayVisitId => visitId?.toString() ?? 'No data';
+  String get displayVisitDate => visitDate ?? 'No data';
+
   factory HistoryTrackerModel.fromJson(Map<String, dynamic> json) {
     return HistoryTrackerModel(
+      visitId: _parseInt(json['Visit ID']),
+      visitDate: _parseString(json['Visit Date']),
       patientInformation: json['Patient Information'] != null
           ? PatientInformationModel.fromJson(
-        json['Patient Information'] as Map<String, dynamic>,
-      )
+              json['Patient Information'] as Map<String, dynamic>,
+            )
           : null,
       painLocation: json['Pain Location (3D Medical Dashboard)'] != null
           ? PainLocationModel.fromJson(
-        json['Pain Location (3D Medical Dashboard)']
-        as Map<String, dynamic>,
-      )
+              json['Pain Location (3D Medical Dashboard)']
+                  as Map<String, dynamic>,
+            )
           : null,
       regionInvolved: json['Region Involved'] != null
           ? RegionInvolvedModel.fromJson(
-        json['Region Involved'] as Map<String, dynamic>,
-      )
+              json['Region Involved'] as Map<String, dynamic>,
+            )
           : null,
       chiefComplaint: json['Chief Complaint'] != null
           ? ChiefComplaintModel.fromJson(
-        json['Chief Complaint'] as Map<String, dynamic>,
-      )
+              json['Chief Complaint'] as Map<String, dynamic>,
+            )
           : null,
       painDetails: json['Pain Details'] != null
           ? PainDetailsModel.fromJson(
-        json['Pain Details'] as Map<String, dynamic>,
-      )
+              json['Pain Details'] as Map<String, dynamic>,
+            )
           : null,
       radiatingPain: json['Radiating Pain (MANDATORY)'] != null
           ? RadiatingPainModel.fromJson(
-        json['Radiating Pain (MANDATORY)'] as Map<String, dynamic>,
-      )
+              json['Radiating Pain (MANDATORY)'] as Map<String, dynamic>,
+            )
           : null,
       associatedSymptoms: json['Associated Symptoms'] != null
           ? AssociatedSymptomsModel.fromJson(
-        json['Associated Symptoms'] as Map<String, dynamic>,
-      )
+              json['Associated Symptoms'] as Map<String, dynamic>,
+            )
           : null,
       movementRelatedPain: json['Movement-Related Pain / Difficulty'] != null
           ? MovementRelatedPainModel.fromJson(
-        json['Movement-Related Pain / Difficulty']
-        as Map<String, dynamic>,
-      )
+              json['Movement-Related Pain / Difficulty']
+                  as Map<String, dynamic>,
+            )
           : null,
       onsetAndCause: json['Onset & Cause'] != null
           ? OnsetAndCauseModel.fromJson(
-        json['Onset & Cause'] as Map<String, dynamic>,
-      )
+              json['Onset & Cause'] as Map<String, dynamic>,
+            )
           : null,
       aggravatingFactors: json['Aggravating Factors'] != null
           ? AggravatingFactorsModel.fromJson(
-        json['Aggravating Factors'] as Map<String, dynamic>,
-      )
+              json['Aggravating Factors'] as Map<String, dynamic>,
+            )
           : null,
       relievingFactors: json['Relieving Factors'] != null
           ? RelievingFactorsModel.fromJson(
-        json['Relieving Factors'] as Map<String, dynamic>,
-      )
+              json['Relieving Factors'] as Map<String, dynamic>,
+            )
           : null,
       functionalLimitations: json['Functional Limitations (ADL)'] != null
           ? FunctionalLimitationsModel.fromJson(
-        json['Functional Limitations (ADL)'] as Map<String, dynamic>,
-      )
+              json['Functional Limitations (ADL)'] as Map<String, dynamic>,
+            )
           : null,
       gaitAnalysis: json['Gait & Movement Analysis'] != null
           ? GaitAnalysisModel.fromJson(
-        json['Gait & Movement Analysis'] as Map<String, dynamic>,
-      )
+              json['Gait & Movement Analysis'] as Map<String, dynamic>,
+            )
           : null,
       pastMedicalHistory:
-      json['Past Medical History & Previous Treatment'] != null
+          json['Past Medical History & Previous Treatment'] != null
           ? PastMedicalHistoryModel.fromJson(
-        json['Past Medical History & Previous Treatment']
-        as Map<String, dynamic>,
-      )
+              json['Past Medical History & Previous Treatment']
+                  as Map<String, dynamic>,
+            )
           : null,
       previousInvestigations: json['Previous Investigations & Reports'] != null
           ? PreviousInvestigationsModel.fromJson(
-        json['Previous Investigations & Reports'] as Map<String, dynamic>,
-      )
+              json['Previous Investigations & Reports'] as Map<String, dynamic>,
+            )
           : null,
       redFlags: json['Red Flags'] != null
           ? RedFlagsModel.fromJson(json['Red Flags'] as Map<String, dynamic>)
           : null,
+      faceOnsetCourse: json['Face: Onset & Course'] != null
+          ? FaceOnsetCourseModel.fromJson(
+              json['Face: Onset & Course'] as Map<String, dynamic>,
+            )
+          : null,
+      faceEyeInvolvement: json['Face: Eye Involvement'] != null
+          ? FaceEyeInvolvementModel.fromJson(
+              json['Face: Eye Involvement'] as Map<String, dynamic>,
+            )
+          : null,
+      speechEatingDrinking: json['Speech, Eating & Drinking'] != null
+          ? SpeechEatingDrinkingModel.fromJson(
+              json['Speech, Eating & Drinking'] as Map<String, dynamic>,
+            )
+          : null,
+      faceSpecificPain: json['Face-Specific Pain'] != null
+          ? FaceSpecificPainModel.fromJson(
+              json['Face-Specific Pain'] as Map<String, dynamic>,
+            )
+          : null,
+      householdWork: json['Household Work'] != null
+          ? HouseholdWorkModel.fromJson(
+              json['Household Work'] as Map<String, dynamic>,
+            )
+          : null,
+      forWomenOnly: json['For Women Only'] != null
+          ? ForWomenOnlyModel.fromJson(
+              json['For Women Only'] as Map<String, dynamic>,
+            )
+          : null,
       forMenOnly: json['For Men Only'] != null
           ? ForMenOnlyModel.fromJson(
-        json['For Men Only'] as Map<String, dynamic>,
-      )
+              json['For Men Only'] as Map<String, dynamic>,
+            )
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'Visit ID': visitId,
+      'Visit Date': visitDate,
       'Patient Information': patientInformation?.toJson(),
       'Pain Location (3D Medical Dashboard)': painLocation?.toJson(),
       'Region Involved': regionInvolved?.toJson(),
@@ -147,35 +200,38 @@ class HistoryTrackerModel {
       'Past Medical History & Previous Treatment': pastMedicalHistory?.toJson(),
       'Previous Investigations & Reports': previousInvestigations?.toJson(),
       'Red Flags': redFlags?.toJson(),
+      'Face: Onset & Course': faceOnsetCourse?.toJson(),
+      'Face: Eye Involvement': faceEyeInvolvement?.toJson(),
+      'Speech, Eating & Drinking': speechEatingDrinking?.toJson(),
+      'Face-Specific Pain': faceSpecificPain?.toJson(),
+      'Household Work': householdWork?.toJson(),
+      'For Women Only': forWomenOnly?.toJson(),
       'For Men Only': forMenOnly?.toJson(),
     };
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper — safely parse any dynamic value to List<String>
-// Returns empty list if null so UI never crashes
+// Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 List<String> _parseStringList(dynamic value) {
   if (value == null) return [];
   if (value is List) return value.map((e) => e?.toString() ?? '').toList();
+  if (value is String && value.trim().isNotEmpty) return [value];
   return [];
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper — safely parse a field that could be String OR List<dynamic>
-// If List  → joins with ", "
-// If String → returns as-is
-// If null  → returns null
-// ─────────────────────────────────────────────────────────────────────────────
-String? _parseStringOrList(dynamic value) {
+String? _parseString(dynamic value) {
   if (value == null) return null;
-  if (value is String) return value;
-  if (value is List) {
-    final items = value.map((e) => e?.toString() ?? '').toList();
-    return items.isEmpty ? null : items.join(', ');
-  }
+  if (value is String) return value.isEmpty ? null : value;
   return value.toString();
+}
+
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -190,13 +246,16 @@ class PatientInformationModel {
 
   String get displayName => name ?? 'No data';
   String get displayAge => age ?? 'No data';
-  String get displayOccupation => occupation ?? 'No data';
+  String get displayOccupation =>
+      (occupation == null || occupation!.trim().isEmpty)
+      ? 'No data'
+      : occupation!;
 
   factory PatientInformationModel.fromJson(Map<String, dynamic> json) {
     return PatientInformationModel(
-      name: json['Name'] as String?,
-      age: json['Age'] as String?,
-      occupation: json['Occupation'] as String?,
+      name: _parseString(json['Name']),
+      age: _parseString(json['Age']),
+      occupation: _parseString(json['Occupation']),
     );
   }
 
@@ -215,6 +274,9 @@ class PainLocationModel {
 
   PainLocationModel({required this.painLocation});
 
+  String get displayPainLocation =>
+      painLocation.isEmpty ? 'No data' : painLocation.join(', ');
+
   factory PainLocationModel.fromJson(Map<String, dynamic> json) {
     return PainLocationModel(
       painLocation: _parseStringList(json['pain_location']),
@@ -226,25 +288,30 @@ class PainLocationModel {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. Region Involved
-// FIX: 'Side Affected' can be null, String, or List<dynamic> from API.
-//      Using _parseStringOrList() to handle all cases safely.
+// Region / Side Affected can be String OR List from API.
 // ─────────────────────────────────────────────────────────────────────────────
 class RegionInvolvedModel {
-  final String? region;
-  final String? sideAffected;   // may arrive as List → joined to String
+  final List<String> region;
+  final List<String> sideAffected;
   final String? deviation;
 
-  RegionInvolvedModel({this.region, this.sideAffected, this.deviation});
+  RegionInvolvedModel({
+    required this.region,
+    required this.sideAffected,
+    this.deviation,
+  });
 
-  String get displayRegion => region ?? 'No data';
-  String get displaySideAffected => sideAffected ?? 'No data';
-  String get displayDeviation => deviation ?? 'No data';
+  String get displayRegion => region.isEmpty ? 'No data' : region.join(', ');
+  String get displaySideAffected =>
+      sideAffected.isEmpty ? 'No data' : sideAffected.join(', ');
+  String get displayDeviation =>
+      (deviation == null || deviation!.trim().isEmpty) ? 'No data' : deviation!;
 
   factory RegionInvolvedModel.fromJson(Map<String, dynamic> json) {
     return RegionInvolvedModel(
-      region: _parseStringOrList(json['Region']),        // ← fix
-      sideAffected: _parseStringOrList(json['Side Affected']),  // ← fix
-      deviation: _parseStringOrList(json['Deviation']),  // ← fix
+      region: _parseStringList(json['Region']),
+      sideAffected: _parseStringList(json['Side Affected']),
+      deviation: _parseString(json['Deviation']),
     );
   }
 
@@ -269,13 +336,14 @@ class ChiefComplaintModel {
     this.deviation,
   });
 
-  String get displayDeviation => deviation ?? 'No data';
+  String get displayDeviation =>
+      (deviation == null || deviation!.trim().isEmpty) ? 'No data' : deviation!;
 
   factory ChiefComplaintModel.fromJson(Map<String, dynamic> json) {
     return ChiefComplaintModel(
       complaints: _parseStringList(json['Complaints']),
       sideAffected: _parseStringList(json['Side Affected']),
-      deviation: json['Deviation'] as String?,
+      deviation: _parseString(json['Deviation']),
     );
   }
 
@@ -306,16 +374,18 @@ class PainDetailsModel {
 
   String get displayPainIntensity =>
       painIntensityVas != null ? painIntensityVas.toString() : 'No data';
+  String get displayTypeOfPain =>
+      typeOfPain.isEmpty ? 'No data' : typeOfPain.join(', ');
   String get displayPainPattern => painPattern ?? 'No data';
   String get displayDuration => duration ?? 'No data';
 
   factory PainDetailsModel.fromJson(Map<String, dynamic> json) {
     return PainDetailsModel(
-      painIntensityVas: json['Pain Intensity (VAS 0-10)'] as int?,
+      painIntensityVas: _parseInt(json['Pain Intensity (VAS 0-10)']),
       typeOfPain: _parseStringList(json['Type of Pain']),
-      painPattern: json['Pain Pattern'] as String?,
+      painPattern: _parseString(json['Pain Pattern']),
       painTiming: _parseStringList(json['Pain Timing']),
-      duration: json['Duration'] as String?,
+      duration: _parseString(json['Duration']),
     );
   }
 
@@ -343,14 +413,17 @@ class RadiatingPainModel {
   });
 
   String get displayRadiatingStatus => radiatingStatus ?? 'No data';
-  String get displayRadiationSide => radiationSide ?? 'No data';
+  String get displayRadiationSide =>
+      (radiationSide == null || radiationSide!.trim().isEmpty)
+      ? 'No data'
+      : radiationSide!;
   bool get hasRadiation => radiatingStatus?.toLowerCase() == 'yes';
 
   factory RadiatingPainModel.fromJson(Map<String, dynamic> json) {
     return RadiatingPainModel(
-      radiatingStatus: json['Radiating Status'] as String?,
+      radiatingStatus: _parseString(json['Radiating Status']),
       radiationPath: _parseStringList(json['Radiation Path']),
-      radiationSide: json['Radiation Side'] as String?,
+      radiationSide: _parseString(json['Radiation Side']),
     );
   }
 
@@ -405,10 +478,12 @@ class OnsetAndCauseModel {
   OnsetAndCauseModel({this.howDidItStart, required this.possibleCause});
 
   String get displayHowDidItStart => howDidItStart ?? 'No data';
+  String get displayPossibleCause =>
+      possibleCause.isEmpty ? 'No data' : possibleCause.join(', ');
 
   factory OnsetAndCauseModel.fromJson(Map<String, dynamic> json) {
     return OnsetAndCauseModel(
-      howDidItStart: json['How did the pain start?'] as String?,
+      howDidItStart: _parseString(json['How did the pain start?']),
       possibleCause: _parseStringList(json['Possible Cause']),
     );
   }
@@ -478,10 +553,11 @@ class GaitAnalysisModel {
 
   GaitAnalysisModel({this.analysis});
 
-  String get displayAnalysis => analysis ?? 'No data';
+  String get displayAnalysis =>
+      (analysis == null || analysis!.trim().isEmpty) ? 'No data' : analysis!;
 
   factory GaitAnalysisModel.fromJson(Map<String, dynamic> json) {
-    return GaitAnalysisModel(analysis: json['Analysis'] as String?);
+    return GaitAnalysisModel(analysis: _parseString(json['Analysis']));
   }
 
   Map<String, dynamic> toJson() => {'Analysis': analysis};
@@ -505,10 +581,13 @@ class PastMedicalHistoryModel {
     required this.treatmentResponses,
   });
 
-  String get displaySurgicalHistory => surgicalHistory ?? 'No data';
+  String get displaySurgicalHistory =>
+      (surgicalHistory == null || surgicalHistory!.trim().isEmpty)
+      ? 'No data'
+      : surgicalHistory!;
 
   factory PastMedicalHistoryModel.fromJson(Map<String, dynamic> json) {
-    Map<String, String?> parsedResponses = {};
+    final parsedResponses = <String, String?>{};
     final responsesRaw = json['Treatment Responses'];
     if (responsesRaw is Map) {
       responsesRaw.forEach((key, value) {
@@ -521,7 +600,7 @@ class PastMedicalHistoryModel {
     return PastMedicalHistoryModel(
       medicalHistory: _parseStringList(json['Medical History']),
       medicalHistoryDetails: _parseStringList(json['Medical History Details']),
-      surgicalHistory: json['Surgical History'] as String?,
+      surgicalHistory: _parseString(json['Surgical History']),
       previousTreatments: _parseStringList(json['Previous Treatments']),
       treatmentResponses: parsedResponses,
     );
@@ -571,7 +650,278 @@ class RedFlagsModel {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 17. For Men Only
+// 17. Face: Onset & Course  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class FaceOnsetCourseModel {
+  final String? onset;
+  final String? duration;
+  final List<String> course;
+  final String? coldExposure;
+
+  FaceOnsetCourseModel({
+    this.onset,
+    this.duration,
+    required this.course,
+    this.coldExposure,
+  });
+
+  String get displayOnset =>
+      (onset == null || onset!.trim().isEmpty) ? 'No data' : onset!;
+  String get displayDuration =>
+      (duration == null || duration!.trim().isEmpty) ? 'No data' : duration!;
+  String get displayColdExposure =>
+      (coldExposure == null || coldExposure!.trim().isEmpty)
+      ? 'No data'
+      : coldExposure!;
+
+  factory FaceOnsetCourseModel.fromJson(Map<String, dynamic> json) {
+    return FaceOnsetCourseModel(
+      onset: _parseString(json['Onset']),
+      duration: _parseString(json['Duration']),
+      course: _parseStringList(json['Course']),
+      coldExposure: _parseString(json['Cold Exposure']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Onset': onset,
+    'Duration': duration,
+    'Course': course,
+    'Cold Exposure': coldExposure,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 18. Face: Eye Involvement  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class FaceEyeInvolvementModel {
+  final String? eyeClosureFully;
+  final int? eyeClosurePercent;
+  final String? eyeDryness;
+  final int? eyeDrynessPercent;
+
+  FaceEyeInvolvementModel({
+    this.eyeClosureFully,
+    this.eyeClosurePercent,
+    this.eyeDryness,
+    this.eyeDrynessPercent,
+  });
+
+  String get displayEyeClosureFully =>
+      (eyeClosureFully == null || eyeClosureFully!.trim().isEmpty)
+      ? 'No data'
+      : eyeClosureFully!;
+  String get displayEyeClosurePercent =>
+      eyeClosurePercent != null ? '$eyeClosurePercent%' : 'No data';
+  String get displayEyeDryness =>
+      (eyeDryness == null || eyeDryness!.trim().isEmpty)
+      ? 'No data'
+      : eyeDryness!;
+  String get displayEyeDrynessPercent =>
+      eyeDrynessPercent != null ? '$eyeDrynessPercent%' : 'No data';
+
+  factory FaceEyeInvolvementModel.fromJson(Map<String, dynamic> json) {
+    return FaceEyeInvolvementModel(
+      eyeClosureFully: _parseString(json['Eye Closure Fully']),
+      eyeClosurePercent: _parseInt(json['Eye Closure %']),
+      eyeDryness: _parseString(json['Eye Dryness']),
+      eyeDrynessPercent: _parseInt(json['Eye Dryness %']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Eye Closure Fully': eyeClosureFully,
+    'Eye Closure %': eyeClosurePercent,
+    'Eye Dryness': eyeDryness,
+    'Eye Dryness %': eyeDrynessPercent,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 19. Speech, Eating & Drinking  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class SpeechEatingDrinkingModel {
+  final List<String> assessment;
+
+  SpeechEatingDrinkingModel({required this.assessment});
+
+  factory SpeechEatingDrinkingModel.fromJson(Map<String, dynamic> json) {
+    return SpeechEatingDrinkingModel(
+      assessment: _parseStringList(json['Assessment']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'Assessment': assessment};
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 20. Face-Specific Pain  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class FaceSpecificPainModel {
+  final String? painPresent;
+  final List<String> location;
+  final int? intensity;
+
+  FaceSpecificPainModel({
+    this.painPresent,
+    required this.location,
+    this.intensity,
+  });
+
+  String get displayPainPresent =>
+      (painPresent == null || painPresent!.trim().isEmpty)
+      ? 'No data'
+      : painPresent!;
+  String get displayLocation =>
+      location.isEmpty ? 'No data' : location.join(', ');
+  String get displayIntensity =>
+      intensity != null ? intensity.toString() : 'No data';
+
+  factory FaceSpecificPainModel.fromJson(Map<String, dynamic> json) {
+    return FaceSpecificPainModel(
+      painPresent: _parseString(json['Pain Present']),
+      location: _parseStringList(json['Location']),
+      intensity: _parseInt(json['Intensity']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Pain Present': painPresent,
+    'Location': location,
+    'Intensity': intensity,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 21. Household Work  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class HouseholdWorkModel {
+  final String? status;
+  final List<String> tasks;
+
+  HouseholdWorkModel({this.status, required this.tasks});
+
+  bool get isActive => status?.toLowerCase() == 'yes';
+  String get displayStatus => status ?? 'No data';
+  String get displayTasks => tasks.isEmpty ? 'No data' : tasks.join(', ');
+
+  factory HouseholdWorkModel.fromJson(Map<String, dynamic> json) {
+    return HouseholdWorkModel(
+      status: _parseString(json['Status']),
+      tasks: _parseStringList(json['Tasks']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'Status': status, 'Tasks': tasks};
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 22. For Women Only  (NEW)
+// ─────────────────────────────────────────────────────────────────────────────
+class ForWomenOnlyModel {
+  final String? marriedSince;
+  final String? hasChildren;
+  final String? specialChild;
+  final String? isPregnant;
+  final String? pregnancyType;
+  final String? previousPregnancy;
+  final String? deliveryType;
+  final String? cycleRegular;
+  final String? cycleDescribe;
+  final String? periodDiscomfort;
+  final String? periodPainDescribe;
+  final String? gyneConditions;
+  final String? gyneDescribe;
+  final String? intercoursePain;
+  final String? hasIud;
+  final String? urineLeakage;
+  final String? nocturia;
+
+  ForWomenOnlyModel({
+    this.marriedSince,
+    this.hasChildren,
+    this.specialChild,
+    this.isPregnant,
+    this.pregnancyType,
+    this.previousPregnancy,
+    this.deliveryType,
+    this.cycleRegular,
+    this.cycleDescribe,
+    this.periodDiscomfort,
+    this.periodPainDescribe,
+    this.gyneConditions,
+    this.gyneDescribe,
+    this.intercoursePain,
+    this.hasIud,
+    this.urineLeakage,
+    this.nocturia,
+  });
+
+  String _d(String? v) => (v == null || v.trim().isEmpty) ? 'No data' : v;
+
+  String get displayMarriedSince => _d(marriedSince);
+  String get displayHasChildren => _d(hasChildren);
+  String get displaySpecialChild => _d(specialChild);
+  String get displayIsPregnant => _d(isPregnant);
+  String get displayPregnancyType => _d(pregnancyType);
+  String get displayPreviousPregnancy => _d(previousPregnancy);
+  String get displayDeliveryType => _d(deliveryType);
+  String get displayCycleRegular => _d(cycleRegular);
+  String get displayCycleDescribe => _d(cycleDescribe);
+  String get displayPeriodDiscomfort => _d(periodDiscomfort);
+  String get displayPeriodPainDescribe => _d(periodPainDescribe);
+  String get displayGyneConditions => _d(gyneConditions);
+  String get displayGyneDescribe => _d(gyneDescribe);
+  String get displayIntercoursePain => _d(intercoursePain);
+  String get displayHasIud => _d(hasIud);
+  String get displayUrineLeakage => _d(urineLeakage);
+  String get displayNocturia => _d(nocturia);
+
+  factory ForWomenOnlyModel.fromJson(Map<String, dynamic> json) {
+    return ForWomenOnlyModel(
+      marriedSince: _parseString(json['Married since']),
+      hasChildren: _parseString(json['Has children']),
+      specialChild: _parseString(json['Special child']),
+      isPregnant: _parseString(json['Is pregnant']),
+      pregnancyType: _parseString(json['Pregnancy type']),
+      previousPregnancy: _parseString(json['Previous pregnancy']),
+      deliveryType: _parseString(json['Delivery type']),
+      cycleRegular: _parseString(json['Cycle regular']),
+      cycleDescribe: _parseString(json['Cycle describe']),
+      periodDiscomfort: _parseString(json['Period discomfort']),
+      periodPainDescribe: _parseString(json['Period pain describe']),
+      gyneConditions: _parseString(json['Gyne conditions']),
+      gyneDescribe: _parseString(json['Gyne describe']),
+      intercoursePain: _parseString(json['Intercourse pain']),
+      hasIud: _parseString(json['Has IUD']),
+      urineLeakage: _parseString(json['Urine leakage']),
+      nocturia: _parseString(json['Nocturia']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Married since': marriedSince,
+    'Has children': hasChildren,
+    'Special child': specialChild,
+    'Is pregnant': isPregnant,
+    'Pregnancy type': pregnancyType,
+    'Previous pregnancy': previousPregnancy,
+    'Delivery type': deliveryType,
+    'Cycle regular': cycleRegular,
+    'Cycle describe': cycleDescribe,
+    'Period discomfort': periodDiscomfort,
+    'Period pain describe': periodPainDescribe,
+    'Gyne conditions': gyneConditions,
+    'Gyne describe': gyneDescribe,
+    'Intercourse pain': intercoursePain,
+    'Has IUD': hasIud,
+    'Urine leakage': urineLeakage,
+    'Nocturia': nocturia,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 23. For Men Only
 // ─────────────────────────────────────────────────────────────────────────────
 class ForMenOnlyModel {
   final String? urinationPain;
@@ -588,20 +938,21 @@ class ForMenOnlyModel {
     this.bladderOrSexualWorsening,
   });
 
-  String get displayUrinationPain => urinationPain ?? 'No data';
-  String get displayUrineLeakage => urineLeakage ?? 'No data';
-  String get displayNocturia => nocturia ?? 'No data';
-  String get displayGenitalNumbness => genitalNumbness ?? 'No data';
-  String get displayBladderOrSexualWorsening =>
-      bladderOrSexualWorsening ?? 'No data';
+  String _d(String? v) => (v == null || v.trim().isEmpty) ? 'No data' : v;
+
+  String get displayUrinationPain => _d(urinationPain);
+  String get displayUrineLeakage => _d(urineLeakage);
+  String get displayNocturia => _d(nocturia);
+  String get displayGenitalNumbness => _d(genitalNumbness);
+  String get displayBladderOrSexualWorsening => _d(bladderOrSexualWorsening);
 
   factory ForMenOnlyModel.fromJson(Map<String, dynamic> json) {
     return ForMenOnlyModel(
-      urinationPain: json['Urination pain'] as String?,
-      urineLeakage: json['Urine leakage'] as String?,
-      nocturia: json['Nocturia'] as String?,
-      genitalNumbness: json['Genital numbness'] as String?,
-      bladderOrSexualWorsening: json['Bladder/Sexual worsening'] as String?,
+      urinationPain: _parseString(json['Urination pain']),
+      urineLeakage: _parseString(json['Urine leakage']),
+      nocturia: _parseString(json['Nocturia']),
+      genitalNumbness: _parseString(json['Genital numbness']),
+      bladderOrSexualWorsening: _parseString(json['Bladder/Sexual worsening']),
     );
   }
 

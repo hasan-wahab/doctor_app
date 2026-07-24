@@ -1,9 +1,11 @@
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
+import 'package:doctor_app/widgets/new-widget/session_progress_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/extentions/context_extentions.dart';
 import '../../core/functions.dart';
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/custom_text.dart';
@@ -84,108 +86,46 @@ class _PackagesScreenState extends State<PackagesScreen> {
                               : 1,
 
                           (index) {
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 10.h),
-
-                              height: 110.h,
-                              width: 360.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: Card(
-                                color: AppColors.secondaryColor,
-                                margin: EdgeInsets.zero,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.h,
-                                    vertical: 10,
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CustomText(
-                                        text:
-                                            currentPatientData!
-                                                .patient!
-                                                .packages
-                                                .isEmpty
-                                            ? 'No Data'
-                                            : currentPatientData!
-                                                  .patient!
-                                                  .packages[index]
-                                                  .name
-                                                  .toString(),
-                                        fontSize: 12,
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText(
-                                            text: 'Sessions Progress',
-                                            fontSize: 12,
-                                            color: AppColors.secondaryTextColor,
-                                          ),
-                                          CustomText(
-                                            text:
-                                                '${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.displaySessionsUsed : 0}/${currentPatientData!.patient!.packages.isNotEmpty ? currentPatientData!.patient!.packages[index].pivot!.displaySessionsTotal : 0}',
-                                            fontSize: 10,
-                                          ),
-                                        ],
-                                      ),
-
-                                      LinearProgressIndicator(
-                                        value:
-                                            currentPatientData!
-                                                .patient!
-                                                .packages
-                                                .isEmpty
-                                            ? 1.0
-                                            : getSessionProgress(
-                                                usedSession: currentPatientData!
-                                                    .patient!
-                                                    .packages[index]
-                                                    .pivot!
-                                                    .displaySessionsUsed,
-                                                totalSession:
-                                                    currentPatientData!
-                                                        .patient!
-                                                        .packages[index]
-                                                        .pivot!
-                                                        .displaySessionsTotal,
-                                              ),
-                                        valueColor: AlwaysStoppedAnimation(
-                                          AppColors.primaryColor,
-                                        ),
-                                      ),
-
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText(
-                                            text: 'Next Session Date',
-                                            fontSize: 15,
-                                          ),
-                                          CustomText(
-                                            text: currentPatientData!
-                                                .therapySessions[index]
-                                                .displayNextSessionDate,
-                                            fontSize: 12,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            final packageName = currentPatientData!
+                                .patient!
+                                .packages[index]
+                                .displayName
+                                .toSentenceCase;
+                            final completedSessions = currentPatientData!
+                                .patient!
+                                .packages[index]
+                                .pivot!
+                                .sessionsUsed!;
+                            final totalSessions = currentPatientData!
+                                .patient!
+                                .packages[index]
+                                .sessions!;
+                            return SessionProgressCard(
+                              title: packageName,
+                              progressLabel: 'Progress',
+                              completedSessions: completedSessions,
+                              nextSessionLabel:
+                                  totalSessions == completedSessions
+                                  ? 'Completed'
+                                  : currentPatientData!.therapySessions.isEmpty
+                                  ? ''
+                                  : currentPatientData
+                                            ?.therapySessions[index]
+                                            .displayNextSessionDate ==
+                                        'No data'
+                                  ? ''
+                                  : 'Next Session',
+                              nextSessionDate:
+                                  totalSessions == completedSessions
+                                  ? ''
+                                  : currentPatientData!.therapySessions.isEmpty
+                                  ? ''
+                                  : DateAndTimeFormater.dateFormat(
+                                      currentPatientData
+                                          ?.therapySessions[index]
+                                          .nextSessionDate,
+                                    ),
+                              totalSessions: totalSessions,
                             );
                           },
                         ),

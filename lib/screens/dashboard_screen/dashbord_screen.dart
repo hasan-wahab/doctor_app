@@ -8,9 +8,13 @@ import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_mod
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboad_states.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_bloc.dart';
 import 'package:doctor_app/screens/dashboard_screen/bloc/dashboard_event.dart';
+import 'package:doctor_app/screens/dashboard_screen/dashboard_entity/dashboard_entity.dart';
 
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:doctor_app/widgets/new-widget/balance%20card.dart';
+import 'package:doctor_app/widgets/new-widget/quick_overview_card.dart';
+import 'package:doctor_app/widgets/new-widget/session_progress_card.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -24,6 +28,7 @@ import '../../core/functions.dart';
 
 import '../../data/models/current_patient_model.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/new-widget/dashboard_appbar.dart';
 import '../../widgets/show_msg.dart';
 
 class DashbordScreen extends StatefulWidget {
@@ -39,8 +44,8 @@ class _DashbordScreenState extends State<DashbordScreen> {
   bool isLoading = false;
   bool hasInternet = false;
   bool isObscureBalanceText = true;
-  String totalSession = '1';
-  String usedSession = '0';
+  int totalSession = 0;
+  int usedSession = 0;
 
   int totalPayment = 10;
   int paidPayment = 5;
@@ -58,28 +63,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
     super.dispose();
   }
 
-  final List<IconData> icons = [
-    Icons.remove_red_eye,
-    Icons.payment,
-    Icons.warning_amber_outlined,
-    Icons.remove_red_eye,
-    Icons.payment,
-  ];
-
-  List<String> cardText = [
-    'Visits',
-    'Active packages',
-    'Assessments',
-    'Invoice',
-    'Sessions',
-  ];
-  List<String> screenNameList = [
-    AppRoutes.visitsDetailScreen,
-    AppRoutes.packagesDetailScreen,
-    AppRoutes.assessmentScreen,
-    AppRoutes.invoiceDetailScreen,
-    AppRoutes.sessionsDetailScreen,
-  ];
   LoginModel1? profileData;
   CurrentPatientModel? currentPatientData;
 
@@ -87,6 +70,12 @@ class _DashbordScreenState extends State<DashbordScreen> {
   double? totalAmount, totalSpend, remaining;
   double? totalInsuranceDiscount, totalDiscount;
   PatientModel? patientModel;
+
+  ///
+  BalanceCardEntity? balanceCardEntity;
+  DashboardHeaderEntity? dashboardHeaderEntity;
+  List<SessionProgressEntity>? sessionProgressEntity;
+  QuickOverviewEntity? quickOverviewEntity;
 
   @override
   Widget build(BuildContext context) {
@@ -139,261 +128,23 @@ class _DashbordScreenState extends State<DashbordScreen> {
                       ),
                       children: [
                         /// AppBar
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    context.push(AppRoutes.myProfileScreen);
-                                  },
-                                  child: Container(
-                                    height: 50.h,
-                                    width: 50.w,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: hasInternet
-                                        ? ClipOval(
-                                            child: profileImage != null
-                                                ? Image.network(
-                                                    fit: BoxFit.cover,
-                                                    '$profileImage',
-                                                    headers: {
-                                                      "Authorization":
-                                                          "Bearer ${profileData!.accessToken.toString()}",
-                                                    },
-                                                    errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) {
-                                                          return CircleAvatar();
-                                                        },
-                                                  )
-                                                : CircleAvatar(),
-                                          )
-                                        : Container(
-                                            alignment: Alignment.center,
-                                            height: 50.h,
-                                            width: 50.w,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: AppColors.primaryColor,
-                                              ),
-                                            ),
-                                            child: CustomText(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20.sp,
-                                              text: getFirstTwoInitials(
-                                                patientName.toString(),
-                                              ),
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                                SizedBox(width: 10.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      width: 200.w,
-                                      child: CustomText(
-                                        text: patientName != null
-                                            ? 'Hi, $patientName'
-                                            : '',
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    CustomText(text: DateTime.now().toReadDate),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
+                        DashboardAppbar(
+                          onAvatarTap: () =>
+                              context.push(AppRoutes.myProfileScreen),
+                          imageUrl: profileImage,
+                          date: DateTime.now(),
+                          userName: patientName.toString(),
                         ),
-
-                        SizedBox(height: 24.67.h),
-
-                        /// Balance Card
-                        Card(
-                          color: AppColors.secondaryColor,
-                          margin: EdgeInsets.zero,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 10.h,
-                            ),
-                            // height: 120.h,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primaryColor,
-                                  Colors.greenAccent.shade200,
-                                  AppColors.secondaryColor,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12.r),
-                              color: AppColors.whiteIconColor,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  spacing: 10.h,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: 'Balance',
-                                      fontSize: 16,
-                                      color: AppColors.textWhiteColor,
-                                    ),
-
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      spacing: 10,
-                                      children: [
-                                        walletBalance != null
-                                            ? CustomText(
-                                                text:
-                                                    isObscureBalanceText != true
-                                                    ? 'PKR $walletBalance'
-                                                    : '* * * * * *',
-                                                fontSize: 13,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : CustomText(
-                                                text: '0.0',
-                                                fontSize: 13,
-                                                color: AppColors.textWhiteColor,
-                                              ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              isObscureBalanceText =
-                                                  !isObscureBalanceText;
-                                            });
-                                          },
-                                          child: isObscureBalanceText
-                                              ? Icon(
-                                                  Icons.visibility_off,
-                                                  size: 18.r,
-                                                  color:
-                                                      AppColors.whiteIconColor,
-                                                )
-                                              : Icon(
-                                                  Icons.visibility,
-                                                  size: 18.r,
-                                                  color:
-                                                      AppColors.whiteIconColor,
-                                                ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        totalAmount != null
-                                            ? CustomText(
-                                                text: 'Total:  $totalAmount',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : SizedBox(),
-
-                                        totalSpend != null
-                                            ? CustomText(
-                                                text: 'Paid: $totalSpend',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : SizedBox(),
-                                        remaining != null
-                                            ? CustomText(
-                                                text: 'Remaining: $remaining',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : SizedBox(),
-                                        totalDiscount != null
-                                            ? CustomText(
-                                                text:
-                                                    'Discount: $totalDiscount',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : SizedBox(),
-                                        totalInsuranceDiscount != null
-                                            ? CustomText(
-                                                text:
-                                                    'Insurance: $totalInsuranceDiscount',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.textWhiteColor,
-                                              )
-                                            : SizedBox(),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    SizedBox(
-                                      height: 80.h,
-                                      width: 80.w,
-                                      child: CircularProgressIndicator(
-                                        value:
-                                            totalAmount != null &&
-                                                totalSpend != null
-                                            ? getTotalPaymentProgress(
-                                                total: totalAmount,
-                                                paid: totalSpend,
-                                              )
-                                            : 0.0,
-                                        strokeWidth: 12,
-                                        backgroundColor: Colors.grey.shade300,
-                                        valueColor: AlwaysStoppedAnimation(
-                                          AppColors.primaryColor,
-                                        ),
-                                      ),
-                                    ),
-                                    Column(
-                                      children: [
-                                        totalAmount != null
-                                            ? CustomText(
-                                                text:
-                                                    "${(getTotalPaymentProgress(total: totalAmount, paid: totalSpend) * 100).toStringAsFixed(0)}%",
-                                                fontWeight: FontWeight.bold,
-                                              )
-                                            : SizedBox(),
-                                        const SizedBox(height: 4),
-                                        CustomText(
-                                          text: "Completed",
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                        SizedBox(height: 10.h),
+                        CustomText(text: 'Payment Overview', fontSize: 14),
+                        SizedBox(height: 10.h),
+                        BalanceCard(
+                          currentBalance: walletBalance.toString(),
+                          discount: totalDiscount.toString(),
+                          total: totalAmount.toString(),
+                          insurance: totalInsuranceDiscount.toString(),
+                          paid: totalSpend.toString(),
+                          remaining: remaining.toString(),
                         ),
 
                         SizedBox(height: 10.h),
@@ -402,94 +153,30 @@ class _DashbordScreenState extends State<DashbordScreen> {
                         CustomText(text: 'Quick Overview', fontSize: 14),
                         SizedBox(height: 10.h),
 
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width - 15,
-                          child: Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            runSpacing: 15.h,
-                            direction: Axis.horizontal,
-                            verticalDirection: VerticalDirection.down,
-                            children: [
-                              ...List.generate((screenNameList.length), (
-                                index,
-                              ) {
-                                List cardSecondText = [
-                                  patientModel!.visits.length.toString(),
-                                  patientModel!.packages.length.toString(),
-                                  '',
-                                  currentPatientData!.recentInvoices.length
-                                      .toString(),
-                                  currentPatientData!.therapySessions.length
-                                      .toString(),
-                                ];
-                                final screenWidth = MediaQuery.sizeOf(
-                                  context,
-                                ).width;
-                                return InkWell(
-                                  onTap: () async {
-                                    context.push(screenNameList[index]);
-                                  },
-                                  child: Card(
-                                    color: Colors.transparent,
-                                    margin: EdgeInsets.zero,
-                                    child: Container(
-                                      height: 58.h,
-                                      width: index == 4
-                                          ? screenWidth
-                                          : screenWidth / 2.2,
-
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 5.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.secondaryColor,
-                                        borderRadius: BorderRadius.circular(
-                                          12.r,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                cardSecondText[index] != ''
-                                                ? MainAxisAlignment.spaceBetween
-                                                : MainAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                width: 100.w,
-                                                child: CustomText(
-                                                  text: cardText[index],
-                                                  fontSize: 12,
-                                                  maxLines: index == 5 ? 2 : 1,
-                                                ),
-                                              ),
-                                              cardSecondText[index] != ''
-                                                  ? SizedBox(
-                                                      width: 100.w,
-                                                      child: CustomText(
-                                                        text:
-                                                            cardSecondText[index],
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                            ],
-                                          ),
-                                          Icon(icons[index]),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
+                        QuickOverview(
+                          onVisitsTap: () {
+                            context.push(AppRoutes.visitsDetailScreen);
+                          },
+                          onActivePackagesTap: () {
+                            context.push(AppRoutes.packagesDetailScreen);
+                          },
+                          onAssessmentsTap: () {
+                            context.push(AppRoutes.assessmentScreen);
+                          },
+                          onInvoiceTap: () {
+                            context.push(AppRoutes.invoiceDetailScreen);
+                          },
+                          onSessionsTap: () {
+                            context.push(AppRoutes.sessionsDetailScreen);
+                          },
+                          visits: patientModel!.visits.length.toString(),
+                          activePackages: patientModel!.packages.length
+                              .toString(),
+                          invoice: currentPatientData!.recentInvoices.length
+                              .toString(),
+                          sessions: currentPatientData!.therapySessions.length
+                              .toString(),
                         ),
-
                         SizedBox(height: 10.h),
 
                         /// Session Progress
@@ -497,107 +184,49 @@ class _DashbordScreenState extends State<DashbordScreen> {
                             ? CustomText(text: 'Session Progress')
                             : Container(),
                         SizedBox(height: 10.h),
-                        ...List.generate(patientModel!.packages.length, (
-                          index,
-                        ) {
-                          return Container(
-                            margin: EdgeInsets.only(bottom: 10.h),
+                        currentPatientData!.therapySessions.isEmpty
+                            ? Container()
+                            : Column(
+                                children: List.generate(
+                                  patientModel!.packages.length,
+                                  (index) {
+                                    final packageName = patientModel!
+                                        .packages[index]
+                                        .displayName
+                                        .toSentenceCase;
+                                    final completedSessions = patientModel!
+                                        .packages[index]
+                                        .pivot!
+                                        .sessionsUsed!;
+                                    final totalSessions =
+                                        patientModel!.packages[index].sessions!;
 
-                            height: 110.h,
-                            width: 360.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Card(
-                              color: AppColors.secondaryColor,
-                              margin: EdgeInsets.zero,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 10.h,
-                                  vertical: 10,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: patientModel!.packages.isEmpty
-                                          ? 'No data'
-                                          : patientModel!.packages[index].name
-                                                .toString(),
-                                      fontSize: 12,
-                                    ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CustomText(
-                                          text: 'Sessions Progress',
-                                          fontSize: 12,
-                                          color: AppColors.secondaryTextColor,
-                                        ),
-                                        CustomText(
-                                          text:
-                                              '${patientModel!.packages[index].pivot!.displaySessionsUsed}/${patientModel!.packages[index].pivot!.sessionsTotal}',
-                                          fontSize: 10,
-                                        ),
-                                      ],
-                                    ),
-
-                                    LinearProgressIndicator(
-                                      value: patientModel!.packages.isEmpty
-                                          ? 1.0
-                                          : getSessionProgress(
-                                              totalSession: patientModel!
-                                                  .packages[index]
-                                                  .pivot!
-                                                  .displaySessionsTotal,
-                                              usedSession: patientModel!
-                                                  .packages[index]
-                                                  .pivot!
-                                                  .displaySessionsUsed,
+                                    return SessionProgressCard(
+                                      title: packageName,
+                                      progressLabel: 'Progress',
+                                      completedSessions: completedSessions,
+                                      nextSessionLabel:
+                                          totalSessions == completedSessions
+                                          ? 'Completed'
+                                          : currentPatientData
+                                                    ?.therapySessions[index]
+                                                    .displayNextSessionDate ==
+                                                'No data'
+                                          ? ''
+                                          : 'Next Session',
+                                      nextSessionDate:
+                                          totalSessions == completedSessions
+                                          ? ''
+                                          : DateAndTimeFormater.dateFormat(
+                                              currentPatientData
+                                                  ?.therapySessions[index]
+                                                  .nextSessionDate,
                                             ),
-                                      valueColor: AlwaysStoppedAnimation(
-                                        AppColors.primaryColor,
-                                      ),
-                                    ),
-
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CustomText(
-                                          text: 'Next Session Date',
-                                          fontSize: 15,
-                                        ),
-                                        currentPatientData!
-                                                .therapySessions
-                                                .isNotEmpty
-                                            ? CustomText(
-                                                text: DateAndTimeFormater.dateFormat(
-                                                  // currentPatientData!
-                                                  currentPatientData!
-                                                      .therapySessions[index]
-                                                      .displayNextSessionDate
-                                                      .toString(),
-                                                ),
-
-                                                fontSize: 12,
-                                              )
-                                            : Container(),
-                                      ],
-                                    ),
-                                  ],
+                                      totalSessions: totalSessions,
+                                    );
+                                  },
                                 ),
                               ),
-                            ),
-                          );
-                        }),
                       ],
                     ),
                   ),
@@ -606,53 +235,6 @@ class _DashbordScreenState extends State<DashbordScreen> {
         );
       },
     );
-  }
-
-  Widget _text({
-    required String firstText,
-    String? secondText,
-    String? buttonText,
-  }) {
-    return Column(
-      spacing: 5.h,
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomText(text: firstText),
-        secondText != null
-            ? CustomText(text: secondText, align: TextAlign.start)
-            : Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 5.w,
-                      vertical: 1.h,
-                    ),
-                    alignment: Alignment.center,
-
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: CustomText(
-                      text: buttonText!,
-                      color: AppColors.textWhiteColor,
-                    ),
-                  ),
-                ],
-              ),
-      ],
-    );
-  }
-
-  double getTotalPaymentProgress({required total, required paid}) {
-    if (total == 0) return 0.0;
-    if (paid == 0) return 0.0;
-    final progress = paid / total!;
-
-    if (progress.isNaN || progress.isInfinite) return 0.0;
-
-    return progress.clamp(0.0, 1.0);
   }
 
   void internetController() {

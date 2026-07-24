@@ -13,13 +13,18 @@ class ConsultantMessageState extends ConsultantAssessmentState {
   ConsultantMessageState({this.message = ''});
 }
 
-class ConsultantLoadedFromRecordsState extends ConsultantAssessmentState {
-  ConsultantAssessmentModel? model;
-
-  ConsultantLoadedFromRecordsState({this.model});
-}
+// class ConsultantLoadedFromRecordsState extends ConsultantAssessmentState {
+//   List<AllConsultantAssessmentModel>? allConsultantAssessmentModel = [];
+//   CurrentPatientModel? currentPatientModel;
+//
+//   ConsultantLoadedFromRecordsState({this.currentPatientModel,this.consultantAssessmentModel});
+// }
 
 class ConsultantFromHomeLoaded extends ConsultantAssessmentState {
   List<AllConsultantAssessmentModel>? allConsultantAssessmentModel = [];
-  ConsultantFromHomeLoaded({this.allConsultantAssessmentModel});
+  CurrentPatientModel? currentPatientModel;
+  ConsultantFromHomeLoaded({
+    this.allConsultantAssessmentModel,
+    this.currentPatientModel,
+  });
 }
