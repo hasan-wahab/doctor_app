@@ -114,6 +114,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                 (invoiceList[index].payments.length),
                                 (generator) {
                                   return BillingPaymentItem(
+
                                     paymentId: invoiceList[index]
                                         .payments[generator]
                                         .displayId,

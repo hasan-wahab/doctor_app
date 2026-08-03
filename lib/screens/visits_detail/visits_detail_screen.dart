@@ -86,11 +86,15 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   }
 
   /// Visit position rules (1-based visit number, oldest visit first):
-  /// - Visit 1 + type consultation → consultation questions
+  /// - Visit 1 + type consultation → consultation
   /// - Visits 2,3,4,5 → therapist
   /// - Visit 6,11,16... + type consultation → reconsultation
   /// - Visits 7,8,9,10,12,13... (other slots) → therapist
-  String _questionCategoryForVisit(int visitIndex) {
+  ///
+  /// Extra rule for consultation / reconsultation:
+  /// - Therapist Sessions Done == true → also include therapist questions
+  /// - Done == false → only consultation / reconsultation questions
+  String _baseQuestionCategoryForVisit(int visitIndex) {
     final visit = allVisitsModel!.visits[visitIndex];
     final type = visit.type?.toLowerCase().trim() ?? '';
     final visitNumber = visitIndex + 1;
@@ -108,14 +112,165 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     return 'therapist';
   }
 
+  List<String> _questionCategoriesForVisit(int visitIndex) {
+    final base = _baseQuestionCategoryForVisit(visitIndex).toLowerCase();
+    final categories = <String>[base];
+
+    if (base == 'consultation' || base == 'reconsultation') {
+      final therapistDone =
+          allVisitsModel!
+              .visits[visitIndex]
+              .assessments
+              ?.therapistSessions
+              ?.isDone ??
+          false;
+      if (therapistDone && !categories.contains('therapist')) {
+        categories.add('therapist');
+      }
+    }
+
+    return categories;
+  }
+
   List<QuestionModel> _questionsForVisit(int visitIndex) {
     if (questionModel == null) return [];
-    final category = _questionCategoryForVisit(visitIndex).toLowerCase();
+    final categories = _questionCategoriesForVisit(visitIndex);
     final filtered = questionModel!
-        .where((q) => q.isActive && q.category.toLowerCase().trim() == category)
+        .where(
+          (q) =>
+              q.isActive &&
+              categories.contains(q.category.toLowerCase().trim()),
+        )
         .toList();
-    filtered.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+    // Keep category order same as visit rule order, then sortOrder.
+    filtered.sort((a, b) {
+      final aCat = a.category.toLowerCase().trim();
+      final bCat = b.category.toLowerCase().trim();
+      final aIdx = categories.indexOf(aCat);
+      final bIdx = categories.indexOf(bCat);
+      if (aIdx != bIdx) return aIdx.compareTo(bIdx);
+      return a.sortOrder.compareTo(b.sortOrder);
+    });
     return filtered;
+  }
+
+  String _categoryTitle(String category) {
+    switch (category.toLowerCase().trim()) {
+      case 'consultation':
+        return 'Consultation Questions';
+      case 'reconsultation':
+        return 'Reconsultation Questions';
+      case 'therapist':
+        return 'Therapist Questions';
+      default:
+        return '${category.toSentenceCase} Questions';
+    }
+  }
+
+  Widget _buildQuestionInput({
+    required QuestionModel q,
+    required AnswerModel ans,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 10.h),
+        CustomText(
+          maxLines: 10,
+          text: q.questionText.toSentenceCase,
+          color: AppColors.primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
+        if (q.type == 'rating')
+          Row(
+            children: List.generate(
+              5,
+              (i) => InkWell(
+                onTap: () {
+                  setState(() {
+                    ans.rating = i + 1;
+                  });
+                },
+                child: Icon(
+                  Icons.star,
+                  color: ans.rating > i ? Colors.amber : Colors.grey,
+                ),
+              ),
+            ),
+          )
+        else if (q.type == 'options')
+          Wrap(
+            spacing: 10,
+            children: List.generate(q.options.length, (i) {
+              return CheckCircle(
+                text: q.options[i].toSentenceCase,
+                isSelected: ans.selectedOptions[i],
+                onChange: () {
+                  setState(() {
+                    ans.selectedOptions[i] = !ans.selectedOptions[i];
+                  });
+                },
+              );
+            }),
+          )
+        else
+          TextField(
+            controller: ans.controller,
+            maxLines: 2,
+            decoration: const InputDecoration(
+              hintText: 'Write feedback...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// Groups questions by category and shows a section header for each.
+  Widget _buildCategorizedQuestions({
+    required int visitIndex,
+    required List<QuestionModel> visitQuestions,
+  }) {
+    final visitAnswerMap = answers[visitIndex];
+    if (visitAnswerMap == null) return const SizedBox.shrink();
+
+    final widgets = <Widget>[];
+    String? lastCategory;
+
+    for (
+      var questionIndex = 0;
+      questionIndex < visitQuestions.length;
+      questionIndex++
+    ) {
+      final q = visitQuestions[questionIndex];
+      final ans = visitAnswerMap[questionIndex];
+      if (ans == null) continue;
+
+      final category = q.category.toLowerCase().trim();
+      if (category != lastCategory) {
+        lastCategory = category;
+        widgets.add(
+          Padding(
+            padding: EdgeInsets.only(top: 8.h, bottom: 4.h),
+            child: CustomText(
+              text: _categoryTitle(category),
+              color: AppColors.firstTextBlackColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 15,
+            ),
+          ),
+        );
+      }
+
+      widgets.add(_buildQuestionInput(q: q, ans: ans));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: widgets,
+    );
   }
 
   /// ======================
@@ -145,7 +300,8 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   /// ======================
   /// SUBMIT DATA
   /// ======================
-  Future submitData(int visitIndex) async {
+  /// Returns `true` when review was submitted; `false` when blocked by validation.
+  Future<bool> submitData(int visitIndex) async {
     final visitAnswers = answers[visitIndex]!;
     final visitQuestions = _questionsForVisit(visitIndex);
 
@@ -185,6 +341,19 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       }
     }
 
+    final hasAnyAnswer =
+        rating != null ||
+        (comment != null && comment.trim().isNotEmpty) ||
+        answersList.isNotEmpty;
+
+    if (!hasAnyAnswer) {
+      AppMsg.showSnackBar(
+        context,
+        message: 'Please answer at least one question before submitting.',
+      );
+      return false;
+    }
+
     final postModel = PostReviewModel(
       visitId: allVisitsModel!.visits[visitIndex].visitId,
       rating: rating,
@@ -194,6 +363,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     context.read<VisitDetailBloc>().add(
       ReviewSubmitEvent(postReviewModel: postModel),
     );
+    return true;
   }
 
   /// Shows top-level rating/comment (old reviews) + every answers[] row.
@@ -464,162 +634,51 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                 const Divider(),
 
                                 /// QUESTIONS
-                                _isVisitExpanded(visitIndex) &&
-                                        visit.isCompleted
+                                _isVisitExpanded(visitIndex)
                                     ? visitQuestions.isEmpty
                                           ? CustomText(
                                               text:
                                                   'No feedback questions available for this visit.',
                                               color: AppColors.primaryColor,
                                             )
-                                          : Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              spacing: 10,
-                                              children: List.generate(visitQuestions.length, (
-                                                questionIndex,
-                                              ) {
-                                                final q =
-                                                    visitQuestions[questionIndex];
-                                                final visitAnswerMap =
-                                                    answers[visitIndex];
-                                                if (visitAnswerMap == null ||
-                                                    !visitAnswerMap.containsKey(
-                                                      questionIndex,
-                                                    )) {
-                                                  return const SizedBox.shrink();
-                                                }
-                                                final ans =
-                                                    visitAnswerMap[questionIndex]!;
-
-                                                return Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    SizedBox(height: 10.h),
-
-                                                    CustomText(
-                                                      maxLines: 10,
-                                                      text: q
-                                                          .questionText
-                                                          .toSentenceCase,
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-
-                                                    /// ⭐ RATING
-                                                    if (q.type == 'rating')
-                                                      Row(
-                                                        children: List.generate(
-                                                          5,
-                                                          (i) => InkWell(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                ans.rating =
-                                                                    i + 1;
-                                                              });
-                                                            },
-                                                            child: Icon(
-                                                              Icons.star,
-                                                              color:
-                                                                  ans.rating > i
-                                                                  ? Colors.amber
-                                                                  : Colors.grey,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    /// OPTIONS
-                                                    else if (q.type ==
-                                                        'options')
-                                                      Wrap(
-                                                        spacing: 10,
-                                                        children: List.generate(
-                                                          q.options.length,
-                                                          (i) {
-                                                            return CheckCircle(
-                                                              text: q
-                                                                  .options[i]
-                                                                  .toSentenceCase,
-                                                              isSelected: ans
-                                                                  .selectedOptions[i],
-                                                              onChange: () {
-                                                                setState(() {
-                                                                  ans.selectedOptions[i] =
-                                                                      !ans.selectedOptions[i];
-                                                                });
-                                                              },
-                                                            );
-                                                          },
-                                                        ),
-                                                      )
-                                                    /// COMMENT
-                                                    else
-                                                      TextField(
-                                                        controller:
-                                                            ans.controller,
-                                                        maxLines: 2,
-                                                        decoration: const InputDecoration(
-                                                          hintText:
-                                                              "Write feedback...",
-                                                          border:
-                                                              OutlineInputBorder(),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                );
-                                              }),
+                                          : _buildCategorizedQuestions(
+                                              visitIndex: visitIndex,
+                                              visitQuestions: visitQuestions,
                                             )
                                     : const SizedBox.shrink(),
                                 SizedBox(height: 20.h),
 
                                 /// BUTTON
                                 !visit.hasReview
-                                    ? visit.isCompleted
-                                          ? AppButton(
-                                              onTap: () async {
-                                                if (_isVisitExpanded(
-                                                  visitIndex,
-                                                )) {
-                                                  if (visitQuestions.isEmpty) {
-                                                    AppMsg.showSnackBar(
-                                                      context,
-                                                      message:
-                                                          'No questions to submit for this visit.',
-                                                    );
-                                                  } else {
-                                                    await submitData(
-                                                      visitIndex,
-                                                    );
-                                                  }
-                                                }
-                                                setState(() {
-                                                  _setVisitExpanded(
-                                                    visitIndex,
-                                                    !_isVisitExpanded(
-                                                      visitIndex,
-                                                    ),
-                                                  );
-                                                });
-                                              },
-                                              text: _isVisitExpanded(visitIndex)
-                                                  ? 'Submit'
-                                                  : 'Give Feedback',
-                                            )
-                                          : Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                CustomText(
-                                                  color: AppColors.primaryColor,
+                                    ? AppButton(
+                                        onTap: () async {
+                                          // Collapsed → only expand (stay open).
+                                          if (!_isVisitExpanded(visitIndex)) {
+                                            setState(() {
+                                              _setVisitExpanded(
+                                                visitIndex,
+                                                true,
+                                              );
+                                            });
+                                            return;
+                                          }
 
-                                                  text:
-                                                      'You can only review completed visits.',
-                                                ),
-                                              ],
-                                            )
+                                          // Expanded → submit; keep open if invalid.
+                                          if (visitQuestions.isEmpty) {
+                                            AppMsg.showSnackBar(
+                                              context,
+                                              message:
+                                                  'No questions to submit for this visit.',
+                                            );
+                                            return;
+                                          }
+
+                                          await submitData(visitIndex);
+                                        },
+                                        text: _isVisitExpanded(visitIndex)
+                                            ? 'Submit'
+                                            : 'Give Feedback',
+                                      )
                                     : _buildSubmittedReview(visit),
                               ],
                             ),

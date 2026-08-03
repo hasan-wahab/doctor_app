@@ -4,6 +4,35 @@
 // App will NEVER crash on null fields
 // ─────────────────────────────────────────────────────────────────────────────
 
+String? _str(dynamic v) {
+  if (v == null) return null;
+  final s = v.toString().trim();
+  return s.isEmpty ? null : s;
+}
+
+int? _int(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  return int.tryParse(v.toString());
+}
+
+num? _num(dynamic v) {
+  if (v == null) return null;
+  if (v is num) return v;
+  return num.tryParse(v.toString());
+}
+
+bool? _bool(dynamic v) {
+  if (v == null) return null;
+  if (v is bool) return v;
+  if (v is num) return v != 0;
+  final s = v.toString().toLowerCase().trim();
+  if (s == 'true' || s == '1' || s == 'yes') return true;
+  if (s == 'false' || s == '0' || s == 'no') return false;
+  return null;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Review Answer Model
 // ─────────────────────────────────────────────────────────────────────────────
@@ -14,7 +43,6 @@ class ReviewAnswerModel {
 
   ReviewAnswerModel({this.questionId, this.question, this.answer});
 
-  // Display getters
   String get displayQuestion =>
       (question != null && question!.trim().isNotEmpty) ? question! : 'No data';
 
@@ -23,9 +51,9 @@ class ReviewAnswerModel {
 
   factory ReviewAnswerModel.fromJson(Map<String, dynamic> json) {
     return ReviewAnswerModel(
-      questionId: json['Question ID'] as int?,
-      question: json['Question'] as String?,
-      answer: json['Answer'] as String?,
+      questionId: _int(json['Question ID']),
+      question: _str(json['Question']),
+      answer: _str(json['Answer']),
     );
   }
 
@@ -52,7 +80,6 @@ class ReviewModel {
     this.answers,
   });
 
-  // Display getters
   String get displayRating => rating != null ? rating.toString() : 'No data';
 
   String get displayComment =>
@@ -67,13 +94,13 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
-      reviewId: json['Review ID'] as int?,
-      rating: json['Rating'] as int?,
-      comment: json['Comment'] as String?,
-      submittedAt: json['Submitted At'] as String?,
+      reviewId: _int(json['Review ID']),
+      rating: _int(json['Rating']),
+      comment: _str(json['Comment']),
+      submittedAt: _str(json['Submitted At']),
       answers: (json['Answers'] as List?)
-          ?.whereType<Map<String, dynamic>>()
-          .map((e) => ReviewAnswerModel.fromJson(e))
+          ?.whereType<Map>()
+          .map((e) => ReviewAnswerModel.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
   }
@@ -90,6 +117,210 @@ class ReviewModel {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Assessments — History Taker
+// ─────────────────────────────────────────────────────────────────────────────
+class HistoryTakerAssessmentModel {
+  final bool? done;
+  final int? amAssessmentId;
+  final int? historyTakingId;
+
+  HistoryTakerAssessmentModel({
+    this.done,
+    this.amAssessmentId,
+    this.historyTakingId,
+  });
+
+  bool get isDone => done == true;
+
+  factory HistoryTakerAssessmentModel.fromJson(Map<String, dynamic> json) {
+    return HistoryTakerAssessmentModel(
+      done: _bool(json['Done']),
+      amAssessmentId: _int(json['AM Assessment ID']),
+      historyTakingId: _int(json['History Taking ID']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Done': done,
+    'AM Assessment ID': amAssessmentId,
+    'History Taking ID': historyTakingId,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Assessments — Consultant
+// ─────────────────────────────────────────────────────────────────────────────
+class ConsultantAssessmentModel {
+  final bool? done;
+  final int? assessmentId;
+
+  ConsultantAssessmentModel({this.done, this.assessmentId});
+
+  bool get isDone => done == true;
+
+  factory ConsultantAssessmentModel.fromJson(Map<String, dynamic> json) {
+    return ConsultantAssessmentModel(
+      done: _bool(json['Done']),
+      assessmentId: _int(json['Assessment ID']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Done': done,
+    'Assessment ID': assessmentId,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Assessments — Reconsultation
+// ─────────────────────────────────────────────────────────────────────────────
+class ReconsultationAssessmentModel {
+  final bool? done;
+  final int? assessmentId;
+
+  ReconsultationAssessmentModel({this.done, this.assessmentId});
+
+  bool get isDone => done == true;
+
+  factory ReconsultationAssessmentModel.fromJson(Map<String, dynamic> json) {
+    return ReconsultationAssessmentModel(
+      done: _bool(json['Done']),
+      assessmentId: _int(json['Assessment ID']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Done': done,
+    'Assessment ID': assessmentId,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Assessments — Therapist Sessions
+// ─────────────────────────────────────────────────────────────────────────────
+class TherapistSessionsAssessmentModel {
+  final bool? done;
+  final int? totalSessions;
+
+  TherapistSessionsAssessmentModel({this.done, this.totalSessions});
+
+  bool get isDone => done == true;
+
+  factory TherapistSessionsAssessmentModel.fromJson(Map<String, dynamic> json) {
+    return TherapistSessionsAssessmentModel(
+      done: _bool(json['Done']),
+      totalSessions: _int(json['Total Sessions']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Done': done,
+    'Total Sessions': totalSessions,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Assessments wrapper
+// ─────────────────────────────────────────────────────────────────────────────
+class VisitAssessmentsModel {
+  final HistoryTakerAssessmentModel? historyTakerAssessment;
+  final ConsultantAssessmentModel? consultantAssessment;
+  final ReconsultationAssessmentModel? reconsultationAssessment;
+  final TherapistSessionsAssessmentModel? therapistSessions;
+
+  VisitAssessmentsModel({
+    this.historyTakerAssessment,
+    this.consultantAssessment,
+    this.reconsultationAssessment,
+    this.therapistSessions,
+  });
+
+  factory VisitAssessmentsModel.fromJson(Map<String, dynamic> json) {
+    return VisitAssessmentsModel(
+      historyTakerAssessment: json['History Taker Assessment'] is Map
+          ? HistoryTakerAssessmentModel.fromJson(
+              Map<String, dynamic>.from(
+                json['History Taker Assessment'] as Map,
+              ),
+            )
+          : null,
+      consultantAssessment: json['Consultant Assessment'] is Map
+          ? ConsultantAssessmentModel.fromJson(
+              Map<String, dynamic>.from(json['Consultant Assessment'] as Map),
+            )
+          : null,
+      reconsultationAssessment: json['Reconsultation Assessment'] is Map
+          ? ReconsultationAssessmentModel.fromJson(
+              Map<String, dynamic>.from(
+                json['Reconsultation Assessment'] as Map,
+              ),
+            )
+          : null,
+      therapistSessions: json['Therapist Sessions'] is Map
+          ? TherapistSessionsAssessmentModel.fromJson(
+              Map<String, dynamic>.from(json['Therapist Sessions'] as Map),
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'History Taker Assessment': historyTakerAssessment?.toJson(),
+    'Consultant Assessment': consultantAssessment?.toJson(),
+    'Reconsultation Assessment': reconsultationAssessment?.toJson(),
+    'Therapist Sessions': therapistSessions?.toJson(),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Invoice & Advance
+// ─────────────────────────────────────────────────────────────────────────────
+class InvoiceAdvanceModel {
+  final int? invoiceId;
+  final String? totalAmount;
+  final String? status;
+  final num? advancePaidAmount;
+
+  InvoiceAdvanceModel({
+    this.invoiceId,
+    this.totalAmount,
+    this.status,
+    this.advancePaidAmount,
+  });
+
+  String get displayInvoiceId => invoiceId?.toString() ?? 'No data';
+
+  String get displayTotalAmount =>
+      (totalAmount != null && totalAmount!.trim().isNotEmpty)
+      ? totalAmount!
+      : 'No data';
+
+  String get displayStatus =>
+      (status != null && status!.trim().isNotEmpty) ? status! : 'No data';
+
+  String get displayAdvancePaidAmount =>
+      advancePaidAmount != null ? advancePaidAmount.toString() : 'No data';
+
+  bool get isPaid => status?.toLowerCase().trim() == 'paid';
+
+  factory InvoiceAdvanceModel.fromJson(Map<String, dynamic> json) {
+    return InvoiceAdvanceModel(
+      invoiceId: _int(json['Invoice ID']),
+      totalAmount: _str(json['Total Amount']),
+      status: _str(json['Status']),
+      advancePaidAmount: _num(json['Advance Paid Amount']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'Invoice ID': invoiceId,
+    'Total Amount': totalAmount,
+    'Status': status,
+    'Advance Paid Amount': advancePaidAmount,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Visit Item Model
 // ─────────────────────────────────────────────────────────────────────────────
 class VisitItemModel {
@@ -99,9 +330,16 @@ class VisitItemModel {
   final String? stage;
   final String? date;
   final num? consultationFee;
+  final String? consultant;
+  final String? historyTaker;
+  final String? therapist;
+
+  /// Legacy field — older API used "Doctor"
   final String? doctor;
   final String? createdAt;
-  final ReviewModel? review; // ✅ NEW FIELD
+  final VisitAssessmentsModel? assessments;
+  final InvoiceAdvanceModel? invoiceAdvance;
+  final ReviewModel? review;
 
   VisitItemModel({
     this.visitId,
@@ -110,8 +348,13 @@ class VisitItemModel {
     this.stage,
     this.date,
     this.consultationFee,
+    this.consultant,
+    this.historyTaker,
+    this.therapist,
     this.doctor,
     this.createdAt,
+    this.assessments,
+    this.invoiceAdvance,
     this.review,
   });
 
@@ -133,16 +376,36 @@ class VisitItemModel {
   String get displayConsultationFee =>
       consultationFee != null ? consultationFee.toString() : 'No data';
 
-  String get displayDoctor =>
-      (doctor != null && doctor!.trim().isNotEmpty) ? doctor! : 'No data';
+  /// Prefer consultant, then legacy doctor, then therapist
+  String get displayDoctor {
+    final value = consultant ?? doctor ?? therapist;
+    return (value != null && value.trim().isNotEmpty) ? value : 'No data';
+  }
+
+  String get displayConsultant {
+    final value = consultant ?? doctor;
+    return (value != null && value.trim().isNotEmpty) ? value : 'No data';
+  }
+
+  String get displayHistoryTaker {
+    if (historyTaker == null || historyTaker!.trim().isEmpty) return 'No data';
+    if (historyTaker!.toUpperCase() == 'N/A') return 'N/A';
+    return historyTaker!;
+  }
+
+  String get displayTherapist =>
+      (therapist != null && therapist!.trim().isNotEmpty)
+      ? therapist!
+      : 'No data';
 
   String get displayCreatedAt =>
       (createdAt != null && createdAt!.trim().isNotEmpty)
       ? createdAt!
       : 'No data';
 
-  // Review display helpers
   bool get hasReview => review != null;
+
+  bool get hasInvoice => invoiceAdvance != null;
 
   String get displayRating => review?.displayRating ?? 'No data';
 
@@ -160,16 +423,31 @@ class VisitItemModel {
   // ── fromJson ────────────────────────────────────────────────────────────
   factory VisitItemModel.fromJson(Map<String, dynamic> json) {
     return VisitItemModel(
-      visitId: json['Visit ID'] as int?,
-      type: json['Type'] as String?,
-      status: json['Status'] as String?,
-      stage: json['Stage'] as String?,
-      date: json['Date'] as String?,
-      consultationFee: json['Consultation Fee'] as num?,
-      doctor: json['Doctor'] as String?,
-      createdAt: json['Created At'] as String?,
-      review: json['Review'] != null
-          ? ReviewModel.fromJson(json['Review'])
+      visitId: _int(json['Visit ID']),
+      type: _str(json['Type']),
+      status: _str(json['Status']),
+      stage: _str(json['Stage']),
+      date: _str(json['Date']),
+      consultationFee: _num(json['Consultation Fee']),
+      consultant: _str(json['consultant'] ?? json['Consultant']),
+      historyTaker: _str(json['History Taker']),
+      therapist: _str(json['Therapist']),
+      doctor: _str(json['Doctor']),
+      createdAt: _str(json['Created At']),
+      assessments: json['Assessments'] is Map
+          ? VisitAssessmentsModel.fromJson(
+              Map<String, dynamic>.from(json['Assessments'] as Map),
+            )
+          : null,
+      invoiceAdvance: json['Invoice & Advance'] is Map
+          ? InvoiceAdvanceModel.fromJson(
+              Map<String, dynamic>.from(json['Invoice & Advance'] as Map),
+            )
+          : null,
+      review: json['Review'] is Map
+          ? ReviewModel.fromJson(
+              Map<String, dynamic>.from(json['Review'] as Map),
+            )
           : null,
     );
   }
@@ -183,8 +461,13 @@ class VisitItemModel {
       'Stage': stage,
       'Date': date,
       'Consultation Fee': consultationFee,
+      'consultant': consultant,
+      'History Taker': historyTaker,
+      'Therapist': therapist,
       'Doctor': doctor,
       'Created At': createdAt,
+      'Assessments': assessments?.toJson(),
+      'Invoice & Advance': invoiceAdvance?.toJson(),
       'Review': review?.toJson(),
     };
   }
@@ -197,8 +480,13 @@ class VisitItemModel {
     String? stage,
     String? date,
     num? consultationFee,
+    String? consultant,
+    String? historyTaker,
+    String? therapist,
     String? doctor,
     String? createdAt,
+    VisitAssessmentsModel? assessments,
+    InvoiceAdvanceModel? invoiceAdvance,
     ReviewModel? review,
   }) {
     return VisitItemModel(
@@ -208,15 +496,20 @@ class VisitItemModel {
       stage: stage ?? this.stage,
       date: date ?? this.date,
       consultationFee: consultationFee ?? this.consultationFee,
+      consultant: consultant ?? this.consultant,
+      historyTaker: historyTaker ?? this.historyTaker,
+      therapist: therapist ?? this.therapist,
       doctor: doctor ?? this.doctor,
       createdAt: createdAt ?? this.createdAt,
+      assessments: assessments ?? this.assessments,
+      invoiceAdvance: invoiceAdvance ?? this.invoiceAdvance,
       review: review ?? this.review,
     );
   }
 
   @override
   String toString() {
-    return 'VisitItemModel(visitId: $visitId, type: $type, stage: $stage, doctor: $doctor)';
+    return 'VisitItemModel(visitId: $visitId, type: $type, stage: $stage, consultant: $consultant)';
   }
 }
 
@@ -244,17 +537,15 @@ class AllVisitsModel {
   List<VisitItemModel> get withReviews =>
       visits.where((v) => v.hasReview).toList();
 
-  // ── fromJson ────────────────────────────────────────────────────────────
   factory AllVisitsModel.fromJson(List<dynamic> jsonList) {
     final List<VisitItemModel> parsed = jsonList
-        .whereType<Map<String, dynamic>>()
-        .map((e) => VisitItemModel.fromJson(e))
+        .whereType<Map>()
+        .map((e) => VisitItemModel.fromJson(Map<String, dynamic>.from(e)))
         .toList();
 
     return AllVisitsModel(visits: parsed);
   }
 
-  // ── toJson ──────────────────────────────────────────────────────────────
   List<Map<String, dynamic>> toJson() {
     return visits.map((v) => v.toJson()).toList();
   }

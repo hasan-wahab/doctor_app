@@ -16,14 +16,34 @@ class BillingPaymentsSection extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: 12.h),
-        ...List.generate(payments.length, (index) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: index == payments.length - 1 ? 0 : 10.h,
+        if (payments.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+            decoration: BoxDecoration(
+              color: AppColors.softGrayColor,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: AppColors.borderColor),
             ),
-            child: _PaymentCard(item: payments[index]),
-          );
-        }),
+            child: Text(
+              'No payments found for this invoice.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.mutedTextColor,
+              ),
+            ),
+          )
+        else
+          ...List.generate(payments.length, (index) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == payments.length - 1 ? 0 : 10.h,
+              ),
+              child: _PaymentCard(item: payments[index]),
+            );
+          }),
       ],
     );
   }

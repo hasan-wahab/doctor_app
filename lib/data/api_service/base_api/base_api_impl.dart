@@ -84,6 +84,8 @@ class BaseApiImpl implements BaseApi {
           )
           .timeout(const Duration(seconds: 50));
 
+      print("STATUS CODE => ${response.statusCode}");
+      log("BODY => ${response.body}");
       return responseHandle(response);
     } on SocketException {
       throw NoInternetException();
@@ -116,6 +118,9 @@ class BaseApiImpl implements BaseApi {
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
+
+    print("STATUS CODE => ${response.statusCode}");
+    log("BODY => ${response.body}");
     return responseHandle(response);
   }
 }
