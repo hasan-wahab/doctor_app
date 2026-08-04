@@ -101,79 +101,108 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
               ),
               backgroundColor: AppColors.bgColor,
               body: SafeArea(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 20.h,
-                  ),
-                  child: Column(
-                    children: List.generate(assessmentLength, (index) {
-                      clinicalFindings =
-                          allConsultantAssessmentModel![index].clinicalFindings;
-                      settingsModel =
-                          allConsultantAssessmentModel![index].sessionSettings;
-                      adviceModel = allConsultantAssessmentModel![index].advice;
-                      prescriptionModel =
-                          allConsultantAssessmentModel![index].prescription;
-                      selectedPackages =
-                          allConsultantAssessmentModel![index].selectedPackages;
-                      specialTest =
-                          allConsultantAssessmentModel![index].specialTests;
-                      mmt = allConsultantAssessmentModel![index].mmt;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PatientInfoCardWidget(
-                            patientName:
-                                currentPatientModel?.patient?.displayName ?? '',
-                            gender:
-                                currentPatientModel?.patient?.displayGender ??
-                                '',
-                            cnic:
-                                currentPatientModel?.patient?.displayCnic ?? '',
-                            age: currentPatientModel?.patient?.displayAge ?? '',
-                            consultant:
-                                allConsultantAssessmentModel![index].consultant,
-                          ),
-                          SizedBox(height: 20.h),
-                          ClinicalFindingWidget(
-                            tags: clinicalFindings?.diagnosis ?? [],
-                            notes: clinicalFindings?.note ?? '',
-                          ),
-                          SizedBox(height: 20.h),
-                          SessionSettingsWidget(
-                            duration: settingsModel?.duration ?? '0',
-                          ),
-                          SizedBox(height: 20.h),
-                          SpecialTestsWidget(specialTests: specialTest ?? {}),
-                          SizedBox(height: 20.h),
-                          AdviceInvestigationsWidget(
-                            investigationsDone: adviceModel!.investigationsDone,
-                            otherInvestigationsAdvice: adviceModel!.otherAdvice
-                                .toString(),
-                          ),
-                          SizedBox(height: 20.h),
-                          MMTTableWidget(mmt: mmt ?? {}),
-                          SizedBox(height: 20.h),
-                          MuscleAssessmentsWidget(
-                            muscleAssessments:
-                                allConsultantAssessmentModel![index]
-                                    .muscleAssessments,
-                          ),
-                          SizedBox(height: 20.h),
-                          TherapeuticPrescriptionWidget(
-                            prescription: prescriptionModel,
-                          ),
-                          SizedBox(height: 20.h),
-                          AssignedPackagesWidget(
-                            selectedPackage: selectedPackages ?? [],
-                          ),
-                          SizedBox(height: 40.h),
-                        ],
-                      );
-                    }),
-                  ),
-                ),
+                child: assessmentLength == 0
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 10.h,
+                          children: [
+                            CustomText(
+                              text: 'No assessments found',
+                              color: AppColors.primaryColor,
+                              fontSize: 16,
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  context.read<ConsultantAssessmentBloc>().add(
+                                    ConsultantAssessmentEvent(isRefresh: true),
+                                  ),
+                              child: Icon(Icons.refresh),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 20.h,
+                        ),
+                        child: Column(
+                          children: List.generate(assessmentLength, (index) {
+                            clinicalFindings = allConsultantAssessmentModel![index]
+                                .clinicalFindings;
+                            settingsModel = allConsultantAssessmentModel![index]
+                                .sessionSettings;
+                            adviceModel =
+                                allConsultantAssessmentModel![index].advice;
+                            prescriptionModel =
+                                allConsultantAssessmentModel![index].prescription;
+                            selectedPackages = allConsultantAssessmentModel![index]
+                                .selectedPackages;
+                            specialTest =
+                                allConsultantAssessmentModel![index].specialTests;
+                            mmt = allConsultantAssessmentModel![index].mmt;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PatientInfoCardWidget(
+                                  patientName:
+                                      currentPatientModel?.patient?.displayName ??
+                                      '',
+                                  gender:
+                                      currentPatientModel
+                                          ?.patient
+                                          ?.displayGender ??
+                                      '',
+                                  cnic:
+                                      currentPatientModel?.patient?.displayCnic ??
+                                      '',
+                                  age:
+                                      currentPatientModel?.patient?.displayAge ??
+                                      '',
+                                  consultant: allConsultantAssessmentModel![index]
+                                      .consultant,
+                                ),
+                                SizedBox(height: 20.h),
+                                ClinicalFindingWidget(
+                                  tags: clinicalFindings?.diagnosis ?? [],
+                                  notes: clinicalFindings?.note ?? '',
+                                ),
+                                SizedBox(height: 20.h),
+                                SessionSettingsWidget(
+                                  duration: settingsModel?.duration ?? '0',
+                                ),
+                                SizedBox(height: 20.h),
+                                SpecialTestsWidget(specialTests: specialTest ?? {}),
+                                SizedBox(height: 20.h),
+                                AdviceInvestigationsWidget(
+                                  investigationsDone:
+                                      adviceModel?.investigationsDone ?? [],
+                                  otherInvestigationsAdvice:
+                                      adviceModel?.otherAdvice?.toString() ?? '',
+                                ),
+                                SizedBox(height: 20.h),
+                                MMTTableWidget(mmt: mmt ?? {}),
+                                SizedBox(height: 20.h),
+                                MuscleAssessmentsWidget(
+                                  muscleAssessments:
+                                      allConsultantAssessmentModel![index]
+                                          .muscleAssessments,
+                                ),
+                                SizedBox(height: 20.h),
+                                TherapeuticPrescriptionWidget(
+                                  prescription: prescriptionModel,
+                                ),
+                                SizedBox(height: 20.h),
+                                AssignedPackagesWidget(
+                                  selectedPackage: selectedPackages ?? [],
+                                ),
+                                SizedBox(height: 40.h),
+                              ],
+                            );
+                          }),
+                        ),
+                      ),
               ),
             ),
           );
@@ -193,7 +222,9 @@ class _AssessmentDetailScreenState extends State<AssessmentDetailScreen> {
                         CustomText(
                           text: message == 'No internet connection!'
                               ? message!
-                              : 'No data',
+                              : 'No assessments found',
+                          color: AppColors.primaryColor,
+                          fontSize: 16,
                         ),
                         InkWell(
                           onTap: () => context

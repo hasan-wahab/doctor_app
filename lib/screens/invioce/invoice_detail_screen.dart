@@ -80,69 +80,89 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   child: RefreshIndicator(
                     onRefresh: () async =>
                         context.read<ProfileBloc>().add(MyProfileEvent()),
-                    child: ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      children: [
-                        SizedBox(height: 20.h),
-
-                        ...List.generate((totalInvoice), (index) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 12.h),
-                            child: BillingInvoiceCard(
-                              invoiceNo: invoiceList[index].id.toString(),
-                              date: DateAndTimeFormater.dateFormat(
-                                invoiceList[index].createdAt,
+                    child: totalInvoice == 0
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.6,
+                                child: Center(
+                                  child: CustomText(
+                                    text: 'No invoices found',
+                                    color: AppColors.primaryColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
-                              type: invoiceList[index].type ?? '',
-                              amount:
-                                  invoiceList[index].amount?.toString() ??
-                                  '0.0',
-                              discount:
-                                  invoiceList[index].discountAmount
-                                      ?.toString() ??
-                                  '0.0',
-                              paid:
-                                  invoiceList[index].paidAmount?.toString() ??
-                                  '0.0',
-                              due:
-                                  invoiceList[index].remainingAmount
-                                      ?.toString() ??
-                                  '0.0',
-                              payStatus: invoiceList[index].computedStatus
-                                  .toString(),
-                              payments: List.generate(
-                                (invoiceList[index].payments.length),
-                                (generator) {
-                                  return BillingPaymentItem(
-
-                                    paymentId: invoiceList[index]
-                                        .payments[generator]
-                                        .displayId,
+                            ],
+                          )
+                        : ListView(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            children: [
+                              SizedBox(height: 20.h),
+                              ...List.generate(totalInvoice, (index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 12.h),
+                                  child: BillingInvoiceCard(
+                                    invoiceNo: invoiceList[index].id
+                                        .toString(),
                                     date: DateAndTimeFormater.dateFormat(
-                                      invoiceList[index]
-                                          .payments[generator]
-                                          .displayCreatedAt,
+                                      invoiceList[index].createdAt,
                                     ),
+                                    type: invoiceList[index].type ?? '',
                                     amount:
-                                        invoiceList[index]
-                                            .payments[generator]
-                                            .amount
+                                        invoiceList[index].amount
                                             ?.toString() ??
                                         '0.0',
-                                    method: invoiceList[index]
-                                        .payments[generator]
-                                        .displayMethod,
-                                    type: invoiceList[index]
-                                        .payments[generator]
-                                        .displayType,
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
+                                    discount:
+                                        invoiceList[index].discountAmount
+                                            ?.toString() ??
+                                        '0.0',
+                                    paid:
+                                        invoiceList[index].paidAmount
+                                            ?.toString() ??
+                                        '0.0',
+                                    due:
+                                        invoiceList[index].remainingAmount
+                                            ?.toString() ??
+                                        '0.0',
+                                    payStatus: invoiceList[index]
+                                        .computedStatus
+                                        .toString(),
+                                    payments: List.generate(
+                                      invoiceList[index].payments.length,
+                                      (generator) {
+                                        return BillingPaymentItem(
+                                          paymentId: invoiceList[index]
+                                              .payments[generator]
+                                              .displayId,
+                                          date:
+                                              DateAndTimeFormater.dateFormat(
+                                            invoiceList[index]
+                                                .payments[generator]
+                                                .displayCreatedAt,
+                                          ),
+                                          amount:
+                                              invoiceList[index]
+                                                  .payments[generator]
+                                                  .amount
+                                                  ?.toString() ??
+                                              '0.0',
+                                          method: invoiceList[index]
+                                              .payments[generator]
+                                              .displayMethod,
+                                          type: invoiceList[index]
+                                              .payments[generator]
+                                              .displayType,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                   ),
                 ),
               )

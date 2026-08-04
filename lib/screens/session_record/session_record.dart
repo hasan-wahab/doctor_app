@@ -124,102 +124,98 @@ class _SessionRecordState extends State<SessionRecord> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height: 15.h),
-                                  CustomText(
-                                    text: 'Session Progress',
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      spacing: 10.w,
-                                      children: List.generate(
-                                        currentPatientData!
+                                  if (currentPatientData!
+                                      .patient!
+                                      .packages
+                                      .isNotEmpty) ...[
+                                    CustomText(
+                                      text: 'Session Progress',
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    SizedBox(height: 10.h),
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        spacing: 10.w,
+                                        children: List.generate(
+                                          currentPatientData!
+                                              .patient!
+                                              .packages
+                                              .length,
+                                          (index) {
+                                            final packages = currentPatientData!
                                                 .patient!
-                                                .packages
-                                                .isNotEmpty
-                                            ? currentPatientData!
-                                                  .patient!
-                                                  .packages
-                                                  .length
-                                            : 1,
-
-                                        (index) {
-                                          final packageName =
-                                              currentPatientData!
-                                                  .patient!
-                                                  .packages[index]
-                                                  .displayName
-                                                  .toSentenceCase;
-                                          final completedSessions =
-                                              currentPatientData!
-                                                  .patient!
-                                                  .packages[index]
-                                                  .pivot!
-                                                  .sessionsUsed!;
-                                          final totalSessions =
-                                              currentPatientData!
-                                                  .patient!
-                                                  .packages[index]
-                                                  .sessions!;
-                                          return Container(
-                                            margin: EdgeInsets.only(
-                                              bottom: 10.h,
-                                            ),
-
-                                            height: 120.h,
-                                            width:
+                                                .packages;
+                                            final package = packages[index];
+                                            final packageName = package
+                                                .displayName
+                                                .toSentenceCase;
+                                            final completedSessions =
+                                                package.pivot?.sessionsUsed ??
+                                                0;
+                                            final totalSessions =
+                                                package.sessions ?? 0;
+                                            final therapySessions =
                                                 currentPatientData!
-                                                        .patient!
-                                                        .packages!
-                                                        .length ==
-                                                    1
-                                                ? 350.w
-                                                : 300,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.r),
-                                            ),
-                                            child: SessionProgressCard(
-                                              title: packageName,
-                                              progressLabel: 'Progress',
-                                              completedSessions:
-                                                  completedSessions,
-                                              nextSessionLabel:
-                                                  totalSessions ==
-                                                      completedSessions
-                                                  ? 'Completed'
-                                                  : currentPatientData!
-                                                        .therapySessions
-                                                        .isEmpty
-                                                  ? ''
-                                                  : currentPatientData
-                                                            ?.therapySessions[index]
-                                                            .displayNextSessionDate ==
-                                                        'No data'
-                                                  ? ''
-                                                  : 'Next Session',
-                                              nextSessionDate:
-                                                  totalSessions ==
-                                                      completedSessions
-                                                  ? ''
-                                                  : currentPatientData!
-                                                        .therapySessions
-                                                        .isEmpty
-                                                  ? ''
-                                                  : DateAndTimeFormater.dateFormat(
-                                                      currentPatientData
-                                                          ?.therapySessions[index]
-                                                          .nextSessionDate,
-                                                    ),
-                                              totalSessions: totalSessions,
-                                            ),
-                                          );
-                                        },
+                                                    .therapySessions;
+                                            final hasTherapyAtIndex =
+                                                index < therapySessions.length;
+                                            final nextSessionDate =
+                                                hasTherapyAtIndex
+                                                ? therapySessions[index]
+                                                      .nextSessionDate
+                                                : null;
+                                            final nextSessionDisplay =
+                                                hasTherapyAtIndex
+                                                ? therapySessions[index]
+                                                      .displayNextSessionDate
+                                                : 'No data';
+
+                                            return Container(
+                                              margin: EdgeInsets.only(
+                                                bottom: 10.h,
+                                              ),
+                                              height: 120.h,
+                                              width: packages.length == 1
+                                                  ? 350.w
+                                                  : 300,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.r),
+                                              ),
+                                              child: SessionProgressCard(
+                                                title: packageName,
+                                                progressLabel: 'Progress',
+                                                completedSessions:
+                                                    completedSessions,
+                                                nextSessionLabel:
+                                                    totalSessions ==
+                                                        completedSessions
+                                                    ? 'Completed'
+                                                    : !hasTherapyAtIndex ||
+                                                          nextSessionDisplay ==
+                                                              'No data'
+                                                    ? ''
+                                                    : 'Next Session',
+                                                nextSessionDate:
+                                                    totalSessions ==
+                                                        completedSessions
+                                                    ? ''
+                                                    : !hasTherapyAtIndex
+                                                    ? ''
+                                                    : DateAndTimeFormater
+                                                          .dateFormat(
+                                                            nextSessionDate,
+                                                          ),
+                                                totalSessions: totalSessions,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(height: 10.h),
+                                    SizedBox(height: 10.h),
+                                  ],
 
                                   /// All Visits
                                   Row(

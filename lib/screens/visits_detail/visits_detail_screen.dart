@@ -85,48 +85,23 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     isExpended[visitIndex] = value;
   }
 
-  /// Visit position rules (1-based visit number, oldest visit first):
-  /// - Visit 1 + type consultation → consultation
-  /// - Visits 2,3,4,5 → therapist
-  /// - Visit 6,11,16... + type consultation → reconsultation
-  /// - Visits 7,8,9,10,12,13... (other slots) → therapist
-  ///
-  /// Extra rule for consultation / reconsultation:
-  /// - Therapist Sessions Done == true → also include therapist questions
-  /// - Done == false → only consultation / reconsultation questions
-  String _baseQuestionCategoryForVisit(int visitIndex) {
-    final visit = allVisitsModel!.visits[visitIndex];
-    final type = visit.type?.toLowerCase().trim() ?? '';
-    final visitNumber = visitIndex + 1;
-
-    if (visitNumber == 1 && type == 'consultation') {
-      return 'consultation';
-    }
-
-    if (visitNumber > 1 &&
-        (visitNumber - 1) % 5 == 0 &&
-        type == 'consultation') {
-      return 'reconsultation';
-    }
-
-    return 'therapist';
-  }
-
+  /// Categories for this visit, based on Assessments.Done flags:
+  /// - Consultant Assessment Done → consultation questions
+  /// - Reconsultation Assessment Done → reconsultation questions
+  /// - Therapist Sessions Done → therapist questions
+  /// Show every category whose Done is true (categorized).
   List<String> _questionCategoriesForVisit(int visitIndex) {
-    final base = _baseQuestionCategoryForVisit(visitIndex).toLowerCase();
-    final categories = <String>[base];
+    final assessments = allVisitsModel!.visits[visitIndex].assessments;
+    final categories = <String>[];
 
-    if (base == 'consultation' || base == 'reconsultation') {
-      final therapistDone =
-          allVisitsModel!
-              .visits[visitIndex]
-              .assessments
-              ?.therapistSessions
-              ?.isDone ??
-          false;
-      if (therapistDone && !categories.contains('therapist')) {
-        categories.add('therapist');
-      }
+    if (assessments?.consultantAssessment?.isDone == true) {
+      categories.add('consultation');
+    }
+    if (assessments?.reconsultationAssessment?.isDone == true) {
+      categories.add('reconsultation');
+    }
+    if (assessments?.therapistSessions?.isDone == true) {
+      categories.add('therapist');
     }
 
     return categories;
@@ -135,6 +110,8 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   List<QuestionModel> _questionsForVisit(int visitIndex) {
     if (questionModel == null) return [];
     final categories = _questionCategoriesForVisit(visitIndex);
+    if (categories.isEmpty) return [];
+
     final filtered = questionModel!
         .where(
           (q) =>
@@ -143,7 +120,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         )
         .toList();
 
-    // Keep category order same as visit rule order, then sortOrder.
+    // Keep category order same as assessment rule order, then sortOrder.
     filtered.sort((a, b) {
       final aCat = a.category.toLowerCase().trim();
       final bCat = b.category.toLowerCase().trim();
@@ -561,7 +538,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
             body: SafeArea(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : allVisitsModel == null
+                  : allVisitsModel == null || allVisitsModel!.visits.isEmpty
                   ? Center(
                       child: SizedBox(
                         width: MediaQuery.sizeOf(context).width,
@@ -573,7 +550,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                             CustomText(
                               text: message == 'No internet connection!'
                                   ? message!
-                                  : 'No data',
+                                  : 'No visits found',
+                              color: AppColors.primaryColor,
+                              fontSize: 16,
                             ),
                             InkWell(
                               onTap: () => context.read<VisitDetailBloc>().add(
@@ -634,52 +613,43 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                 const Divider(),
 
                                 /// QUESTIONS
-                                _isVisitExpanded(visitIndex)
-                                    ? visitQuestions.isEmpty
-                                          ? CustomText(
-                                              text:
-                                                  'No feedback questions available for this visit.',
-                                              color: AppColors.primaryColor,
-                                            )
-                                          : _buildCategorizedQuestions(
-                                              visitIndex: visitIndex,
-                                              visitQuestions: visitQuestions,
-                                            )
-                                    : const SizedBox.shrink(),
-                                SizedBox(height: 20.h),
+                                if (_isVisitExpanded(visitIndex) &&
+                                    visitQuestions.isNotEmpty)
+                                  _buildCategorizedQuestions(
+                                    visitIndex: visitIndex,
+                                    visitQuestions: visitQuestions,
+                                  ),
 
-                                /// BUTTON
-                                !visit.hasReview
-                                    ? AppButton(
-                                        onTap: () async {
-                                          // Collapsed → only expand (stay open).
-                                          if (!_isVisitExpanded(visitIndex)) {
-                                            setState(() {
-                                              _setVisitExpanded(
-                                                visitIndex,
-                                                true,
-                                              );
-                                            });
-                                            return;
-                                          }
+                                /// BUTTON / SUBMITTED REVIEW / EMPTY MSG
+                                if (visit.hasReview) ...[
+                                  SizedBox(height: 20.h),
+                                  _buildSubmittedReview(visit),
+                                ] else if (visitQuestions.isNotEmpty) ...[
+                                  SizedBox(height: 20.h),
+                                  AppButton(
+                                    onTap: () async {
+                                      // Collapsed → only expand (stay open).
+                                      if (!_isVisitExpanded(visitIndex)) {
+                                        setState(() {
+                                          _setVisitExpanded(visitIndex, true);
+                                        });
+                                        return;
+                                      }
 
-                                          // Expanded → submit; keep open if invalid.
-                                          if (visitQuestions.isEmpty) {
-                                            AppMsg.showSnackBar(
-                                              context,
-                                              message:
-                                                  'No questions to submit for this visit.',
-                                            );
-                                            return;
-                                          }
-
-                                          await submitData(visitIndex);
-                                        },
-                                        text: _isVisitExpanded(visitIndex)
-                                            ? 'Submit'
-                                            : 'Give Feedback',
-                                      )
-                                    : _buildSubmittedReview(visit),
+                                      await submitData(visitIndex);
+                                    },
+                                    text: _isVisitExpanded(visitIndex)
+                                        ? 'Submit'
+                                        : 'Give Feedback',
+                                  ),
+                                ] else ...[
+                                  SizedBox(height: 12.h),
+                                  CustomText(
+                                    text:
+                                        'No feedback available for this visit yet.',
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ],
                               ],
                             ),
                           ),

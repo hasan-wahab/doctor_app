@@ -91,7 +91,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 onRefresh: () async => context.read<TherapySessionBloc>().add(
                   TherapySessionEvent(refresh: true),
                 ),
-                child: allTherapistModel != null
+                child: allTherapistModel != null &&
+                        filteredVisits.isNotEmpty
                     ? ListView(
                         padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
                         children: [
@@ -153,7 +154,13 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                           }).toList(),
                         ],
                       )
-                    : Center(child: CustomText(text: 'No data found!')),
+                    : Center(
+                        child: CustomText(
+                          text: 'No sessions found',
+                          color: AppColors.primaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
               ),
             ),
           );
@@ -172,7 +179,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                   CustomText(
                     text: message == 'No internet connection!'
                         ? message!
-                        : 'No data',
+                        : 'No sessions found',
+                    color: AppColors.primaryColor,
+                    fontSize: 16,
                   ),
                   InkWell(
                     onTap: () => context.read<TherapySessionBloc>().add(

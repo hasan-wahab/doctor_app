@@ -80,55 +80,68 @@ class _PackagesScreenState extends State<PackagesScreen> {
                       children: [
                         /// Session Progress
                         SizedBox(height: 10.h),
-                        ...List.generate(
-                          currentPatientData!.patient!.packages.isNotEmpty
-                              ? currentPatientData!.patient!.packages.length
-                              : 1,
-
-                          (index) {
-                            final packageName = currentPatientData!
-                                .patient!
-                                .packages[index]
-                                .displayName
-                                .toSentenceCase;
-                            final completedSessions = currentPatientData!
-                                .patient!
-                                .packages[index]
-                                .pivot!
-                                .sessionsUsed!;
-                            final totalSessions = currentPatientData!
-                                .patient!
-                                .packages[index]
-                                .sessions!;
-                            return SessionProgressCard(
-                              title: packageName,
-                              progressLabel: 'Progress',
-                              completedSessions: completedSessions,
-                              nextSessionLabel:
-                                  totalSessions == completedSessions
-                                  ? 'Completed'
-                                  : currentPatientData!.therapySessions.isEmpty
-                                  ? ''
-                                  : currentPatientData
+                        if (currentPatientData!.patient!.packages.isEmpty)
+                          Padding(
+                            padding: EdgeInsets.only(top: 40.h),
+                            child: Center(
+                              child: CustomText(
+                                text: 'No packages found',
+                                color: AppColors.primaryColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        else
+                          ...List.generate(
+                            currentPatientData!.patient!.packages.length,
+                            (index) {
+                              final packageName = currentPatientData!
+                                  .patient!
+                                  .packages[index]
+                                  .displayName
+                                  .toSentenceCase;
+                              final completedSessions = currentPatientData!
+                                  .patient!
+                                  .packages[index]
+                                  .pivot!
+                                  .sessionsUsed!;
+                              final totalSessions = currentPatientData!
+                                  .patient!
+                                  .packages[index]
+                                  .sessions!;
+                              return SessionProgressCard(
+                                title: packageName,
+                                progressLabel: 'Progress',
+                                completedSessions: completedSessions,
+                                nextSessionLabel:
+                                    totalSessions == completedSessions
+                                    ? 'Completed'
+                                    : currentPatientData!
+                                          .therapySessions
+                                          .isEmpty
+                                    ? ''
+                                    : currentPatientData
+                                              ?.therapySessions[index]
+                                              .displayNextSessionDate ==
+                                          'No data'
+                                    ? ''
+                                    : 'Next Session',
+                                nextSessionDate:
+                                    totalSessions == completedSessions
+                                    ? ''
+                                    : currentPatientData!
+                                          .therapySessions
+                                          .isEmpty
+                                    ? ''
+                                    : DateAndTimeFormater.dateFormat(
+                                        currentPatientData
                                             ?.therapySessions[index]
-                                            .displayNextSessionDate ==
-                                        'No data'
-                                  ? ''
-                                  : 'Next Session',
-                              nextSessionDate:
-                                  totalSessions == completedSessions
-                                  ? ''
-                                  : currentPatientData!.therapySessions.isEmpty
-                                  ? ''
-                                  : DateAndTimeFormater.dateFormat(
-                                      currentPatientData
-                                          ?.therapySessions[index]
-                                          .nextSessionDate,
-                                    ),
-                              totalSessions: totalSessions,
-                            );
-                          },
-                        ),
+                                            .nextSessionDate,
+                                      ),
+                                totalSessions: totalSessions,
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ],
