@@ -17,6 +17,12 @@ abstract class BaseApi {
   });
   Future getApi({required String url, String? patientId, String? token});
 
+  Future putApi({
+    required String url,
+    String? token,
+    Map? body,
+  });
+
   Future multiPartPostApi({
     required String token,
     required File file,

@@ -100,6 +100,38 @@ class BaseApiImpl implements BaseApi {
   }
 
   @override
+  Future putApi({required String url, String? token, Map? body}) async {
+    var urL = Uri.parse(url);
+
+    try {
+      http.Response response = await http
+          .put(
+            urL,
+            body: jsonEncode(body ?? {}),
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              if (token != null) "Authorization": "Bearer $token",
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+      print(token);
+      print("STATUS CODE => ${response.statusCode}");
+      log("BODY => ${response.body}");
+      return responseHandle(response);
+    } on SocketException {
+      throw NoInternetException();
+    } on TimeoutException {
+      throw TimeOutException();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      throw BaseExceptions(message: e.toString(), debugMessage: e.toString());
+    }
+  }
+
+  @override
   Future multiPartPostApi({
     required String token,
     required File file,

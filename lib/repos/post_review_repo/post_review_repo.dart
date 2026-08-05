@@ -22,4 +22,20 @@ class PostReviewRepo {
       throw e.toString();
     }
   }
+
+  Future editReview({
+    required int reviewId,
+    required PostReviewModel model,
+    required String token,
+  }) async {
+    try {
+      await api.putApi(
+        url: ApiKeys.editReviewKey(reviewId),
+        body: model.toJson(),
+        token: token,
+      );
+    } on Exception catch (e) {
+      throw e.toString();
+    }
+  }
 }

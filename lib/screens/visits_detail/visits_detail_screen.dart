@@ -132,6 +132,49 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     return filtered;
   }
 
+  /// Categories that already have at least one posted answer.
+  /// Once any question in a category is reviewed, that whole category is closed
+  /// for further edit (remaining questions in it are not shown again).
+  Set<String> _postedReviewCategories(int visitIndex) {
+    final visit = allVisitsModel!.visits[visitIndex];
+    final posted = <String>{};
+    if (questionModel == null) return posted;
+
+    final idToCategory = <int, String>{
+      for (final q in questionModel!) q.id: q.category.toLowerCase().trim(),
+    };
+
+    for (final a in visit.review?.answers ?? []) {
+      final id = a.questionId;
+      if (id == null) continue;
+      final category = idToCategory[id];
+      if (category != null && category.isNotEmpty) {
+        posted.add(category);
+      }
+    }
+    return posted;
+  }
+
+  /// Questions the user can still answer:
+  /// - Done=true categories only
+  /// - If review exists: only categories with zero posted answers yet
+  ///   (e.g. therapist already reviewed → skip leftover therapist questions;
+  ///    when reconsultation Done → show only reconsultation)
+  List<QuestionModel> _questionsForInput(int visitIndex) {
+    final allDoneQuestions = _questionsForVisit(visitIndex);
+    if (allDoneQuestions.isEmpty) return [];
+
+    final visit = allVisitsModel!.visits[visitIndex];
+    if (!visit.hasReview) return allDoneQuestions;
+
+    final postedCategories = _postedReviewCategories(visitIndex);
+    return allDoneQuestions
+        .where(
+          (q) => !postedCategories.contains(q.category.toLowerCase().trim()),
+        )
+        .toList();
+  }
+
   String _categoryTitle(String category) {
     switch (category.toLowerCase().trim()) {
       case 'consultation':
@@ -142,6 +185,20 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         return 'Therapist Questions';
       default:
         return '${category.toSentenceCase} Questions';
+    }
+  }
+
+  /// Submitted review section headers (no "Questions" suffix).
+  String _submittedReviewCategoryTitle(String category) {
+    switch (category.toLowerCase().trim()) {
+      case 'consultation':
+        return 'Consultation';
+      case 'reconsultation':
+        return 'Reconsultation';
+      case 'therapist':
+        return 'Therapist';
+      default:
+        return category.toSentenceCase;
     }
   }
 
@@ -259,7 +316,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
 
     for (var i = 0; i < allVisitsModel!.visits.length; i++) {
       answers[i] = {};
-      final visitQuestions = _questionsForVisit(i);
+      final visitQuestions = _questionsForInput(i);
 
       for (var j = 0; j < visitQuestions.length; j++) {
         answers[i]![j] = AnswerModel(
@@ -278,15 +335,20 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   /// SUBMIT DATA
   /// ======================
   /// Returns `true` when review was submitted; `false` when blocked by validation.
+  /// Create (POST) when no review yet; edit (PUT) when adding answers for newly
+  /// Done categories — previous answers are merged into the same payload.
   Future<bool> submitData(int visitIndex) async {
     final visitAnswers = answers[visitIndex]!;
-    final visitQuestions = _questionsForVisit(visitIndex);
+    final visitQuestions = _questionsForInput(visitIndex);
+    final visit = allVisitsModel!.visits[visitIndex];
+    final existingReview = visit.review;
+    final isEdit = visit.hasReview && existingReview?.reviewId != null;
 
     // Top-level rating/comment: first filled values (API schema).
     // Every answered question also goes into answers[] with question_id.
     int? rating;
     String? comment;
-    List<Answers> answersList = [];
+    List<Answers> newAnswersList = [];
 
     final sortedIndexes = visitAnswers.keys.toList()..sort();
 
@@ -299,7 +361,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       if (type == 'rating') {
         if (ans.rating <= 0) continue;
         rating ??= ans.rating;
-        answersList.add(
+        newAnswersList.add(
           Answers(questionId: q.id, answer: ans.rating.toString()),
         );
       } else if (type == 'text' ||
@@ -308,11 +370,11 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         final text = ans.controller.text.trim();
         if (text.isEmpty) continue;
         comment ??= text;
-        answersList.add(Answers(questionId: q.id, answer: text));
+        newAnswersList.add(Answers(questionId: q.id, answer: text));
       } else if (type == 'options') {
         for (int i = 0; i < ans.selectedOptions.length; i++) {
           if (ans.selectedOptions[i]) {
-            answersList.add(Answers(questionId: q.id, answer: q.options[i]));
+            newAnswersList.add(Answers(questionId: q.id, answer: q.options[i]));
           }
         }
       }
@@ -321,7 +383,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     final hasAnyAnswer =
         rating != null ||
         (comment != null && comment.trim().isNotEmpty) ||
-        answersList.isNotEmpty;
+        newAnswersList.isNotEmpty;
 
     if (!hasAnyAnswer) {
       AppMsg.showSnackBar(
@@ -331,19 +393,37 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       return false;
     }
 
+    List<Answers> answersList = newAnswersList;
+    if (isEdit) {
+      final merged = <Answers>[];
+      for (final a in existingReview!.answers ?? []) {
+        if (a.questionId == null) continue;
+        final answerText = (a.answer ?? '').trim();
+        if (answerText.isEmpty) continue;
+        merged.add(Answers(questionId: a.questionId, answer: answerText));
+      }
+      merged.addAll(newAnswersList);
+      answersList = merged;
+    }
+
     final postModel = PostReviewModel(
-      visitId: allVisitsModel!.visits[visitIndex].visitId,
-      rating: rating,
-      comment: comment,
+      visitId: visit.visitId,
+      rating: rating ?? existingReview?.rating,
+      comment: (comment != null && comment.trim().isNotEmpty)
+          ? comment
+          : existingReview?.comment,
       options: answersList,
     );
     context.read<VisitDetailBloc>().add(
-      ReviewSubmitEvent(postReviewModel: postModel),
+      ReviewSubmitEvent(
+        postReviewModel: postModel,
+        reviewId: isEdit ? existingReview!.reviewId : null,
+      ),
     );
     return true;
   }
 
-  /// Shows top-level rating/comment (old reviews) + every answers[] row.
+  /// Shows top-level rating/comment (old reviews) + answers grouped by category.
   Widget _buildSubmittedReview(VisitItemModel visit) {
     final review = visit.review;
     if (review == null) return const SizedBox.shrink();
@@ -352,16 +432,16 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     final widgets = <Widget>[];
     var rowNo = 1;
 
-    bool answerLooksLikeRating(ReviewAnswerModel item) {
-      QuestionModel? question;
-      if (questionModel != null) {
-        for (final q in questionModel!) {
-          if (q.id == item.questionId) {
-            question = q;
-            break;
-          }
-        }
+    QuestionModel? questionFor(ReviewAnswerModel item) {
+      if (questionModel == null || item.questionId == null) return null;
+      for (final q in questionModel!) {
+        if (q.id == item.questionId) return q;
       }
+      return null;
+    }
+
+    bool answerLooksLikeRating(ReviewAnswerModel item) {
+      final question = questionFor(item);
       final type = (question?.type ?? '').toLowerCase();
       final ratingValue = int.tryParse(item.displayAnswer.trim());
       return type == 'rating' ||
@@ -370,16 +450,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
 
     final hasRatingInAnswers = reviewAnswers.any(answerLooksLikeRating);
     final hasTextInAnswers = reviewAnswers.any((item) {
-      QuestionModel? question;
-      if (questionModel != null) {
-        for (final q in questionModel!) {
-          if (q.id == item.questionId) {
-            question = q;
-            break;
-          }
-        }
-      }
-      final type = (question?.type ?? '').toLowerCase();
+      final type = (questionFor(item)?.type ?? '').toLowerCase();
       return type == 'text' ||
           type.contains('comment') ||
           type.contains('feedback');
@@ -433,53 +504,80 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       rowNo++;
     }
 
+    // Group answers by category (consultation / reconsultation / therapist).
+    const preferredOrder = ['consultation', 'reconsultation', 'therapist'];
+    final grouped = <String, List<ReviewAnswerModel>>{};
     for (final item in reviewAnswers) {
-      QuestionModel? question;
-      if (questionModel != null) {
-        for (final q in questionModel!) {
-          if (q.id == item.questionId) {
-            question = q;
-            break;
-          }
-        }
-      }
+      final category = (questionFor(item)?.category ?? '').toLowerCase().trim();
+      final key = category.isEmpty ? 'other' : category;
+      grouped.putIfAbsent(key, () => []).add(item);
+    }
 
-      final type = (question?.type ?? '').toLowerCase();
-      final title =
-          (item.question ?? question?.questionText ?? 'Answer').toSentenceCase;
-      final answerText = item.displayAnswer;
-      final ratingValue = int.tryParse(answerText.trim()) ?? 0;
-      final isRating =
-          type == 'rating' ||
-          (type.isEmpty && ratingValue >= 1 && ratingValue <= 5);
+    final sortedCategories = grouped.keys.toList()
+      ..sort((a, b) {
+        final aIdx = preferredOrder.indexOf(a);
+        final bIdx = preferredOrder.indexOf(b);
+        final aOrder = aIdx == -1 ? preferredOrder.length : aIdx;
+        final bOrder = bIdx == -1 ? preferredOrder.length : bIdx;
+        if (aOrder != bOrder) return aOrder.compareTo(bOrder);
+        return a.compareTo(b);
+      });
 
+    for (final category in sortedCategories) {
+      final items = grouped[category]!;
       widgets.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomText(
-              maxLines: 10,
-              text: '$rowNo. $title',
-              color: AppColors.primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-            SizedBox(height: 4.h),
-            if (isRating)
-              Row(
-                children: List.generate(
-                  5,
-                  (i) => Icon(
-                    Icons.star,
-                    color: ratingValue > i ? Colors.amber : Colors.grey,
-                  ),
-                ),
-              )
-            else
-              CustomText(maxLines: 10, text: answerText.toSentenceCase),
-          ],
+        Padding(
+          padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
+          child: CustomText(
+            text: category == 'other'
+                ? 'Other'
+                : _submittedReviewCategoryTitle(category),
+            color: AppColors.firstTextBlackColor,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+          ),
         ),
       );
-      rowNo++;
+
+      for (final item in items) {
+        final question = questionFor(item);
+        final type = (question?.type ?? '').toLowerCase();
+        final title = (item.question ?? question?.questionText ?? 'Answer')
+            .toSentenceCase;
+        final answerText = item.displayAnswer;
+        final ratingValue = int.tryParse(answerText.trim()) ?? 0;
+        final isRating =
+            type == 'rating' ||
+            (type.isEmpty && ratingValue >= 1 && ratingValue <= 5);
+
+        widgets.add(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomText(
+                maxLines: 10,
+                text: '$rowNo. $title',
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+              SizedBox(height: 4.h),
+              if (isRating)
+                Row(
+                  children: List.generate(
+                    5,
+                    (i) => Icon(
+                      Icons.star,
+                      color: ratingValue > i ? Colors.amber : Colors.grey,
+                    ),
+                  ),
+                )
+              else
+                CustomText(maxLines: 10, text: answerText.toSentenceCase),
+            ],
+          ),
+        );
+        rowNo++;
+      }
     }
 
     if (widgets.isEmpty) return const SizedBox.shrink();
@@ -574,7 +672,8 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                         final visitIndex =
                             allVisitsModel!.visits.length - 1 - displayIndex;
                         final visit = allVisitsModel!.visits[visitIndex];
-                        final visitQuestions = _questionsForVisit(visitIndex);
+                        // Only unanswered Done-category questions (create or edit).
+                        final pendingQuestions = _questionsForInput(visitIndex);
                         return Card(
                           margin: EdgeInsets.only(bottom: 12.h),
                           color: AppColors.secondaryColor,
@@ -612,19 +711,22 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
 
                                 const Divider(),
 
-                                /// QUESTIONS
+                                /// Already submitted answers (if any)
+                                if (visit.hasReview) ...[
+                                  SizedBox(height: 12.h),
+                                  _buildSubmittedReview(visit),
+                                ],
+
+                                /// Pending questions (new Done categories / empty)
                                 if (_isVisitExpanded(visitIndex) &&
-                                    visitQuestions.isNotEmpty)
+                                    pendingQuestions.isNotEmpty)
                                   _buildCategorizedQuestions(
                                     visitIndex: visitIndex,
-                                    visitQuestions: visitQuestions,
+                                    visitQuestions: pendingQuestions,
                                   ),
 
-                                /// BUTTON / SUBMITTED REVIEW / EMPTY MSG
-                                if (visit.hasReview) ...[
-                                  SizedBox(height: 20.h),
-                                  _buildSubmittedReview(visit),
-                                ] else if (visitQuestions.isNotEmpty) ...[
+                                /// Create or edit feedback for pending questions
+                                if (pendingQuestions.isNotEmpty) ...[
                                   SizedBox(height: 20.h),
                                   AppButton(
                                     onTap: () async {
@@ -639,10 +741,12 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
                                       await submitData(visitIndex);
                                     },
                                     text: _isVisitExpanded(visitIndex)
-                                        ? 'Submit'
+                                        ? (visit.hasReview
+                                              ? 'Update Review'
+                                              : 'Submit')
                                         : 'Give Feedback',
                                   ),
-                                ] else ...[
+                                ] else if (!visit.hasReview) ...[
                                   SizedBox(height: 12.h),
                                   CustomText(
                                     text:

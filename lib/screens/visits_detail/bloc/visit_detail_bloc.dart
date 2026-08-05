@@ -131,10 +131,20 @@ class VisitDetailBloc extends Bloc<VisitDetailEvent, VisitDetailState> {
     try {
       emit(VisitDetailLoadingState());
       String? token = await profileLocalRepo.getToken();
-      await postReviewRepo.postReview(
-        model: event.postReviewModel,
-        token: token ?? '',
-      );
+      final isEdit = event.reviewId != null;
+
+      if (isEdit) {
+        await postReviewRepo.editReview(
+          reviewId: event.reviewId!,
+          model: event.postReviewModel,
+          token: token ?? '',
+        );
+      } else {
+        await postReviewRepo.postReview(
+          model: event.postReviewModel,
+          token: token ?? '',
+        );
+      }
       debugPrint('All Visit Data From Server');
       emit(VisitDetailLoadingState());
       // Here we will get data from server
@@ -160,7 +170,11 @@ class VisitDetailBloc extends Bloc<VisitDetailEvent, VisitDetailState> {
         }
       }
 
-      emit(VisitDetailMessageState(message: 'Review Submitted'));
+      emit(
+        VisitDetailMessageState(
+          message: isEdit ? 'Review Updated' : 'Review Submitted',
+        ),
+      );
     } catch (e) {
       emit(VisitDetailMessageState(message: e.toString()));
     }

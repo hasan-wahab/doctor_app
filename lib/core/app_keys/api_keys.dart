@@ -1,13 +1,13 @@
 class ApiKeys {
   ApiKeys._();
   //  // old for testing
-  // static String baseUrl = 'https://alitherapy.neonweb.tech/api';
-  // // old for testing
-  // static String imageBaseUrl = 'https://alitherapy.neonweb.tech';
+  static String baseUrl = 'https://alitherapy.neonweb.tech/api';
+  // old for testing
+  static String imageBaseUrl = 'https://alitherapy.neonweb.tech';
   // new url
-  static String baseUrl = 'http://cms.dralitherapy.com/api';
-  //new url
-  static String imageBaseUrl = 'http://cms.dralitherapy.com';
+  // static String baseUrl = 'http://cms.dralitherapy.com/api';
+  // //new url
+  // static String imageBaseUrl = 'http://cms.dralitherapy.com';
 
   /// Login Api Key
   static String loginKey = '$baseUrl/patient/login';
@@ -56,6 +56,10 @@ class ApiKeys {
 
   /// Post Review Key
   static String postReviewKey = "${ApiKeys.baseUrl}/patient/reviews";
+
+  /// Edit Review Key — PUT /api/patient/reviews/{id}
+  static String editReviewKey(int reviewId) =>
+      "${ApiKeys.baseUrl}/patient/reviews/$reviewId";
 
   /// All Packages Images url
   static String allPackegesImagesUrl = "$imageBaseUrl/storage";

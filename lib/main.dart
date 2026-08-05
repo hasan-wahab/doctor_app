@@ -256,7 +256,7 @@ class _MyAppState extends State<MyApp> {
             );
           },
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
+          title: 'Dr.Ali Therapy',
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           ),

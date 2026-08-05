@@ -8,5 +8,9 @@ class VisitDetailJustFromServerEvent extends VisitDetailEvent {}
 
 class ReviewSubmitEvent extends VisitDetailEvent {
   PostReviewModel postReviewModel;
-  ReviewSubmitEvent({required this.postReviewModel});
+
+  /// When set, updates an existing review via PUT /patient/reviews/{id}.
+  int? reviewId;
+
+  ReviewSubmitEvent({required this.postReviewModel, this.reviewId});
 }
