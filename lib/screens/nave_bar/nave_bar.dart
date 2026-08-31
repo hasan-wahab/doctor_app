@@ -99,7 +99,8 @@ class _NaveBarState extends State<NaveBar> {
                                 if (index != 0 && index != 3) {
                                   AppMsg.showSnackBar(
                                     context,
-                                    message: 'First of all you need to login',
+                                    message:
+                                        'You need to log in to continue. Please log in first.',
                                   );
                                 }
                               } else {

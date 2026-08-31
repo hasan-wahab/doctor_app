@@ -133,6 +133,22 @@ class VisitDetailBloc extends Bloc<VisitDetailEvent, VisitDetailState> {
       String? token = await profileLocalRepo.getToken();
       final isEdit = event.reviewId != null;
 
+      if (kDebugMode) {
+        print('========== REVIEW BLOC API CALL ==========');
+        if (isEdit) {
+          print('type     : EDITED REVIEW');
+          print('method   : PUT');
+          print('reviewId : ${event.reviewId}');
+          print('url      : ${ApiKeys.editReviewKey(event.reviewId!)}');
+        } else {
+          print('type     : SUBMITTED REVIEW (create)');
+          print('method   : POST');
+          print('url      : ${ApiKeys.postReviewKey}');
+        }
+        print('body     : ${event.postReviewModel.toJson()}');
+        print('==========================================');
+      }
+
       if (isEdit) {
         await postReviewRepo.editReview(
           reviewId: event.reviewId!,

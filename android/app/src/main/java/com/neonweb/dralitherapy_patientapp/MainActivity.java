@@ -1,6 +1,6 @@
 package com.neonweb.dralitherapy_patientapp;
 
-import android.os.Bundle;
+import android.util.Log;
 
 import com.hce_flutter.MyHostApduService;
 
@@ -22,6 +22,7 @@ public class MainActivity extends FlutterActivity {
                         if (data == null || data.isEmpty()) data = "1234567a";
 
                         MyHostApduService.virtualData = data;
+                        Log.d("HCE", "setData called → virtualData = " + data);
 
                         result.success(true);
                     } else {

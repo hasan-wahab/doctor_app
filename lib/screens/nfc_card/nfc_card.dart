@@ -474,6 +474,7 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
     if (state == AppLifecycleState.resumed) {
       context.read<NfcCardBloc>().add(NfcCardEvent());
     }
@@ -484,6 +485,12 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
     context.read<NfcCardBloc>().add(NfcCardEvent());
     WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -514,8 +521,19 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
           if (state is NfcCardDataState) {
             patientModel = state.patientModel;
             final uid = patientModel?.cardUid;
+            print(uid);
             if (uid != null && uid.isNotEmpty) {}
-            isNfcOn = await NfcManager.instance.isAvailable();
+            try {
+              isNfcOn = await NfcManager.instance.isAvailable();
+            } on PlatformException catch (e) {
+              isNfcOn = false;
+              message = (e.message ?? '').trim().isNotEmpty
+                  ? e.message!.trim()
+                  : 'NFC is not supported on this device.';
+            } catch (_) {
+              isNfcOn = false;
+              message = 'NFC is not supported on this device.';
+            }
           }
         },
         builder: (context, state) {

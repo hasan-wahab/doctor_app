@@ -29,6 +29,13 @@ public class MyHostApduService extends HostApduService {
         response[response.length - 2] = (byte) 0x90;
         response[response.length - 1] = (byte) 0x00;
 
+        // What the NFC reader will read (app payload, without status words)
+        Log.d("HCE", "======= READER WILL READ =======");
+        Log.d("HCE", "data (string): " + virtualData);
+        Log.d("HCE", "data (hex)   : " + bytesToHex(dataBytes));
+        Log.d("HCE", "full response: " + bytesToHex(response));
+        Log.d("HCE", "================================");
+
         return response;
     }
 

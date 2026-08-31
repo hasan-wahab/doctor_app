@@ -7,10 +7,10 @@ import 'package:http/http.dart' as http;
 class InternetUtils {
   static const Duration timeout = Duration(seconds: 3);
 
-  /// Check network interface
+  /// Check network interface (connectivity_plus 7+ returns a List).
   static Future<bool> isConnected() async {
     final result = await Connectivity().checkConnectivity();
-    return result != ConnectivityResult.none;
+    return result.any((r) => r != ConnectivityResult.none);
   }
 
   /// Real internet check using HTTP
@@ -20,7 +20,7 @@ class InternetUtils {
           .get(Uri.parse('https://clients3.google.com/generate_204'))
           .timeout(timeout);
 
-      return response.statusCode == 204; // ✅ FIX
+      return response.statusCode == 204;
     } on SocketException {
       return false;
     } on TimeoutException {

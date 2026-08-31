@@ -91,8 +91,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 onRefresh: () async => context.read<TherapySessionBloc>().add(
                   TherapySessionEvent(refresh: true),
                 ),
-                child: allTherapistModel != null &&
-                        filteredVisits.isNotEmpty
+                child: allTherapistModel != null && filteredVisits.isNotEmpty
                     ? ListView(
                         padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
                         children: [

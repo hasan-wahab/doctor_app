@@ -30,9 +30,32 @@ class NfcCardBloc extends Bloc<NfcCardEvent, NfcCardState> {
         patientModel = currentPatientModel!.patient;
         const MethodChannel hceChannel = MethodChannel('hce.channel');
         try {
-          if (defaultTargetPlatform != TargetPlatform.android) return;
-          if (patientModel!.cardUid == null) return;
-          bool isNfcOn = await NfcManager.instance.isAvailable();
+          if (defaultTargetPlatform != TargetPlatform.android) {
+            emit(NfcMessageState(message: 'NFC is only supported on Android.'));
+            emit(NfcCardDataState(patientModel: patientModel));
+            return;
+          }
+          if (patientModel!.cardUid == null) {
+            emit(NfcCardDataState(patientModel: patientModel));
+            return;
+          }
+
+          bool isNfcOn = false;
+          try {
+            isNfcOn = await NfcManager.instance.isAvailable();
+          } on PlatformException catch (e) {
+            final msg = (e.message ?? '').trim();
+            emit(
+              NfcMessageState(
+                message: msg.isNotEmpty
+                    ? msg
+                    : 'NFC is not supported on this device.',
+              ),
+            );
+            emit(NfcCardDataState(patientModel: patientModel));
+            return;
+          }
+
           if (isNfcOn) {
             await hceChannel.invokeMethod<bool>('setData', <String, dynamic>{
               'data': patientModel!.cardUid,
@@ -41,10 +64,17 @@ class NfcCardBloc extends Bloc<NfcCardEvent, NfcCardState> {
             emit(NfcMessageState(message: 'NFC is not available'));
           }
         } on PlatformException catch (e) {
-          // print(e.message);
-          emit(NfcMessageState(message: e.message.toString()));
+          final msg = (e.message ?? '').trim();
+          emit(
+            NfcMessageState(
+              message: msg.isNotEmpty
+                  ? msg
+                  : 'NFC is not supported on this device.',
+            ),
+          );
         } catch (e, st) {
           debugPrint('HCE setData failed: $e\n$st');
+          emit(NfcMessageState(message: 'NFC setup failed. Please try again.'));
         }
         emit(NfcCardDataState(patientModel: patientModel));
       } else {

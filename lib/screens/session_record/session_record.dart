@@ -203,10 +203,9 @@ class _SessionRecordState extends State<SessionRecord> {
                                                     ? ''
                                                     : !hasTherapyAtIndex
                                                     ? ''
-                                                    : DateAndTimeFormater
-                                                          .dateFormat(
-                                                            nextSessionDate,
-                                                          ),
+                                                    : DateAndTimeFormater.dateFormat(
+                                                        nextSessionDate,
+                                                      ),
                                                 totalSessions: totalSessions,
                                               ),
                                             );

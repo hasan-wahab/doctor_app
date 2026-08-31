@@ -5,10 +5,12 @@ import 'package:doctor_app/widgets/app_button.dart';
 import 'package:doctor_app/widgets/check_circle.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../core/app_keys/api_keys.dart';
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/post_review_model.dart';
 import '../../widgets/row_text.dart';
@@ -414,10 +416,32 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
           : existingReview?.comment,
       options: answersList,
     );
+
+    final reviewId = isEdit ? existingReview!.reviewId : null;
+    if (kDebugMode) {
+      print('========== VISIT REVIEW DEBUG ==========');
+      print('visit_id        : ${visit.visitId}');
+      print('hasReview       : ${visit.hasReview}');
+      print('existingReviewId: ${existingReview?.reviewId}');
+      print('action          : ${isEdit ? "EDIT (PUT)" : "SUBMIT / CREATE (POST)"}');
+      if (isEdit) {
+        print('API             : PUT ${ApiKeys.editReviewKey(reviewId!)}');
+        print('EDITED REVIEW   : reviewId=$reviewId');
+      } else {
+        print('API             : POST ${ApiKeys.postReviewKey}');
+        print('SUBMITTED REVIEW: new create (no reviewId yet)');
+      }
+      print('pending categories questions: ${visitQuestions.map((q) => "${q.id}:${q.category}").toList()}');
+      print('new answers count : ${newAnswersList.length}');
+      print('payload answers   : ${answersList.length}');
+      print('body             : ${postModel.toJson()}');
+      print('========================================');
+    }
+
     context.read<VisitDetailBloc>().add(
       ReviewSubmitEvent(
         postReviewModel: postModel,
-        reviewId: isEdit ? existingReview!.reviewId : null,
+        reviewId: reviewId,
       ),
     );
     return true;

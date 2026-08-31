@@ -148,11 +148,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- NFC HCE SERVICE - disabled by default, enabled via code on NFC devices -->
+        <!-- NFC HCE SERVICE - temporarily enabled for testing -->
         <service
             android:name="com.hce_flutter.MyHostApduService"
             android:exported="true"
-            android:enabled="false"
+            android:enabled="true"
             android:permission="android.permission.BIND_NFC_SERVICE"
             tools:replace="android:enabled">
 
