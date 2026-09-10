@@ -51,8 +51,7 @@ dependencies:
   go_router: ^17.3.0
   connectivity_plus: ^7.1.1
   in_app_update: ^5.0.0
-
-
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +64,35 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   change_app_package_name: ^1.5.0
+
+# Native launch splash (same as Ali Therapy Admin / Figma 651:2):
+#   white screen + centered 176pt clinic logo + Neon Web branding at bottom.
+# After changing images, run:
+#   dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF"
+  color_dark: "#FFFFFF"
+  image: assets/images/native_splash_logo.png
+  image_dark: assets/images/native_splash_logo.png
+  branding: assets/images/native_splash_branding.png
+  branding_dark: assets/images/native_splash_branding.png
+  branding_mode: bottom
+  branding_bottom_padding: 32
+  fullscreen: true
+  android_gravity: center
+  ios_content_mode: center
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#FFFFFF"
+    color_dark: "#FFFFFF"
+    image: assets/images/native_splash_android12.png
+    image_dark: assets/images/native_splash_android12.png
+    icon_background_color: "#FFFFFF"
+    icon_background_color_dark: "#FFFFFF"
+    branding: assets/images/native_splash_android12_branding.png
+    branding_dark: assets/images/native_splash_android12_branding.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -38,6 +38,7 @@ import 'package:doctor_app/screens/visits_detail/bloc/visit_detail_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/app_routes/generate_route.dart';
@@ -52,6 +53,9 @@ Future<void> main() async {
     debugPrint(details.exceptionAsString());
     debugPrint(details.stack.toString());
   };
+  // Keep the native white+logo splash until the first real screen is ready.
+  final bindings = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: bindings);
   runApp(const MyApp());
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

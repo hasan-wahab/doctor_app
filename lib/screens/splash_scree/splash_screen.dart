@@ -1,16 +1,16 @@
-import 'package:doctor_app/screens/nave_bar/nave_bar.dart';
-import 'package:doctor_app/widgets/custom_text.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:io';
+import 'package:in_app_update/in_app_update.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../widgets/custom_text.dart';
 import '../home/bloc/home_bloc.dart';
 import '../home/bloc/home_event.dart';
-import 'package:in_app_update/in_app_update.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,60 +20,87 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool firstText = false;
-  bool secondText = false;
-  bool thirdText = false;
-  bool fourthText = false;
-
   bool _blockBecauseUpdate = false;
   String _updateMessage = '';
+  bool _nativeSplashRemoved = false;
+
+  static const _phoneLogo = 176.0;
+  static const _phoneBrandHeight = 42.0;
+  static const _phoneBottomInset = 32.0;
+
+  static const _tabletLogo = 240.0;
+  static const _tabletBrandHeight = 64.0;
+  static const _tabletBottomInset = 48.0;
 
   @override
   void initState() {
-    splashScreenNavigation();
     super.initState();
+    splashScreenNavigation();
+  }
+
+  void _removeNativeSplash() {
+    if (_nativeSplashRemoved) return;
+    _nativeSplashRemoved = true;
+    FlutterNativeSplash.remove();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
+    final logoSize = isTablet ? _tabletLogo : _phoneLogo;
+    final brandHeight = isTablet ? _tabletBrandHeight : _phoneBrandHeight;
+    final bottomInset = isTablet ? _tabletBottomInset : _phoneBottomInset;
+
     return Scaffold(
-      body: Container(
-        height: MediaQuery.sizeOf(context).height,
-        width: double.infinity,
-        color: AppColors.primaryColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              //  height: 100.h,
-              width: 300.w,
-              child: Image.asset("assets/images/main_logo.png"),
-            ),
-            SizedBox(height: 20),
-
-            Text(
-              'A L I T H E R A P Y',
-              style: TextStyle(
-                color: AppColors.textWhiteColor,
-                fontSize: 35,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            CustomText(
-              text: 'Your Health, Our Priority',
-              color: Color.fromRGBO(255, 255, 255, 0.8),
-            ),
-            if (_blockBecauseUpdate)
-              Padding(
-                padding: EdgeInsets.only(top: 24),
-                child: CustomText(
-                  text: _updateMessage,
-                  color: AppColors.textWhiteColor,
+      backgroundColor: Colors.white,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: SizedBox(
+                    width: logoSize,
+                    height: logoSize,
+                    child: Image.asset(
+                      'assets/images/native_splash_logo.png',
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                  ),
                 ),
               ),
-          ],
-        ),
+              Padding(
+                padding: EdgeInsets.only(bottom: bottomInset),
+                child: SizedBox(
+                  height: brandHeight,
+                  child: Image.asset(
+                    'assets/images/native_splash_branding.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_blockBecauseUpdate)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  0,
+                  24,
+                  bottomInset + brandHeight + 16,
+                ),
+                child: CustomText(
+                  text: _updateMessage,
+                  color: AppColors.firstTextBlackColor,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -81,13 +108,18 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> splashScreenNavigation() async {
     await _checkAndHandleUpdate();
     if (!mounted) return;
-    if (_blockBecauseUpdate) return;
 
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
+    // Required update: hide native splash so the message is visible.
+    if (_blockBecauseUpdate) {
+      _removeNativeSplash();
+      return;
+    }
 
     context.read<HomeBloc>().add(HomeLoadEvent());
     context.go(AppRoutes.naveBar);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _removeNativeSplash();
+    });
   }
 
   Future<void> _checkAndHandleUpdate() async {
