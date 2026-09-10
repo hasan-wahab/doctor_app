@@ -1,3 +1,8 @@
+import 'dart:io';
+
+/// NFC card is Android-only. Never show it on iPhone / iOS.
+bool get showNfcCard => Platform.isAndroid;
+
 double getSessionProgress({
   required final totalSession,
   required final usedSession,

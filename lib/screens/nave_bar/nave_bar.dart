@@ -15,6 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/functions.dart';
 import '../../data/local_storage/local_storage.dart';
 import 'bloc/nave_bar_state.dart';
 
@@ -26,29 +27,56 @@ class NaveBar extends StatefulWidget {
 }
 
 class _NaveBarState extends State<NaveBar> {
-  final List<String> iconText = ['Home', 'My card', 'Records', 'Account'];
-  final List<IconData> icons = [
-    Icons.home,
-    Icons.credit_card,
-    Icons.list_alt_rounded,
-    Icons.person_2_outlined,
-  ];
-  List<Widget> screenList = [
-    HomeScreen(),
-    NfcCardPage(),
-    SessionRecord(),
-    LoginScreen(),
-  ];
-  List<Widget> screenList2 = [
-    DashbordScreen(),
-    NfcCardPage(),
-    SessionRecord(),
-    ProfileScreen(),
-  ];
+  late final List<String> iconText;
+  late final List<IconData> icons;
+  late final List<Widget> screenList;
+  late final List<Widget> screenList2;
+  late final int accountTabIndex;
+
   @override
   void initState() {
-    context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
     super.initState();
+    if (showNfcCard) {
+      iconText = ['Home', 'My card', 'Records', 'Account'];
+      icons = [
+        Icons.home,
+        Icons.credit_card,
+        Icons.list_alt_rounded,
+        Icons.person_2_outlined,
+      ];
+      screenList = [
+        HomeScreen(),
+        NfcCardPage(),
+        SessionRecord(),
+        LoginScreen(),
+      ];
+      screenList2 = [
+        DashbordScreen(),
+        NfcCardPage(),
+        SessionRecord(),
+        ProfileScreen(),
+      ];
+    } else {
+      // iPhone / iOS: never show the NFC card tab.
+      iconText = ['Home', 'Records', 'Account'];
+      icons = [
+        Icons.home,
+        Icons.list_alt_rounded,
+        Icons.person_2_outlined,
+      ];
+      screenList = [
+        HomeScreen(),
+        SessionRecord(),
+        LoginScreen(),
+      ];
+      screenList2 = [
+        DashbordScreen(),
+        SessionRecord(),
+        ProfileScreen(),
+      ];
+    }
+    accountTabIndex = iconText.length - 1;
+    context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
   }
 
   bool isLoading = false;
@@ -80,7 +108,7 @@ class _NaveBarState extends State<NaveBar> {
                     : screenList2.elementAt(currentIndex),
                 bottomNavigationBar: Container(
                   padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
-                  height: Platform.isIOS ? 701.h : 100.h,
+                  height: 100.h,
                   color: AppColors.secondaryColor,
                   child: SingleChildScrollView(
                     child: SafeArea(
@@ -93,10 +121,10 @@ class _NaveBarState extends State<NaveBar> {
                               if (token == '') {
                                 context.read<NaveBarBloc>().add(
                                   NaveBarIndexEvent(
-                                    index: index == 0 ? index : 3,
+                                    index: index == 0 ? index : accountTabIndex,
                                   ),
                                 );
-                                if (index != 0 && index != 3) {
+                                if (index != 0 && index != accountTabIndex) {
                                   AppMsg.showSnackBar(
                                     context,
                                     message:

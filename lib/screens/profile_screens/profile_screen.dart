@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_bloc.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_state.dart';
-import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
@@ -248,46 +247,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        context.push(
-                                          AppRoutes.myNFCCardScreen,
-                                          extra: true,
-                                        );
-                                      },
-                                      child: Card(
-                                        color: AppColors.secondaryColor,
-                                        child: Padding(
-                                          padding: EdgeInsets.all(15.r),
-                                          child: SizedBox(
-                                            // height: 50.h,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  spacing: 10.w,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.credit_card,
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    ),
-                                                    CustomText(text: 'My Card'),
-                                                  ],
-                                                ),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_forward_ios_outlined,
-                                                  size: 18.r,
-                                                ),
-                                              ],
+                                    if (showNfcCard)
+                                      InkWell(
+                                        onTap: () {
+                                          context.push(
+                                            AppRoutes.myNFCCardScreen,
+                                            extra: true,
+                                          );
+                                        },
+                                        child: Card(
+                                          color: AppColors.secondaryColor,
+                                          child: Padding(
+                                            padding: EdgeInsets.all(15.r),
+                                            child: SizedBox(
+                                              // height: 50.h,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    spacing: 10.w,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.credit_card,
+                                                        color: AppColors
+                                                            .primaryColor,
+                                                      ),
+                                                      CustomText(
+                                                        text: 'My Card',
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Icon(
+                                                    Icons
+                                                        .arrow_forward_ios_outlined,
+                                                    size: 18.r,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
                                     InkWell(
                                       onTap: () {
                                         context.push(AppRoutes.mapScreen);

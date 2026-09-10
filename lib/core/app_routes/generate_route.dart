@@ -113,6 +113,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:doctor_app/core/app_routes/routes_name.dart';
+import 'package:doctor_app/core/functions.dart';
 import 'package:doctor_app/screens/all_packages_screen/all_packages_screen.dart';
 import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
 import 'package:doctor_app/screens/auth_screen/login_screen/login_screen.dart';
@@ -136,9 +137,11 @@ class RouteGenerator {
   static GoRoute _goRoute({
     required String routeName,
     required Widget Function(BuildContext context, GoRouterState state) screen,
+    String? Function(BuildContext context, GoRouterState state)? redirect,
   }) {
     return GoRoute(
       path: routeName,
+      redirect: redirect,
       builder: (context, state) => screen(context, state),
     );
   }
@@ -203,6 +206,9 @@ class RouteGenerator {
       ),
       _goRoute(
         routeName: AppRoutes.myNFCCardScreen,
+        // iPhone / iOS: never open the NFC card screen.
+        redirect: (context, state) =>
+            showNfcCard ? null : AppRoutes.naveBar,
         screen: (context, state) =>
             NfcCardPage(fromProfile: state.extra as bool),
       ),
