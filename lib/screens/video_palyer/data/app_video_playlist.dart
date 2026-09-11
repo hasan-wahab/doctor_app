@@ -43,6 +43,8 @@ class AppVideoPlaylist {
     return 'https://img.youtube.com/vi/$id/0.jpg';
   }
 
+  static String heroTag(int index) => 'video-hero-$index';
+
   static String? videoIdFromUrl(String url) {
     return YoutubePlayer.convertUrlToId(url);
   }

@@ -384,6 +384,14 @@ class VisitModel {
   String get displayConsultationFee => _display(consultationFee);
   String get displayStatus => _display(status);
 
+  bool get isConsultationVisit {
+    final visitType = type?.toLowerCase().trim() ?? '';
+    return consultant != null ||
+        historyTaking != null ||
+        consultantAssessment != null ||
+        visitType == 'consultation';
+  }
+
   factory VisitModel.fromJson(Map<String, dynamic> json) => VisitModel(
     id: _int(json['id']),
     type: _str(json['type']),

@@ -34,14 +34,42 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     try {
-      emit(HomeLoadingState());
-      // await sliderImagesLocalRepo.deleteSliderImages();
-      // await allPackagesLocalRepo.deleteAllPackages();
-      // First we will try to get data from local storage
-      allPackagesModel = await allPackagesLocalRepo.getAllPackagesFromLocal();
-      sliderModel = await sliderImagesLocalRepo.getSliderImages();
-      if (allPackagesModel != null &&
-          allPackagesModel!.packages.isNotEmpty &&
+      if (!event.forceRefresh) {
+        if (state is HomeLoadState &&
+            allPackagesModel != null &&
+            allPackagesModel!.packages.isNotEmpty &&
+            sliderModel != null) {
+          return;
+        }
+        if (state is! HomeLoadState) {
+          emit(HomeLoadingState());
+        }
+        allPackagesModel = await allPackagesLocalRepo.getAllPackagesFromLocal();
+        sliderModel = await sliderImagesLocalRepo.getSliderImages();
+        if (allPackagesModel != null &&
+            allPackagesModel!.packages.isNotEmpty &&
+            sliderModel != null) {
+          emit(
+            HomeLoadState(
+              allPackagesModel: allPackagesModel,
+              sliderModel: sliderModel,
+            ),
+          );
+          return;
+        }
+      }
+
+      allPackagesModel = await allPackagesRepo.getAllPackages();
+      sliderModel = await sliderRepo.getSliderImages();
+      emit(
+        HomeLoadState(
+          allPackagesModel: allPackagesModel,
+          sliderModel: sliderModel,
+        ),
+      );
+    } catch (e) {
+      if (event.forceRefresh &&
+          allPackagesModel != null &&
           sliderModel != null) {
         emit(
           HomeLoadState(
@@ -49,18 +77,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             sliderModel: sliderModel,
           ),
         );
-      } else {
-        // Here we will get data from api
-        allPackagesModel = await allPackagesRepo.getAllPackages();
-        sliderModel = await sliderRepo.getSliderImages();
-        emit(
-          HomeLoadState(
-            allPackagesModel: allPackagesModel,
-            sliderModel: sliderModel,
-          ),
-        );
+        return;
       }
-    } catch (e) {
       emit(HomeMessageState(message: e.toString()));
     }
   }

@@ -1,7 +1,9 @@
+import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 
 class SessionProgressCard extends StatelessWidget {
   final String title;
@@ -26,81 +28,124 @@ class SessionProgressCard extends StatelessWidget {
     return (completedSessions / totalSessions).clamp(0.0, 1.0);
   }
 
+  bool get _isCompleted =>
+      nextSessionLabel == 'Completed' || completedSessions == totalSessions;
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColors.secondaryColor,
-      margin: EdgeInsets.only(bottom: 10.h),
+    final showNextSession = !_isCompleted &&
+        nextSessionLabel.isNotEmpty &&
+        nextSessionDate.isNotEmpty;
 
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.firstTextBlackColor,
+    return Padding(
+      padding: EdgeInsets.only(bottom: AppSizes.spaceMd),
+      child: Material(
+        color: AppColors.bgColor,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          side: BorderSide(color: AppColors.borderColor),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSizes.gapMd,
+            AppSizes.spaceLg,
+            AppSizes.gapMd,
+            AppSizes.spaceLg,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomText(
+                      text: title,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 2,
+                      textOverflow: TextOverflow.visible,
+                    ),
+                  ),
+                  SizedBox(width: AppSizes.gapSm),
+                  _StatusChip(completed: _isCompleted),
+                ],
               ),
-            ),
-            SizedBox(height: 10.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  progressLabel,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.labelTextColor,
+              SizedBox(height: AppSizes.spaceMd),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomText(
+                    text: progressLabel,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.labelTextColor,
+                    ),
+                  ),
+                  CustomText(
+                    text: '$completedSessions/$totalSessions',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.firstTextBlackColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSizes.spaceSm),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                child: LinearProgressIndicator(
+                  value: _progress,
+                  minHeight: AppSizes.spaceXs,
+                  backgroundColor: AppColors.secondaryColor,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryColor,
                   ),
                 ),
-                Text(
-                  '$completedSessions/$totalSessions',
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.firstTextBlackColor,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.h),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4.r),
-              child: LinearProgressIndicator(
-                value: _progress,
-                minHeight: 4.h,
-                backgroundColor: AppColors.borderColor,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppColors.primaryColor,
-                ),
               ),
-            ),
-            SizedBox(height: 12.h),
-            Row(
-              children: [
-                Text(
-                  nextSessionLabel,
-                  style: TextStyle(
-                    fontSize: 14.sp,
+              if (showNextSession) ...[
+                SizedBox(height: AppSizes.spaceMd),
+                CustomText(
+                  text: '$nextSessionLabel $nextSessionDate'.trim(),
+                  style: AppTextStyles.body.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryColor,
                   ),
                 ),
-                Text(
-                  nextSessionDate,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
               ],
-            ),
-          ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.completed});
+
+  final bool completed;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = completed ? AppColors.success : AppColors.primaryColor;
+    final bg = completed
+        ? AppColors.success.withValues(alpha: 0.12)
+        : AppColors.secondaryColor;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.gapMd,
+        vertical: AppSizes.spaceXs,
+      ),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+      ),
+      child: CustomText(
+        text: completed ? 'Completed' : 'In Progress',
+        style: AppTextStyles.chipPrimary.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

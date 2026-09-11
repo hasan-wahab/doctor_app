@@ -2,22 +2,24 @@ import 'package:doctor_app/core/extentions/context_extentions.dart';
 import 'package:doctor_app/data/models/all_visits_model.dart';
 import 'package:doctor_app/data/models/reviews_question_model.dart';
 import 'package:doctor_app/widgets/app_button.dart';
-import 'package:doctor_app/widgets/check_circle.dart';
+import 'package:doctor_app/widgets/app_app_bar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_keys/api_keys.dart';
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 import '../../data/models/post_review_model.dart';
-import '../../widgets/row_text.dart';
+import '../../widgets/app_pull_refresh.dart';
 import '../../widgets/show_msg.dart';
 import 'bloc/visit_detail_bloc.dart';
 import 'bloc/visit_detail_event.dart';
 import 'bloc/visit_detail_state.dart';
+import 'visits_shimmer.dart';
 
 /// ======================
 /// ANSWER MODEL
@@ -53,6 +55,7 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
   List<bool> isExpended = [];
 
   bool isLoading = false;
+  bool isRefreshing = false;
   final String token = '';
 
   @override
@@ -190,123 +193,310 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     }
   }
 
-  /// Submitted review section headers (no "Questions" suffix).
-  String _submittedReviewCategoryTitle(String category) {
+  String _categorySubtitle(String category) {
     switch (category.toLowerCase().trim()) {
       case 'consultation':
-        return 'Consultation';
+        return 'Please share your immediate treatment feedback';
       case 'reconsultation':
-        return 'Reconsultation';
+        return 'Please share your follow-up treatment feedback';
       case 'therapist':
-        return 'Therapist';
+        return 'Evaluation of therapist attention & clinic care';
       default:
-        return category.toSentenceCase;
+        return 'Please share your feedback';
     }
+  }
+
+  String _displayAmount(String fee) {
+    final trimmed = fee.trim();
+    if (trimmed.isEmpty || trimmed == 'No data') return fee;
+    if (trimmed.toLowerCase().startsWith('rs')) return trimmed;
+    final parsed = num.tryParse(trimmed.replaceAll(',', ''));
+    if (parsed == null) return 'Rs. $trimmed';
+    final digits = parsed.round().toString();
+    final buffer = StringBuffer();
+    for (var i = 0; i < digits.length; i++) {
+      final remaining = digits.length - i;
+      if (i > 0 && remaining % 3 == 0) buffer.write(',');
+      buffer.write(digits[i]);
+    }
+    return 'Rs. $buffer';
   }
 
   Widget _buildQuestionInput({
     required QuestionModel q,
     required AnswerModel ans,
+    required int number,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 10.h),
         CustomText(
           maxLines: 10,
-          text: q.questionText.toSentenceCase,
-          color: AppColors.primaryColor,
-          fontWeight: FontWeight.bold,
+          text: '$number. ${q.questionText.toSentenceCase}',
+          style: AppTextStyles.body.copyWith(
+            color: AppColors.primaryColor,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        SizedBox(height: AppSizes.spaceMd),
         if (q.type == 'rating')
-          Row(
-            children: List.generate(
-              5,
-              (i) => InkWell(
-                onTap: () {
-                  setState(() {
-                    ans.rating = i + 1;
-                  });
-                },
-                child: Icon(
-                  Icons.star,
-                  color: ans.rating > i ? Colors.amber : Colors.grey,
-                ),
-              ),
-            ),
+          _StarRating(
+            rating: ans.rating,
+            onChanged: (value) {
+              setState(() {
+                ans.rating = value;
+              });
+            },
           )
         else if (q.type == 'options')
-          Wrap(
-            spacing: 10,
-            children: List.generate(q.options.length, (i) {
-              return CheckCircle(
-                text: q.options[i].toSentenceCase,
-                isSelected: ans.selectedOptions[i],
-                onChange: () {
-                  setState(() {
-                    ans.selectedOptions[i] = !ans.selectedOptions[i];
-                  });
-                },
-              );
-            }),
+          _OptionPills(
+            options: q.options,
+            isSelected: (i) => ans.selectedOptions[i],
+            onToggle: (i) {
+              setState(() {
+                ans.selectedOptions[i] = !ans.selectedOptions[i];
+              });
+            },
           )
         else
           TextField(
             controller: ans.controller,
-            maxLines: 2,
-            decoration: const InputDecoration(
+            maxLines: 3,
+            style: AppTextStyles.body,
+            decoration: InputDecoration(
               hintText: 'Write feedback...',
-              border: OutlineInputBorder(),
+              hintStyle: AppTextStyles.bodySmall,
+              filled: true,
+              fillColor: AppColors.bgColor,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: AppSizes.fieldPaddingH,
+                vertical: AppSizes.fieldPaddingV,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                borderSide: BorderSide(color: AppColors.borderColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                borderSide: BorderSide(color: AppColors.borderColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                borderSide: BorderSide(color: AppColors.primaryColor),
+              ),
             ),
           ),
       ],
     );
   }
 
-  /// Groups questions by category and shows a section header for each.
-  Widget _buildCategorizedQuestions({
+  Widget _numberedBlock({required String title, required Widget child}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomText(maxLines: 10, text: title, style: AppTextStyles.bodySmall),
+        SizedBox(height: AppSizes.spaceXs),
+        child,
+      ],
+    );
+  }
+
+  Widget _submittedAnswerView({
+    required ReviewAnswerModel item,
+    required QuestionModel? question,
+  }) {
+    final type = (question?.type ?? '').toLowerCase();
+    final answerText = item.displayAnswer;
+    final ratingValue = int.tryParse(answerText.trim()) ?? 0;
+    final isRating =
+        type == 'rating' ||
+        (type.isEmpty && ratingValue >= 1 && ratingValue <= 5);
+
+    if (isRating) {
+      return _StarRating(rating: ratingValue);
+    }
+    return CustomText(
+      maxLines: 10,
+      text: answerText.toSentenceCase,
+      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+    );
+  }
+
+  Widget? _sectionCards(List<Widget> cards) {
+    if (cards.isEmpty) return null;
+    return Column(
+      children: [
+        for (var i = 0; i < cards.length; i++) ...[
+          if (i > 0) SizedBox(height: AppSizes.spaceXxl),
+          cards[i],
+        ],
+      ],
+    );
+  }
+
+  /// Submitted answers only — always visible, same as the old flow.
+  Widget? _buildSubmittedReviewCards(VisitItemModel visit) {
+    final review = visit.review;
+    if (review == null) return null;
+
+    QuestionModel? questionFor(ReviewAnswerModel item) {
+      if (questionModel == null || item.questionId == null) return null;
+      for (final q in questionModel!) {
+        if (q.id == item.questionId) return q;
+      }
+      return null;
+    }
+
+    bool answerLooksLikeRating(ReviewAnswerModel item) {
+      final question = questionFor(item);
+      final type = (question?.type ?? '').toLowerCase();
+      final ratingValue = int.tryParse(item.displayAnswer.trim());
+      return type == 'rating' ||
+          (ratingValue != null && ratingValue >= 1 && ratingValue <= 5);
+    }
+
+    final reviewAnswers = review.answers ?? [];
+    final hasRatingInAnswers = reviewAnswers.any(answerLooksLikeRating);
+    final hasTextInAnswers = reviewAnswers.any((item) {
+      final type = (questionFor(item)?.type ?? '').toLowerCase();
+      return type == 'text' ||
+          type.contains('comment') ||
+          type.contains('feedback');
+    });
+
+    const preferredOrder = ['consultation', 'reconsultation', 'therapist'];
+    final cards = <Widget>[];
+
+    final legacyItems = <Widget>[];
+    if (review.rating != null && !hasRatingInAnswers) {
+      legacyItems.add(
+        _numberedBlock(
+          title: '1. Rating',
+          child: _StarRating(rating: review.rating!),
+        ),
+      );
+    }
+    if ((review.comment ?? '').trim().isNotEmpty && !hasTextInAnswers) {
+      legacyItems.add(
+        _numberedBlock(
+          title: '${legacyItems.isEmpty ? 1 : 2}. Comment',
+          child: CustomText(
+            maxLines: 10,
+            text: visit.displayComment,
+            style: AppTextStyles.body,
+          ),
+        ),
+      );
+    }
+    if (legacyItems.isNotEmpty) {
+      cards.add(
+        _SectionCard(
+          title: 'REVIEW',
+          subtitle: 'Your submitted feedback',
+          submitted: true,
+          items: legacyItems,
+        ),
+      );
+    }
+
+    final grouped = <String, List<ReviewAnswerModel>>{};
+    for (final item in reviewAnswers) {
+      final category = (questionFor(item)?.category ?? '').toLowerCase().trim();
+      final key = category.isEmpty ? 'other' : category;
+      grouped.putIfAbsent(key, () => []).add(item);
+    }
+
+    final sortedCategories = grouped.keys.toList()
+      ..sort((a, b) {
+        final aIdx = preferredOrder.indexOf(a);
+        final bIdx = preferredOrder.indexOf(b);
+        final aOrder = aIdx == -1 ? preferredOrder.length : aIdx;
+        final bOrder = bIdx == -1 ? preferredOrder.length : bIdx;
+        if (aOrder != bOrder) return aOrder.compareTo(bOrder);
+        return a.compareTo(b);
+      });
+
+    for (final category in sortedCategories) {
+      final items = <Widget>[];
+      var number = 1;
+      for (final item in grouped[category]!) {
+        final question = questionFor(item);
+        final title = (item.question ?? question?.questionText ?? 'Answer')
+            .toSentenceCase;
+        items.add(
+          _numberedBlock(
+            title: '$number. $title',
+            child: _submittedAnswerView(item: item, question: question),
+          ),
+        );
+        number++;
+      }
+      cards.add(
+        _SectionCard(
+          title: category == 'other'
+              ? 'OTHER'
+              : _categoryTitle(category).toUpperCase(),
+          subtitle: 'Your submitted feedback',
+          submitted: true,
+          items: items,
+        ),
+      );
+    }
+
+    return _sectionCards(cards);
+  }
+
+  /// Pending questions — only after Give Feedback, same as the old flow.
+  Widget? _buildPendingQuestionCards({
     required int visitIndex,
-    required List<QuestionModel> visitQuestions,
+    required List<QuestionModel> pendingQuestions,
   }) {
     final visitAnswerMap = answers[visitIndex];
-    if (visitAnswerMap == null) return const SizedBox.shrink();
+    if (visitAnswerMap == null || pendingQuestions.isEmpty) return null;
 
-    final widgets = <Widget>[];
-    String? lastCategory;
+    final ordered = <String>[];
+    final indexesByCategory = <String, List<int>>{};
 
     for (
       var questionIndex = 0;
-      questionIndex < visitQuestions.length;
+      questionIndex < pendingQuestions.length;
       questionIndex++
     ) {
-      final q = visitQuestions[questionIndex];
-      final ans = visitAnswerMap[questionIndex];
-      if (ans == null) continue;
+      if (visitAnswerMap[questionIndex] == null) continue;
+      final category = pendingQuestions[questionIndex].category
+          .toLowerCase()
+          .trim();
+      if (!indexesByCategory.containsKey(category)) {
+        ordered.add(category);
+        indexesByCategory[category] = [];
+      }
+      indexesByCategory[category]!.add(questionIndex);
+    }
 
-      final category = q.category.toLowerCase().trim();
-      if (category != lastCategory) {
-        lastCategory = category;
-        widgets.add(
-          Padding(
-            padding: EdgeInsets.only(top: 8.h, bottom: 4.h),
-            child: CustomText(
-              text: _categoryTitle(category),
-              color: AppColors.firstTextBlackColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 15,
-            ),
+    final cards = <Widget>[];
+    var questionNumber = 1;
+    for (final category in ordered) {
+      final indexes = indexesByCategory[category]!;
+      final items = <Widget>[];
+      for (final questionIndex in indexes) {
+        items.add(
+          _buildQuestionInput(
+            q: pendingQuestions[questionIndex],
+            ans: visitAnswerMap[questionIndex]!,
+            number: questionNumber++,
           ),
         );
       }
-
-      widgets.add(_buildQuestionInput(q: q, ans: ans));
+      cards.add(
+        _SectionCard(
+          title: _categoryTitle(category).toUpperCase(),
+          subtitle: _categorySubtitle(category),
+          items: items,
+        ),
+      );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10,
-      children: widgets,
-    );
+    return _sectionCards(cards);
   }
 
   /// ======================
@@ -423,7 +613,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
       print('visit_id        : ${visit.visitId}');
       print('hasReview       : ${visit.hasReview}');
       print('existingReviewId: ${existingReview?.reviewId}');
-      print('action          : ${isEdit ? "EDIT (PUT)" : "SUBMIT / CREATE (POST)"}');
+      print(
+        'action          : ${isEdit ? "EDIT (PUT)" : "SUBMIT / CREATE (POST)"}',
+      );
       if (isEdit) {
         print('API             : PUT ${ApiKeys.editReviewKey(reviewId!)}');
         print('EDITED REVIEW   : reviewId=$reviewId');
@@ -431,7 +623,9 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         print('API             : POST ${ApiKeys.postReviewKey}');
         print('SUBMITTED REVIEW: new create (no reviewId yet)');
       }
-      print('pending categories questions: ${visitQuestions.map((q) => "${q.id}:${q.category}").toList()}');
+      print(
+        'pending categories questions: ${visitQuestions.map((q) => "${q.id}:${q.category}").toList()}',
+      );
       print('new answers count : ${newAnswersList.length}');
       print('payload answers   : ${answersList.length}');
       print('body             : ${postModel.toJson()}');
@@ -439,178 +633,159 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     }
 
     context.read<VisitDetailBloc>().add(
-      ReviewSubmitEvent(
-        postReviewModel: postModel,
-        reviewId: reviewId,
-      ),
+      ReviewSubmitEvent(postReviewModel: postModel, reviewId: reviewId),
     );
     return true;
   }
 
-  /// Shows top-level rating/comment (old reviews) + answers grouped by category.
-  Widget _buildSubmittedReview(VisitItemModel visit) {
-    final review = visit.review;
-    if (review == null) return const SizedBox.shrink();
-
-    final reviewAnswers = review.answers ?? [];
-    final widgets = <Widget>[];
-    var rowNo = 1;
-
-    QuestionModel? questionFor(ReviewAnswerModel item) {
-      if (questionModel == null || item.questionId == null) return null;
-      for (final q in questionModel!) {
-        if (q.id == item.questionId) return q;
-      }
-      return null;
-    }
-
-    bool answerLooksLikeRating(ReviewAnswerModel item) {
-      final question = questionFor(item);
-      final type = (question?.type ?? '').toLowerCase();
-      final ratingValue = int.tryParse(item.displayAnswer.trim());
-      return type == 'rating' ||
-          (ratingValue != null && ratingValue >= 1 && ratingValue <= 5);
-    }
-
-    final hasRatingInAnswers = reviewAnswers.any(answerLooksLikeRating);
-    final hasTextInAnswers = reviewAnswers.any((item) {
-      final type = (questionFor(item)?.type ?? '').toLowerCase();
-      return type == 'text' ||
-          type.contains('comment') ||
-          type.contains('feedback');
-    });
-
-    // Old reviews: rating only on top-level fields
-    if (review.rating != null && !hasRatingInAnswers) {
-      widgets.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomText(
-              maxLines: 10,
-              text: '$rowNo. Rating',
-              color: AppColors.primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-            SizedBox(height: 4.h),
-            Row(
-              children: List.generate(
-                5,
-                (i) => Icon(
-                  Icons.star,
-                  color: review.rating! > i ? Colors.amber : Colors.grey,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-      rowNo++;
-    }
-
-    // Old reviews: comment only on top-level fields
-    if ((review.comment ?? '').trim().isNotEmpty && !hasTextInAnswers) {
-      widgets.add(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomText(
-              maxLines: 10,
-              text: '$rowNo. Comment',
-              color: AppColors.primaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-            SizedBox(height: 4.h),
-            CustomText(maxLines: 10, text: visit.displayComment),
-          ],
-        ),
-      );
-      rowNo++;
-    }
-
-    // Group answers by category (consultation / reconsultation / therapist).
-    const preferredOrder = ['consultation', 'reconsultation', 'therapist'];
-    final grouped = <String, List<ReviewAnswerModel>>{};
-    for (final item in reviewAnswers) {
-      final category = (questionFor(item)?.category ?? '').toLowerCase().trim();
-      final key = category.isEmpty ? 'other' : category;
-      grouped.putIfAbsent(key, () => []).add(item);
-    }
-
-    final sortedCategories = grouped.keys.toList()
-      ..sort((a, b) {
-        final aIdx = preferredOrder.indexOf(a);
-        final bIdx = preferredOrder.indexOf(b);
-        final aOrder = aIdx == -1 ? preferredOrder.length : aIdx;
-        final bOrder = bIdx == -1 ? preferredOrder.length : bIdx;
-        if (aOrder != bOrder) return aOrder.compareTo(bOrder);
-        return a.compareTo(b);
-      });
-
-    for (final category in sortedCategories) {
-      final items = grouped[category]!;
-      widgets.add(
-        Padding(
-          padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
-          child: CustomText(
-            text: category == 'other'
-                ? 'Other'
-                : _submittedReviewCategoryTitle(category),
-            color: AppColors.firstTextBlackColor,
-            fontWeight: FontWeight.w800,
-            fontSize: 15,
-          ),
-        ),
-      );
-
-      for (final item in items) {
-        final question = questionFor(item);
-        final type = (question?.type ?? '').toLowerCase();
-        final title = (item.question ?? question?.questionText ?? 'Answer')
-            .toSentenceCase;
-        final answerText = item.displayAnswer;
-        final ratingValue = int.tryParse(answerText.trim()) ?? 0;
-        final isRating =
-            type == 'rating' ||
-            (type.isEmpty && ratingValue >= 1 && ratingValue <= 5);
-
-        widgets.add(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(
-                maxLines: 10,
-                text: '$rowNo. $title',
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-              SizedBox(height: 4.h),
-              if (isRating)
-                Row(
-                  children: List.generate(
-                    5,
-                    (i) => Icon(
-                      Icons.star,
-                      color: ratingValue > i ? Colors.amber : Colors.grey,
-                    ),
-                  ),
-                )
-              else
-                CustomText(maxLines: 10, text: answerText.toSentenceCase),
-            ],
-          ),
-        );
-        rowNo++;
-      }
-    }
-
-    if (widgets.isEmpty) return const SizedBox.shrink();
+  Widget _buildVisitInfo(VisitItemModel visit) {
+    final status = visit.displayStatus;
+    final showStatus =
+        status.isNotEmpty &&
+        status != 'No data' &&
+        status.toLowerCase() != visit.displayStage.toLowerCase();
 
     return Column(
-      spacing: 12.h,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
+      children: [
+        _VisitInfoRow(
+          label: 'Date',
+          value: DateAndTimeFormater.dateFormat(visit.displayDate),
+        ),
+        SizedBox(height: AppSizes.spaceSm),
+        _VisitInfoRow(label: 'Type', value: visit.displayType),
+        SizedBox(height: AppSizes.spaceSm),
+        _VisitInfoRow(
+          label: 'Doctor',
+          value: visit.displayDoctor,
+          valueStyle: AppTextStyles.name,
+        ),
+        SizedBox(height: AppSizes.spaceSm),
+        _VisitInfoRow(
+          label: 'Stage',
+          trailing: _StageChip(label: visit.displayStage),
+        ),
+        if (showStatus) ...[
+          SizedBox(height: AppSizes.spaceSm),
+          _VisitInfoRow(label: 'Status', value: status),
+        ],
+        SizedBox(height: AppSizes.spaceSm),
+        _VisitInfoRow(
+          label: 'Amount',
+          value: _displayAmount(visit.displayConsultationFee),
+          valueStyle: AppTextStyles.name.copyWith(
+            color: AppColors.primaryColor,
+          ),
+        ),
+        SizedBox(height: AppSizes.spaceMd),
+        Divider(color: AppColors.borderColor, height: 1),
+      ],
     );
+  }
+
+  Widget _buildVisitItem({
+    required int visitIndex,
+    required VisitItemModel visit,
+  }) {
+    final pendingQuestions = _questionsForInput(visitIndex);
+    final expanded = _isVisitExpanded(visitIndex);
+    final submittedCards = visit.hasReview
+        ? _buildSubmittedReviewCards(visit)
+        : null;
+    final pendingCards = expanded && pendingQuestions.isNotEmpty
+        ? _buildPendingQuestionCards(
+            visitIndex: visitIndex,
+            pendingQuestions: pendingQuestions,
+          )
+        : null;
+
+    return _VisitSurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildVisitInfo(visit),
+          if (submittedCards != null) ...[
+            SizedBox(height: AppSizes.spaceXxl),
+            submittedCards,
+          ],
+          if (pendingCards != null) ...[
+            SizedBox(height: AppSizes.spaceXxl),
+            pendingCards,
+          ],
+          if (pendingQuestions.isNotEmpty) ...[
+            SizedBox(height: AppSizes.spaceXxl),
+            AppButton(
+              onTap: () async {
+                // Collapsed → only expand (stay open).
+                if (!_isVisitExpanded(visitIndex)) {
+                  setState(() {
+                    _setVisitExpanded(visitIndex, true);
+                  });
+                  return;
+                }
+
+                await submitData(visitIndex);
+              },
+              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+              text: expanded
+                  ? (visit.hasReview ? 'Update Review' : 'Submit')
+                  : 'Give Feedback',
+            ),
+          ] else if (!visit.hasReview) ...[
+            SizedBox(height: AppSizes.spaceXxl),
+            CustomText(
+              text: 'No feedback available for this visit yet.',
+              style: AppTextStyles.body.copyWith(color: AppColors.primaryColor),
+              maxLines: 3,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: AppSizes.pageInsets,
+          children: [
+            SizedBox(
+              height: constraints.maxHeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(
+                    text: message == 'No internet connection!'
+                        ? message!
+                        : 'No visits found',
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: AppSizes.spaceMd),
+                  AppBarRefreshButton(onTap: _requestFirstLoad),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _requestFirstLoad() {
+    context.read<VisitDetailBloc>().add(VisitDetailApiAndLocalEvent());
+  }
+
+  Future<void> _onRefresh() async {
+    final bloc = context.read<VisitDetailBloc>();
+    final done = bloc.stream.firstWhere(
+      (state) =>
+          state is AllVisitDatilsListState || state is VisitDetailMessageState,
+    );
+    bloc.add(VisitDetailJustFromServerEvent());
+    await done;
   }
 
   /// ======================
@@ -621,17 +796,22 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
     return BlocConsumer<VisitDetailBloc, VisitDetailState>(
       listener: (context, state) {
         if (state is VisitDetailLoadingState) {
-          isLoading = true;
+          if (allVisitsModel == null) {
+            isLoading = true;
+          } else {
+            isRefreshing = true;
+          }
+        } else {
+          isLoading = false;
+          isRefreshing = false;
         }
 
         if (state is VisitDetailMessageState) {
-          isLoading = false;
           message = state.message.toString();
           AppMsg.showSnackBar(context, message: state.message.toString());
         }
 
         if (state is AllVisitDatilsListState) {
-          isLoading = false;
           allVisitsModel = state.model;
           questionModel = state.question;
           _sortVisitsOldestFirst();
@@ -639,155 +819,325 @@ class _VisitsDetailScreenState extends State<VisitsDetailScreen> {
         }
       },
       builder: (context, state) {
-        return RefreshIndicator(
-          onRefresh: () async => context.read<VisitDetailBloc>().add(
-            VisitDetailJustFromServerEvent(),
+        final firstLoad = isLoading && allVisitsModel == null;
+        final appBarLoading = isLoading || isRefreshing;
+        final visits = allVisitsModel?.visits ?? const <VisitItemModel>[];
+
+        return Scaffold(
+          backgroundColor: AppColors.screenBgColor,
+          appBar: AppAppBar(
+            title: 'My visit',
+            showBack: true,
+            isLoading: appBarLoading,
+            actions: [
+              AppBarRefreshButton(onTap: appBarLoading ? null : _onRefresh),
+            ],
           ),
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
-              ),
-              centerTitle: true,
-              title: Text('My visit'),
-              automaticallyImplyLeading: false,
-            ),
-            backgroundColor: AppColors.bgColor,
-            body: SafeArea(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : allVisitsModel == null || allVisitsModel!.visits.isEmpty
-                  ? Center(
-                      child: SizedBox(
-                        width: MediaQuery.sizeOf(context).width,
-                        child: Column(
-                          spacing: 10.h,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CustomText(
-                              text: message == 'No internet connection!'
-                                  ? message!
-                                  : 'No visits found',
-                              color: AppColors.primaryColor,
-                              fontSize: 16,
-                            ),
-                            InkWell(
-                              onTap: () => context.read<VisitDetailBloc>().add(
-                                VisitDetailApiAndLocalEvent(),
-                              ),
-                              child: Icon(Icons.refresh),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : ListView(
-                      padding: EdgeInsets.all(16.w),
-                      // Display newest first; review rules still use
-                      // chronological index (oldest = visit 1).
-                      children: List.generate(allVisitsModel!.visits.length, (
-                        displayIndex,
-                      ) {
-                        final visitIndex =
-                            allVisitsModel!.visits.length - 1 - displayIndex;
-                        final visit = allVisitsModel!.visits[visitIndex];
-                        // Only unanswered Done-category questions (create or edit).
-                        final pendingQuestions = _questionsForInput(visitIndex);
-                        return Card(
-                          margin: EdgeInsets.only(bottom: 12.h),
-                          color: AppColors.secondaryColor,
-                          child: Padding(
-                            padding: EdgeInsets.all(12.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                RowText(
-                                  firstText: 'Date',
-                                  secondText: DateAndTimeFormater.dateFormat(
-                                    visit.displayDate,
-                                  ),
-                                ),
-                                RowText(
-                                  firstText: 'Type',
-                                  buttonText: visit.displayType.toString(),
-                                ),
-                                RowText(
-                                  firstText: 'Doctor',
-                                  secondText: visit.displayDoctor,
-                                ),
-                                RowText(
-                                  firstText: 'Stage',
-                                  secondText: visit.displayStage,
-                                ),
-                                RowText(
-                                  firstText: 'Amount',
-                                  secondText: visit.displayConsultationFee,
-                                ),
-                                RowText(
-                                  firstText: 'Status',
-                                  secondText: visit.displayStatus,
-                                ),
-
-                                const Divider(),
-
-                                /// Already submitted answers (if any)
-                                if (visit.hasReview) ...[
-                                  SizedBox(height: 12.h),
-                                  _buildSubmittedReview(visit),
-                                ],
-
-                                /// Pending questions (new Done categories / empty)
-                                if (_isVisitExpanded(visitIndex) &&
-                                    pendingQuestions.isNotEmpty)
-                                  _buildCategorizedQuestions(
-                                    visitIndex: visitIndex,
-                                    visitQuestions: pendingQuestions,
-                                  ),
-
-                                /// Create or edit feedback for pending questions
-                                if (pendingQuestions.isNotEmpty) ...[
-                                  SizedBox(height: 20.h),
-                                  AppButton(
-                                    onTap: () async {
-                                      // Collapsed → only expand (stay open).
-                                      if (!_isVisitExpanded(visitIndex)) {
-                                        setState(() {
-                                          _setVisitExpanded(visitIndex, true);
-                                        });
-                                        return;
-                                      }
-
-                                      await submitData(visitIndex);
-                                    },
-                                    text: _isVisitExpanded(visitIndex)
-                                        ? (visit.hasReview
-                                              ? 'Update Review'
-                                              : 'Submit')
-                                        : 'Give Feedback',
-                                  ),
-                                ] else if (!visit.hasReview) ...[
-                                  SizedBox(height: 12.h),
-                                  CustomText(
-                                    text:
-                                        'No feedback available for this visit yet.',
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
+          body: firstLoad
+              ? const VisitsShimmer()
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: AppSizes.contentMaxWidth(context),
                     ),
-            ),
-          ),
+                    child: AppPullRefresh(
+                      enabled: !appBarLoading,
+                      onRefresh: _onRefresh,
+                      child: visits.isEmpty
+                          ? _emptyState()
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: AppSizes.pageInsets,
+                              itemCount: visits.length,
+                              separatorBuilder: (_, _) =>
+                                  SizedBox(height: AppSizes.spaceXxl),
+                              itemBuilder: (context, displayIndex) {
+                                // Display newest first; review rules still use
+                                // chronological index (oldest = visit 1).
+                                final visitIndex =
+                                    visits.length - 1 - displayIndex;
+                                return _buildVisitItem(
+                                  visitIndex: visitIndex,
+                                  visit: visits[visitIndex],
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                ),
         );
       },
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.subtitle,
+    required this.items,
+    this.submitted = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<Widget> items;
+  final bool submitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: submitted ? AppColors.secondaryColor : AppColors.screenBgColor,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+        side: BorderSide(
+          color: submitted ? AppColors.primaryColor : AppColors.borderColor,
+        ),
+      ),
+      child: Padding(
+        padding: AppSizes.cardInsets,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: CustomText(text: title, style: AppTextStyles.name),
+                ),
+                if (submitted) ...[
+                  SizedBox(width: AppSizes.gapSm),
+                  Icon(
+                    Icons.check_circle_rounded,
+                    size: AppSizes.iconSm,
+                    color: AppColors.primaryColor,
+                  ),
+                  SizedBox(width: AppSizes.gapSm),
+                  CustomText(
+                    text: 'Submitted',
+                    style: AppTextStyles.chipPrimary,
+                  ),
+                ],
+              ],
+            ),
+            SizedBox(height: AppSizes.spaceXs),
+            CustomText(
+              text: submitted ? 'This review has been submitted' : subtitle,
+              style: AppTextStyles.bodySmall,
+              maxLines: 3,
+            ),
+            SizedBox(height: AppSizes.spaceMd),
+            for (var i = 0; i < items.length; i++) ...[
+              if (i > 0) SizedBox(height: AppSizes.spaceXl),
+              items[i],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VisitSurfaceCard extends StatelessWidget {
+  const _VisitSurfaceCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.bgColor,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        side: BorderSide(color: AppColors.borderColor),
+      ),
+      child: Padding(padding: AppSizes.cardInsets, child: child),
+    );
+  }
+}
+
+class _VisitInfoRow extends StatelessWidget {
+  const _VisitInfoRow({
+    required this.label,
+    this.value,
+    this.valueStyle,
+    this.trailing,
+  });
+
+  final String label;
+  final String? value;
+  final TextStyle? valueStyle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: CustomText(text: label, style: AppTextStyles.bodySmall),
+        ),
+        SizedBox(width: AppSizes.gapMd),
+        if (trailing != null)
+          trailing!
+        else
+          Flexible(
+            child: CustomText(
+              text: value ?? '',
+              style: valueStyle ?? AppTextStyles.body,
+              align: TextAlign.right,
+              maxLines: 3,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _StageChip extends StatelessWidget {
+  const _StageChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final isComplete = label.toLowerCase().contains('complete');
+    final color = isComplete ? AppColors.success : AppColors.primaryColor;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.gapMd,
+        vertical: AppSizes.spaceXs,
+      ),
+      decoration: BoxDecoration(
+        color: isComplete
+            ? AppColors.success.withValues(alpha: 0.12)
+            : AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: AppSizes.spaceXs,
+            height: AppSizes.spaceXs,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          SizedBox(width: AppSizes.gapSm),
+          CustomText(
+            text: label,
+            style: AppTextStyles.chipPrimary.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarRating extends StatelessWidget {
+  const _StarRating({required this.rating, this.onChanged});
+
+  final int rating;
+  final ValueChanged<int>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: List.generate(5, (i) {
+        final filled = rating > i;
+        final star = Icon(
+          filled ? Icons.star_rounded : Icons.star_border_rounded,
+          color: filled ? AppColors.warning : AppColors.mutedTextColor,
+          size: AppSizes.iconLg,
+        );
+        if (onChanged == null) return star;
+        return InkWell(
+          onTap: () => onChanged!(i + 1),
+          borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+          child: star,
+        );
+      }),
+    );
+  }
+}
+
+class _OptionPills extends StatelessWidget {
+  const _OptionPills({
+    required this.options,
+    required this.isSelected,
+    this.onToggle,
+  });
+
+  final List<String> options;
+  final bool Function(int index) isSelected;
+  final ValueChanged<int>? onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Wrap(
+          spacing: AppSizes.gapSm,
+          runSpacing: AppSizes.spaceSm,
+          children: List.generate(options.length, (i) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: _OptionPill(
+                text: options[i].toSentenceCase,
+                selected: isSelected(i),
+                onTap: onToggle == null ? null : () => onToggle!(i),
+              ),
+            );
+          }),
+        );
+      },
+    );
+  }
+}
+
+class _OptionPill extends StatelessWidget {
+  const _OptionPill({required this.text, required this.selected, this.onTap});
+
+  final String text;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(AppSizes.radiusSm);
+
+    return Material(
+      color: selected ? AppColors.primaryColor : AppColors.bgColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: selected
+            ? BorderSide.none
+            : BorderSide(color: AppColors.borderColor),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSizes.gapMd,
+            vertical: AppSizes.spaceXs,
+          ),
+          child: CustomText(
+            text: text,
+            style:
+                (selected
+                        ? AppTextStyles.chipPrimary.copyWith(
+                            color: AppColors.textWhiteColor,
+                          )
+                        : AppTextStyles.chipMuted)
+                    .copyWith(fontWeight: FontWeight.w600),
+            align: TextAlign.center,
+            maxLines: 1,
+          ),
+        ),
+      ),
     );
   }
 }

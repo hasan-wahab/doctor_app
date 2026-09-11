@@ -6,16 +6,17 @@ import '../core/app_styles/app_colors.dart';
 
 class AppButton extends StatelessWidget {
   final String text;
-  VoidCallback? onTap;
-  bool isColor;
+  final VoidCallback? onTap;
+  final bool isColor;
   final double? width;
   final Color? borderColor;
   final Color? textColor;
   final double? textSize;
   final double? height;
   final BorderRadius? borderRadius;
+  final FontWeight? fontWeight;
 
-  AppButton({
+  const AppButton({
     super.key,
     required this.text,
     this.onTap,
@@ -26,31 +27,40 @@ class AppButton extends StatelessWidget {
     this.textSize,
     this.height,
     this.borderRadius,
+    this.fontWeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        color: AppColors.secondaryColor,
+    final radius = borderRadius ?? BorderRadius.circular(24.r);
+    final background = isColor
+        ? AppColors.primaryColor
+        : AppColors.whiteIconColor;
+    final foreground = isColor
+        ? textColor ?? AppColors.textWhiteColor
+        : textColor ?? AppColors.primaryColor;
+
+    return Material(
+      color: background,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
         child: Container(
           alignment: Alignment.center,
           height: height?.h ?? 50.h,
-          width: width?.w ?? MediaQuery.sizeOf(context).width.w,
+          width: width?.w ?? double.infinity,
           decoration: BoxDecoration(
-            color: isColor ? AppColors.primaryColor : AppColors.whiteIconColor,
-            borderRadius: borderRadius ?? BorderRadius.circular(12.r),
-            // border: isColor == false
-            //     ? Border.all(color: borderColor ?? AppColors.primaryColor)
-            //     : null,
+            borderRadius: radius,
+            border: isColor
+                ? null
+                : Border.all(color: borderColor ?? AppColors.primaryColor),
           ),
           child: CustomText(
             text: text,
-            color: isColor
-                ? textColor ?? AppColors.textWhiteColor
-                : textColor ?? AppColors.primaryColor,
-            fontSize: textSize?.sp ?? 18.sp,
+            color: foreground,
+            fontSize: textSize ?? 16,
+            fontWeight: fontWeight ?? FontWeight.w600,
           ),
         ),
       ),

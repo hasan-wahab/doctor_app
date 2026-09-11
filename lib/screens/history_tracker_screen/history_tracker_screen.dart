@@ -18,7 +18,9 @@ import 'package:doctor_app/screens/history_tracker_screen/widgets/primary_pain_l
 import 'package:doctor_app/screens/history_tracker_screen/widgets/radiating_pain_card.dart';
 import 'package:doctor_app/screens/history_tracker_screen/widgets/regions_involved_card.dart';
 import 'package:doctor_app/screens/history_tracker_screen/widgets/speech_eating_drinking_card.dart';
-import 'package:doctor_app/widgets/show_msg.dart';
+import 'package:doctor_app/widgets/app_app_bar.dart';
+import 'package:doctor_app/widgets/app_pull_refresh.dart';
+import 'package:doctor_app/widgets/app_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,11 +30,17 @@ import '../../data/api_service/base_api/base_api_impl.dart';
 import '../../data/local_storage/local_curd_base/local_curd_impl.dart';
 import '../../data/models/history_traker_model.dart';
 import '../../repos/history_tracker_repo/history_tracker_repo_Impl.dart';
+import '../../widgets/app_empty_state.dart';
 import '../../widgets/custom_text.dart';
 
 class HistoryTrackerScreen extends StatefulWidget {
   final String? visitId;
-  const HistoryTrackerScreen({super.key, this.visitId = ''});
+  final bool embedded;
+  const HistoryTrackerScreen({
+    super.key,
+    this.visitId = '',
+    this.embedded = false,
+  });
 
   @override
   State<HistoryTrackerScreen> createState() => _HistoryTrackerScreenState();
@@ -40,6 +48,7 @@ class HistoryTrackerScreen extends StatefulWidget {
 
 class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
   bool isLoading = false;
+  bool isRefreshing = false;
   HistoryTrackerModel? historyTrackerModel;
   ForMenOnlyModel? forMenOnlyModel;
   FaceSpecificPainModel? faceSpecificPainModel;
@@ -79,16 +88,20 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
     return BlocListener<HistoryTrackerBloc, HistoryTrackerState>(
       listener: (context, state) async {
         if (state is HistoryTLoadingState) {
-          isLoading = true;
+          if (historyTrackerModel == null) {
+            isLoading = true;
+          } else {
+            isRefreshing = true;
+          }
         }
         if (state is HistoryTrackerMessageState) {
           isLoading = false;
+          isRefreshing = false;
           message = state.message;
-          AppMsg.showSnackBar(context, message: state.message);
-          print(state);
         }
         if (state is HistoryTrackerGetState) {
           isLoading = false;
+          isRefreshing = false;
           historyTrackerModel = state.historyTrackerModel;
           faceSpecificPainModel = state.historyTrackerModel.faceSpecificPain;
           faceEyeInvolvementModel =
@@ -122,26 +135,27 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
               state.historyTrackerModel.previousInvestigations;
           redFlagsModel = state.historyTrackerModel.redFlags;
         }
+        _syncAppBarLoading();
       },
       child: BlocBuilder<HistoryTrackerBloc, HistoryTrackerState>(
         builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
-              ),
-              centerTitle: true,
-              title: Text('History Taker'),
-              automaticallyImplyLeading: false,
-            ),
-            backgroundColor: AppColors.bgColor,
-
-            body: historyTrackerModel != null
-                ? ListView(
+          final body = historyTrackerModel != null
+                ? AppPullRefresh(
+                    enabled: !(isLoading || isRefreshing),
+                    onRefresh: () async {
+                      final bloc = context.read<HistoryTrackerBloc>();
+                      final done = bloc.stream.firstWhere(
+                        (s) =>
+                            s is HistoryTrackerGetState ||
+                            s is HistoryTrackerMessageState,
+                      );
+                      bloc.add(
+                        HistoryTrackerEvent(visitId: widget.visitId),
+                      );
+                      await done;
+                    },
+                    child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.only(
                       left: 20.w,
                       right: 20.w,
@@ -729,34 +743,59 @@ class _HistoryTrackerScreenState extends State<HistoryTrackerScreen> {
                       //   }),
                       // ],
                     ],
+                  ),
                   )
                 : isLoading
-                ? Center(child: CircularProgressIndicator())
-                : SizedBox(
-                    width: MediaQuery.sizeOf(context).width,
-                    child: Column(
-                      spacing: 10.h,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomText(
-                          text: message == 'No internet connection!'
-                              ? message!
-                              : 'No data',
+                ? const AppListShimmer()
+                : AppPullRefresh(
+                    enabled: !(isLoading || isRefreshing),
+                    onRefresh: () async {
+                      final bloc = context.read<HistoryTrackerBloc>();
+                      final done = bloc.stream.firstWhere(
+                        (s) =>
+                            s is HistoryTrackerGetState ||
+                            s is HistoryTrackerMessageState,
+                      );
+                      bloc.add(
+                        HistoryTrackerEvent(visitId: widget.visitId),
+                      );
+                      await done;
+                    },
+                    child: AppEmptyRefreshView(
+                      child: AppEmptyState.historyTracker(
+                        message: message,
+                        onRetry: () => context.read<HistoryTrackerBloc>().add(
+                          HistoryTrackerEvent(visitId: widget.visitId),
                         ),
-                        InkWell(
-                          onTap: () => context.read<HistoryTrackerBloc>().add(
-                            HistoryTrackerEvent(visitId: widget.visitId),
-                          ),
-                          child: Icon(Icons.refresh),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  );
+
+          if (widget.embedded) {
+            return ColoredBox(color: AppColors.bgColor, child: body);
+          }
+
+          return Scaffold(
+            appBar: AppAppBar(
+              title: 'History Taker',
+              showBack: true,
+              isLoading: isLoading || isRefreshing,
+            ),
+            backgroundColor: AppColors.bgColor,
+            body: body,
           );
         },
       ),
     );
+  }
+
+  void _syncAppBarLoading() {
+    if (!widget.embedded || !mounted) return;
+    final loading = isLoading || isRefreshing;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppBarLoadingNotification(loading).dispatch(context);
+    });
   }
 }
 

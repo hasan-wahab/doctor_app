@@ -1,95 +1,124 @@
 import 'package:doctor_app/core/app_styles/app_colors.dart';
+import 'package:doctor_app/core/app_styles/app_sizes.dart';
+import 'package:doctor_app/core/app_styles/app_text_styles.dart';
 import 'package:doctor_app/screens/video_palyer/models/video_playlist_item.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
+import 'package:doctor_app/widgets/network_media.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlaylistTile extends StatelessWidget {
   final VideoPlaylistItem item;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool dense;
 
   const PlaylistTile({
     super.key,
     required this.item,
     required this.isSelected,
     required this.onTap,
+    this.dense = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-        padding: EdgeInsets.all(10.w),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondaryColor : null,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryColor : Colors.grey.shade300,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.r),
-              child: Image.network(
-                item.thumbnailUrl,
-                height: 72.h,
-                width: 120.w,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 72.h,
-                  width: 120.w,
-                  color: Colors.grey.shade200,
-                  child: Icon(Icons.play_circle_outline, size: 32.sp),
-                ),
+    final thumbHeight = dense
+        ? AppSizes.buttonHeightSm
+        : AppSizes.buttonHeight + AppSizes.spaceXl;
+    final thumbWidth = thumbHeight * 16 / 9;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: AppSizes.spaceMd),
+      child: Material(
+        color: isSelected ? AppColors.secondaryColor : AppColors.bgColor,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.all(dense ? AppSizes.gapSm : AppSizes.gapMd),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.primaryColor
+                    : AppColors.borderColor,
               ),
             ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  child: SizedBox(
+                    height: thumbHeight,
+                    width: thumbWidth,
+                    child: NetworkMedia(
+                      url: item.thumbnailUrl,
+                      emptyMessage: 'Video unavailable',
+                      emptyIcon: Icons.videocam_off_outlined,
+                      overlay: isSelected
+                          ? ColoredBox(
+                              color: AppColors.firstTextBlackColor.withValues(
+                                alpha: 0.28,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.equalizer_rounded,
+                                  color: AppColors.textWhiteColor,
+                                  size: AppSizes.iconMd,
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                SizedBox(width: AppSizes.gapMd),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (isSelected) ...[
-                        Icon(
-                          Icons.play_arrow_rounded,
-                          color: AppColors.primaryColor,
-                          size: 20.sp,
+                      if (isSelected)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: AppSizes.spaceXs),
+                          child: CustomText(
+                            text: 'Now playing',
+                            style: AppTextStyles.chipPrimary.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                        SizedBox(width: 4.w),
-                      ],
-                      Expanded(
-                        child: CustomText(
-                          text: item.title,
-                          fontSize: 15,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
+                      CustomText(
+                        text: item.title,
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
                           color: isSelected
                               ? AppColors.primaryColor
                               : AppColors.firstTextBlackColor,
+                        ),
+                        maxLines: dense ? 1 : 2,
+                      ),
+                      if (!dense) ...[
+                        SizedBox(height: AppSizes.spaceXs),
+                        CustomText(
+                          text: item.description,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.labelTextColor,
+                          ),
                           maxLines: 2,
                         ),
-                      ),
+                      ],
                     ],
                   ),
-                  SizedBox(height: 4.h),
-                  CustomText(
-                    text: item.description,
-                    fontSize: 12,
-                    color: AppColors.secondaryTextColor,
-                    maxLines: 2,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

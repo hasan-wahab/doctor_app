@@ -42,6 +42,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/app_routes/generate_route.dart';
+import 'core/app_styles/app_sizes.dart';
 import 'core/navigation_theme.dart';
 import 'data/api_service/base_api/base_api.dart';
 import 'data/local_storage/local_curd_base/local_curd_impl.dart';
@@ -75,7 +76,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late BaseApiImpl apiImpl;
   late LocalCurdImpl curdImpl;
   late ProfileLocalRepo profileLocalRepo;
@@ -97,10 +98,40 @@ class _MyAppState extends State<MyApp> {
   late SliderRepo sliderRepo;
   late QuestionRepo questionRepo;
   late PostReviewRepo postReviewRepo;
+  late Size _designSize = _readDesignSize();
+
+  static Size _readDesignSize() {
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final logical = view.physicalSize / view.devicePixelRatio;
+    final landscape = logical.width > logical.height;
+    return AppSizes.screenUtilDesignSize(landscape: landscape);
+  }
+
+  static bool _screenUtilRebuildFactor(
+    MediaQueryData old,
+    MediaQueryData data,
+  ) {
+    if (old.size.isEmpty || data.size.isEmpty) {
+      return old.size != data.size;
+    }
+    return RebuildFactors.orientation(old, data);
+  }
+
+  static bool _hasUsableSize(Size size) => size.width > 1 && size.height > 1;
+
+  void _applyScreenUtil(BuildContext context) {
+    ScreenUtil.configure(
+      data: MediaQueryData.fromView(View.of(context)),
+      designSize: _designSize,
+      splitScreenMode: true,
+      minTextAdapt: true,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     curdImpl = LocalCurdImpl();
     profileLocalRepo = ProfileLocalRepo(curdBase: curdImpl);
     patientLocalRepo = PatientLocalRepo(curdBase: curdImpl);
@@ -164,6 +195,19 @@ class _MyAppState extends State<MyApp> {
     sliderRepo = SliderRepo(api: apiImpl, localRepo: sliderImagesLocalRepo);
     questionRepo = QuestionRepo(api: apiImpl);
     postReviewRepo = PostReviewRepo(api: apiImpl);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final next = _readDesignSize();
+    if (next == _designSize) return;
+    setState(() => _designSize = next);
   }
 
   @override
@@ -251,21 +295,54 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
       child: ScreenUtilInit(
-        designSize: Size(390, 844),
-        child: MaterialApp.router(
-          builder: (context, child) {
-            return AnnotatedRegion<SystemUiOverlayStyle>(
-              value: AppSystemUi.light,
-              child: child ?? const SizedBox.shrink(),
+        key: ValueKey('${_designSize.width}x${_designSize.height}'),
+        designSize: _designSize,
+        minTextAdapt: true,
+        splitScreenMode: true,
+        ensureScreenSize: true,
+        rebuildFactor: _screenUtilRebuildFactor,
+        enableScaleWH: () {
+          try {
+            return _hasUsableSize(
+              Size(ScreenUtil().screenWidth, ScreenUtil().screenHeight),
             );
-          },
-          debugShowCheckedModeBanner: false,
-          title: 'Dr.Ali Therapy',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          ),
-          routerConfig: RouteGenerator.route,
-        ),
+          } catch (_) {
+            return false;
+          }
+        },
+        enableScaleText: () {
+          try {
+            return _hasUsableSize(
+              Size(ScreenUtil().screenWidth, ScreenUtil().screenHeight),
+            );
+          } catch (_) {
+            return false;
+          }
+        },
+        builder: (context, child) {
+          final view = View.of(context);
+          final logical = view.physicalSize / view.devicePixelRatio;
+          if (!_hasUsableSize(logical)) {
+            return const ColoredBox(color: Colors.white);
+          }
+
+          _applyScreenUtil(context);
+
+          return MaterialApp.router(
+            builder: (context, child) {
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: AppSystemUi.light,
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
+            debugShowCheckedModeBanner: false,
+            title: 'Dr.Ali Therapy',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            ),
+            routerConfig: RouteGenerator.route,
+          );
+        },
       ),
     );
   }

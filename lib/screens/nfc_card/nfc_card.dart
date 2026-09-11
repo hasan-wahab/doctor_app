@@ -445,6 +445,9 @@ import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_bloc.dart';
 import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_event.dart';
 import 'package:doctor_app/screens/nfc_card/bloc/nfc_card_state.dart';
+import 'package:doctor_app/widgets/app_app_bar.dart';
+import 'package:doctor_app/widgets/app_pull_refresh.dart';
+import 'package:doctor_app/widgets/app_shimmer.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/foundation.dart';
@@ -508,6 +511,8 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
         listener: (context, state) async {
           if (state is NfcLoadingState) {
             isLoading = true;
+          } else {
+            isLoading = false;
           }
           if (state is NfcMessageState) {
             message = state.message.toString();
@@ -549,25 +554,32 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
                 );
               } else {
                 return Scaffold(
-                  appBar: AppBar(
-                    backgroundColor: AppColors.bgColor,
-                    leading: IconButton(
-                      onPressed: () {
-                        if (widget.fromProfile == false) {
-                          context.read<NaveBarBloc>().add(
-                            NaveBarIndexEvent(index: 0),
-                          );
-                        } else {
-                          Navigator.pop(context);
-                        }
-                      },
-                      icon: Icon(Icons.arrow_back_ios_new),
-                    ),
-                    centerTitle: true,
-                    title: Text('My Card'),
-                    automaticallyImplyLeading: false,
+                  appBar: AppAppBar(
+                    title: 'My Card',
+                    showBack: true,
+                    isLoading: isLoading,
+                    onBack: () {
+                      if (widget.fromProfile == false) {
+                        context.read<NaveBarBloc>().add(
+                          NaveBarIndexEvent(index: 0),
+                        );
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
                   ),
-                  body: ListView(
+                  body: AppPullRefresh(
+                    enabled: !isLoading,
+                    onRefresh: () async {
+                      final bloc = context.read<NfcCardBloc>();
+                      final done = bloc.stream.firstWhere(
+                        (s) =>
+                            s is NfcCardDataState || s is NfcMessageState,
+                      );
+                      bloc.add(NfcCardEvent());
+                      await done;
+                    },
+                    child: ListView(
                     padding: EdgeInsets.symmetric(
                       horizontal: 15.w,
                       vertical: 15.h,
@@ -1007,6 +1019,7 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
                       ),
                     ],
                   ),
+                  ),
                 );
               }
             } else {
@@ -1016,7 +1029,15 @@ class _NfcCardPageState extends State<NfcCardPage> with WidgetsBindingObserver {
             }
           } else {
             return Scaffold(
-              body: Center(child: CustomText(text: 'No Data')),
+              backgroundColor: AppColors.bgColor,
+              appBar: AppAppBar(
+                title: 'My Card',
+                showBack: true,
+                isLoading: isLoading,
+              ),
+              body: isLoading
+                  ? const AppListShimmer()
+                  : const Center(child: CustomText(text: 'No Data')),
             );
           }
         },

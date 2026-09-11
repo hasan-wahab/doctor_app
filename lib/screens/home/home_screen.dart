@@ -1,29 +1,35 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:doctor_app/core/extentions/internect_connectivity.dart';
 import 'package:doctor_app/screens/home/bloc/home_bloc.dart';
 import 'package:doctor_app/screens/home/bloc/home_event.dart';
 import 'package:doctor_app/screens/home/bloc/home_state.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
-import 'package:doctor_app/widgets/heding_text.dart';
-import 'package:doctor_app/widgets/outline_button.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
-import '../../data/models/all_packages_model.dart';
-import '../../data/models/slider_model.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
+import '../../widgets/app_pull_refresh.dart';
 import '../../widgets/home_appbar.dart';
+import '../../widgets/network_media.dart';
+import 'home_widget/home_shimmer.dart';
 import 'home_widget/packages_widget.dart';
 import 'home_widget/second_slider.dart';
 import 'home_widget/slider_widget.dart';
+
+const _clinics = [
+  (title: 'Clinic 1 Near IDC F8', number: '+92334 8199990'),
+  (title: 'Clinic 2 PMC Plaza F8', number: '+923086776666'),
+  (title: 'Clinic 3 Neuro Stroke PMC F8', number: '+92331 8181681'),
+];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,363 +39,421 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late PageController _pageController1;
-  late PageController _pageController2;
-  int currentValue1 = 0;
-  int currentValue2 = 0;
-  late Timer _timer;
-  AllPackagesModel? allPackagesModel;
-  List<SliderModel>? sliderModel;
-  bool isLoading = false;
-  String? message;
-  bool hasInternet = false;
-  List sliderImagesList = [];
+  StreamSubscription<List<ConnectivityResult>>? _netSub;
+  bool _hasInternet = false;
+  int _mediaRefreshToken = 0;
+  bool _refreshing = false;
 
   @override
   void initState() {
-    context.read<HomeBloc>().add(HomeLoadEvent());
-    _pageController1 = PageController(initialPage: currentValue1);
-    _pageController2 = PageController(initialPage: currentValue2);
-    sliderController(_pageController1, currentValue1);
-    sliderController(_pageController2, currentValue2);
-    internetController();
     super.initState();
+    final homeBloc = context.read<HomeBloc>();
+    if (homeBloc.state is! HomeLoadState) {
+      homeBloc.add(HomeLoadEvent());
+    }
+    _checkInternet();
+    _netSub = Connectivity().onConnectivityChanged.listen((_) {
+      _checkInternet();
+    });
+  }
+
+  @override
+  void dispose() {
+    _netSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _checkInternet() async {
+    final value = await InternetUtils.isInternetAvailable();
+    if (mounted && value != _hasInternet) {
+      setState(() => _hasInternet = value);
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      _refreshing = true;
+      _mediaRefreshToken++;
+    });
+    final bloc = context.read<HomeBloc>();
+    final done = bloc.stream.firstWhere(
+      (state) => state is HomeLoadState || state is HomeMessageState,
+    );
+    bloc.add(HomeLoadEvent(forceRefresh: true));
+    await _checkInternet();
+    await done;
+    if (mounted) {
+      setState(() => _refreshing = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
       listener: (context, state) {
-        if (state is HomeLoadingState) {
-          isLoading = true;
-        }
         if (state is HomeMessageState) {
-          isLoading = false;
-          message = state.message;
-          print(state.message?.isEmpty);
           AppMsg.showSnackBar(context, message: state.message.toString());
-        }
-        if (state is HomeLoadState) {
-          isLoading = false;
-          allPackagesModel = state.allPackagesModel;
-          sliderModel = state.sliderModel;
-          sliderImagesList = sliderModel != null
-              ? sliderModel!.expand((slider) => slider.images).toList()
-              : [];
         }
       },
       builder: (context, state) {
+        final firstLoad = state is! HomeLoadState && state is! HomeMessageState;
         return Scaffold(
-          appBar: HomeAppBar(),
-          body:
-              isLoading != true &&
-                  allPackagesModel != null &&
-                  sliderModel != null
-              ? ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  children: [
-                    SizedBox(height: 15.h),
-                    FirstSlider(
-                      sliderImages: sliderImagesList,
-                      currentValue: currentValue1,
-                      controller: _pageController1,
-                      hasInternet: hasInternet,
-                    ),
-                    SizedBox(height: 15.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        HeadingText(text: 'Therapy Session Packages'),
-                        InkWell(
-                          onTap: () {
-                            context.push(
-                              AppRoutes.allPackagesScreen,
-                              extra: hasInternet,
-                            );
-                          },
-                          child: CustomText(
-                            text: 'View all',
-                            color: AppColors.secondaryTextColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 9.h),
-                    AllPackagesWidget(
-                      packages: allPackagesModel!,
-                      hasInternet: hasInternet,
-                    ),
-                    SizedBox(height: 12.h),
-
-                    SizedBox(height: 20.h),
-                    SecondSlider(
-                      controller: _pageController2,
-                      currentValue: currentValue2,
-                      hasInternet: hasInternet,
-                    ),
-                  ],
-                )
-              : isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SizedBox(
-                  width: MediaQuery.sizeOf(context).width,
-                  child: Column(
-                    spacing: 10.h,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomText(
-                        text: message == 'No internet connection!'
-                            ? message!
-                            : 'No data',
-                      ),
-                      InkWell(
-                        onTap: () =>
-                            context.read<HomeBloc>().add(HomeLoadEvent()),
-                        child: Icon(Icons.refresh),
-                      ),
-                    ],
-                  ),
-                ),
-
-          backgroundColor: AppColors.bgColor,
-          floatingActionButton: InkWell(
-            onTap: () async {
-              showCupertinoModalPopup(
-                context: context,
-                builder: (context) => Material(
-                  borderRadius: BorderRadius.circular(20.r),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.r),
-                    child: SizedBox(
-                      height: MediaQuery.sizeOf(context).height / 2.5,
-                      width: MediaQuery.sizeOf(context).width,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.r),
-                            child: Row(
-                              children: [
-                                CustomText(
-                                  text: 'Please Select WhatsApp',
-                                  style: TextStyle(
-                                    color: AppColors.primaryColor,
-                                    fontSize: 18.sp,
-                                  ),
-                                ),
-                                Spacer(),
-                                InkWell(
-                                  onTap: () => context.pop(context),
-                                  child: Icon(
-                                    Icons.close,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 5.h),
-
-                          Divider(),
-                          SizedBox(height: 10.h),
-
-                          InkWell(
-                            onTap: () => _launchWhatsApp(
-                              message: "I need help",
-                              number: "+92334 8199990",
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.r),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 40.h,
-                                    width: 40.h,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/what_app_image.png',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  CustomText(
-                                    text: 'Clinic 1 Near IDC F8',
-                                    style: TextStyle(
-                                      color: AppColors.firstTextBlackColor,
-                                      fontSize: 18.sp,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 18.r,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          InkWell(
-                            onTap: () => _launchWhatsApp(
-                              message: "I need help",
-                              number: "+923086776666",
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.r),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 40.h,
-                                    width: 40.h,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/what_app_image.png',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  CustomText(
-                                    text: 'Clinic 2 PMC Plaza F8',
-                                    style: TextStyle(
-                                      color: AppColors.firstTextBlackColor,
-                                      fontSize: 18.sp,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 18.r,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          InkWell(
-                            onTap: () => _launchWhatsApp(
-                              message: "I need help",
-                              number: "+92331 8181681",
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.r),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 40.h,
-                                    width: 40.h,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          'assets/images/what_app_image.png',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  CustomText(
-                                    text: 'Clinic 3 Neuro Stroke PMC F8',
-                                    style: TextStyle(
-                                      color: AppColors.firstTextBlackColor,
-                                      fontSize: 18.sp,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 18.r,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              height: 68.h,
-              width: 68.h,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/what_app_image.png'),
-                  fit: BoxFit.cover,
-                ),
-                shape: BoxShape.circle,
-              ),
-            ),
+          backgroundColor: AppColors.screenBgColor,
+          appBar: HomeAppBar(isLoading: firstLoad || _refreshing),
+          body: AppPullRefresh(
+            enabled: !firstLoad && !_refreshing,
+            onRefresh: _onRefresh,
+            child: firstLoad ? const HomeShimmer() : _body(state),
           ),
+          floatingActionButton: firstLoad ? null : _chatButton(),
         );
       },
     );
   }
 
-  void internetController() {
-    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
-      hasInternet = await InternetUtils.isInternetAvailable();
-      if (!mounted) return; // ✅ IMPORTANT
-      setState(() {});
-    });
+  Widget _body(HomeState state) {
+    if (state is HomeLoadState &&
+        state.allPackagesModel != null &&
+        state.sliderModel != null) {
+      final images = state.sliderModel!.expand((s) => s.images).toList();
+      return Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: AppSizes.contentMaxWidth(context),
+          ),
+          child: MediaRefresh(
+            token: _mediaRefreshToken,
+            child: ListView(
+              clipBehavior: Clip.none,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(
+                top: AppSizes.pagePaddingTop,
+                bottom: AppSizes.pagePaddingBottom,
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.pagePaddingH,
+                  ),
+                  child: FirstSlider(images: images),
+                ),
+                SizedBox(height: AppSizes.spaceXxl),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.pagePaddingH,
+                  ),
+                  child: _header(
+                    'Therapy Session Packages',
+                    'View all',
+                    () => context.push(
+                      AppRoutes.allPackagesScreen,
+                      extra: _hasInternet,
+                    ),
+                  ),
+                ),
+                SizedBox(height: AppSizes.spaceMd),
+                AllPackagesWidget(packages: state.allPackagesModel!),
+                SizedBox(height: AppSizes.spaceXxl),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.pagePaddingH,
+                  ),
+                  child: _header(
+                    'Doctor Insights & Stories',
+                    'Watch all',
+                    () => _openVideos(),
+                  ),
+                ),
+                SizedBox(height: AppSizes.spaceMd),
+                SecondSlider(),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final message = state is HomeMessageState ? state.message : null;
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(height: MediaQuery.sizeOf(context).height * 0.35),
+        Center(
+          child: Column(
+            children: [
+              CustomText(
+                text: message == 'No internet connection!'
+                    ? message!
+                    : 'No data',
+                style: AppTextStyles.body,
+              ),
+              SizedBox(height: AppSizes.spaceMd),
+              IconButton(
+                onPressed: () => context.read<HomeBloc>().add(HomeLoadEvent()),
+                icon: const Icon(Icons.refresh),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
-  void sliderController(PageController controller, int currentValue) {
-    _timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-      if (controller.hasClients) {
-        setState(() {
-          if (currentValue < 3) {
-            currentValue++;
-          } else {
-            currentValue = 0;
-          }
-        });
-        controller.animateToPage(
-          currentValue,
-          duration: Duration(milliseconds: 1000),
-          curve: Curves.easeIn,
-        );
-      }
-    });
+  Widget _header(String title, String action, VoidCallback onTap) {
+    return Row(
+      children: [
+        Expanded(
+          child: CustomText(
+            text: title,
+            style: AppTextStyles.name,
+            maxLines: 1,
+          ),
+        ),
+        InkWell(
+          onTap: onTap,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomText(
+                text: action,
+                style: AppTextStyles.chipPrimary.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: AppSizes.iconSm,
+                color: AppColors.primaryColor,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
-  void _launchWhatsApp({
-    required String message,
-    required String number,
-  }) async {
-    var newMessage = Uri.encodeComponent(message);
-    try {
-      if (Platform.isAndroid) {
-        String androidUrl = 'whatsapp://send?phone=$number&text=$newMessage';
-        await launchUrl(Uri.parse(androidUrl));
-      } else if (Platform.isIOS) {
-        String iosUrl = 'https://wa.me/$number?text=$newMessage';
-        await launchUrl(Uri.parse(iosUrl));
-      }
-    } on Exception catch (e) {
-      print(e.toString());
+  Widget _chatButton() {
+    return GestureDetector(
+      onTap: _showClinics,
+      child: Container(
+        height: AppSizes.buttonHeight,
+        width: AppSizes.buttonHeight,
+        padding: EdgeInsets.all(AppSizes.spaceSm),
+        decoration: BoxDecoration(
+          color: AppColors.bgColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.firstTextBlackColor.withValues(alpha: 0.12),
+              blurRadius: AppSizes.spaceXl,
+              offset: Offset(0, AppSizes.spaceXs),
+            ),
+          ],
+        ),
+        child: Image.asset(
+          'assets/images/what_app_image.png',
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openVideos() async {
+    if (await InternetUtils.isInternetAvailable()) {
+      if (mounted) context.push(AppRoutes.videoPlayerScreen, extra: 0);
+    } else if (mounted) {
+      AppMsg.warning(
+        context,
+        'Looks like you are offline. Please check your connection and try again.',
+      );
     }
   }
 
+  void _showClinics() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.bgColor,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSizes.radiusMd),
+        ),
+      ),
+      builder: (context) => _WhatsAppClinicsSheet(
+        clinics: _clinics,
+        onSelect: (number) async {
+          context.pop();
+          await _openWhatsApp(number);
+        },
+      ),
+    );
+  }
+
+  Future<void> _openWhatsApp(String number) async {
+    final text = Uri.encodeComponent('I need help');
+    try {
+      if (Platform.isAndroid) {
+        await launchUrl(Uri.parse('whatsapp://send?phone=$number&text=$text'));
+      } else if (Platform.isIOS) {
+        await launchUrl(Uri.parse('https://wa.me/$number?text=$text'));
+      }
+    } on Exception {
+      // Keep previous behavior: ignore launch failures.
+    }
+  }
+}
+
+class _WhatsAppClinicsSheet extends StatelessWidget {
+  const _WhatsAppClinicsSheet({required this.clinics, required this.onSelect});
+
+  final List<({String title, String number})> clinics;
+  final ValueChanged<String> onSelect;
+
   @override
-  void dispose() {
-    _timer.cancel();
-    _pageController1.dispose();
-    _pageController2.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: AppSizes.contentMaxWidth(context),
+          ),
+          child: Padding(
+            padding: AppSizes.pageInsets,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: AppSizes.logoSize,
+                  height: AppSizes.spaceXs,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderColor,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  ),
+                ),
+                SizedBox(height: AppSizes.spaceXl),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CustomText(
+                            text: 'Chat on WhatsApp',
+                            style: AppTextStyles.name,
+                          ),
+                          SizedBox(height: AppSizes.spaceXs),
+                          CustomText(
+                            text: 'Select a clinic to start a conversation',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.labelTextColor,
+                            ),
+                            maxLines: 2,
+                            textOverflow: TextOverflow.visible,
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => context.pop(),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                      child: Padding(
+                        padding: EdgeInsets.all(AppSizes.spaceXs),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: AppSizes.iconMd,
+                          color: AppColors.labelTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: AppSizes.spaceXxl),
+                for (var i = 0; i < clinics.length; i++) ...[
+                  if (i > 0) SizedBox(height: AppSizes.spaceMd),
+                  _ClinicTile(
+                    title: clinics[i].title,
+                    number: clinics[i].number,
+                    onTap: () => onSelect(clinics[i].number),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ClinicTile extends StatelessWidget {
+  const _ClinicTile({
+    required this.title,
+    required this.number,
+    required this.onTap,
+  });
+
+  final String title;
+  final String number;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.sectionBgColor,
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSizes.gapLg,
+            vertical: AppSizes.spaceXl,
+          ),
+          child: Row(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  'assets/images/what_app_image.png',
+                  height: AppSizes.buttonHeightSm,
+                  width: AppSizes.buttonHeightSm,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(width: AppSizes.gapMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomText(
+                      text: title,
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      textOverflow: TextOverflow.visible,
+                    ),
+                    SizedBox(height: AppSizes.spaceXs),
+                    CustomText(
+                      text: number,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.labelTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: AppSizes.gapSm),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: AppSizes.iconLg,
+                color: AppColors.primaryColor,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -14,7 +14,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
 import '../../data/models/current_patient_model.dart';
+import '../../widgets/app_app_bar.dart';
+import '../../widgets/app_pull_refresh.dart';
+import '../../widgets/app_shimmer.dart';
 import '../../widgets/custom_text.dart';
 import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
@@ -32,6 +36,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   var isExpanded;
   double remainingPayments = 0;
   bool isLoading = false;
+  bool isRefreshing = false;
   int totalInvoice = 0;
   List<InvoiceModel> invoiceList = [];
   List<PaymentModel> paymentList = [];
@@ -48,38 +53,49 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
         if (state is ProfileLoadingState) {
-          isLoading = true;
+          if (currentPatientData == null) {
+            isLoading = true;
+          } else {
+            isRefreshing = true;
+          }
         } else if (state is MyProfileState) {
           isLoading = false;
+          isRefreshing = false;
 
           currentPatientData = state.currentPatientModel;
           totalInvoice = currentPatientData?.recentInvoices.length ?? 0;
           invoiceList = currentPatientData?.recentInvoices ?? [];
         } else if (state is ProfileMessageState) {
           isLoading = false;
+          isRefreshing = false;
           AppMsg.showErrorMsg(context, msg: state.message.toString());
         }
       },
       builder: (context, state) {
-        return isLoading != true
-            ? Scaffold(
-                appBar: AppBar(
-                  backgroundColor: AppColors.bgColor,
-                  leading: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
+        final firstLoad = isLoading && currentPatientData == null;
+        final appBarLoading = isLoading || isRefreshing;
+
+        return Scaffold(
+          appBar: AppAppBar(
+            title: 'Invoice',
+            showBack: true,
+            isLoading: appBarLoading,
+          ),
+          backgroundColor: AppColors.bgColor,
+          body: firstLoad
+              ? const AppListShimmer()
+              : SafeArea(
+                  child: AppPullRefresh(
+                    enabled: !appBarLoading,
+                    onRefresh: () async {
+                      final bloc = context.read<ProfileBloc>();
+                      final done = bloc.stream.firstWhere(
+                        (s) =>
+                            s is MyProfileState || s is ProfileMessageState,
+                      );
+                      bloc.add(MyProfileEvent());
+                      await done;
                     },
-                    icon: Icon(Icons.arrow_back_ios_new),
-                  ),
-                  centerTitle: true,
-                  title: Text('Invoice'),
-                  automaticallyImplyLeading: false,
-                ),
-                backgroundColor: AppColors.bgColor,
-                body: SafeArea(
-                  child: RefreshIndicator(
-                    onRefresh: () async =>
-                        context.read<ProfileBloc>().add(MyProfileEvent()),
                     child: totalInvoice == 0
                         ? ListView(
                             physics: const AlwaysScrollableScrollPhysics(),
@@ -98,6 +114,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                             ],
                           )
                         : ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
                             children: [
                               SizedBox(height: 20.h),
@@ -165,8 +182,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           ),
                   ),
                 ),
-              )
-            : Scaffold(body: Center(child: CircularProgressIndicator()));
+        );
       },
     );
   }

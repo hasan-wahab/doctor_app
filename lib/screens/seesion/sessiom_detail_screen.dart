@@ -14,6 +14,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
 import '../../data/models/current_patient_model.dart';
+import '../../widgets/app_app_bar.dart';
+import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_pull_refresh.dart';
+import '../../widgets/app_shimmer.dart';
 import '../../widgets/custom_text.dart';
 import '../../widgets/row_text.dart';
 import '../../widgets/show_msg.dart';
@@ -22,7 +26,12 @@ import 'bloc/session_event.dart';
 
 class SessionDetailScreen extends StatefulWidget {
   final String? visitId;
-  const SessionDetailScreen({super.key, this.visitId = ''});
+  final bool embedded;
+  const SessionDetailScreen({
+    super.key,
+    this.visitId = '',
+    this.embedded = false,
+  });
 
   @override
   State<SessionDetailScreen> createState() => _SessionDetailScreenState();
@@ -34,6 +43,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   String? id = '0';
 
   bool isLoading = false;
+  bool isRefreshing = false;
   AllTerapistModle? allTherapistModel;
   String? message;
   @override
@@ -49,17 +59,32 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<TherapySessionBloc, TherapySessionState>(
       listener: (context, state) {
+        if (state is SessionLoadingState) {
+          if (allTherapistModel == null) {
+            isLoading = true;
+          } else {
+            isRefreshing = true;
+          }
+        } else {
+          isLoading = false;
+          isRefreshing = false;
+        }
         if (state is SessionMessageState) {
           message = state.message.toString();
-          isLoading = false;
-          AppMsg.showSnackBar(context, message: state.message.toString());
         }
+        _syncAppBarLoading();
       },
       builder: (context, state) {
         if (state is SessionFromHomeLoaded) {
           print('From Home /..............');
           allTherapistModel = state.allTherapistModel;
           currentPatientData = state.patientData;
+        }
+
+        final firstLoad = isLoading && allTherapistModel == null;
+        final appBarLoading = isLoading || isRefreshing;
+
+        if (allTherapistModel != null) {
           final sessions = allTherapistModel!.visitWiseSessions;
           List filteredVisits;
           if (widget.visitId != null && widget.visitId != '') {
@@ -71,130 +96,222 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             filteredVisits = sessions!;
           }
 
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
-              ),
-              centerTitle: true,
-              title: Text('Sessions'),
-              automaticallyImplyLeading: false,
-            ),
-            backgroundColor: AppColors.bgColor,
-
-            body: SafeArea(
-              child: RefreshIndicator(
-                onRefresh: () async => context.read<TherapySessionBloc>().add(
-                  TherapySessionEvent(refresh: true),
-                ),
-                child: allTherapistModel != null && filteredVisits.isNotEmpty
-                    ? ListView(
-                        padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
-                        children: [
-                          SizedBox(height: 16.h),
-                          ...filteredVisits.expand((items) {
-                            final summary = items.summary!.visitSummary;
-                            final sessions = items.sessions;
-                            final allVisitsIds = allTherapistModel!
-                                .visitWiseSessions!
-                                .expand(
-                                  (e) => e.sessions!.map(
-                                    (_) => e.summary!.visitSummary!.visitID,
-                                  ),
-                                )
-                                .toList();
-                            bool isDup =
-                                allVisitsIds
-                                    .where((id) => id == summary!.visitID)
-                                    .toList()
-                                    .length >
-                                1;
-                            return sessions!.map((session) {
-                              return SessionReportSessionCard(
-                                terapistName: session.therapist ?? '',
-                                patientName:
-                                    currentPatientData!.patient?.name ?? '',
-                                cnic: currentPatientData!.patient?.cnic ?? '',
-                                ageGender:
-                                    currentPatientData!.patient?.gender ?? '',
-                                startedAt: '10:30',
-
-                                endedAt: '10:40',
-                                packageUsed: session.packageUsed ?? '',
-                                sessionDuration:
-                                    session.sessionDurationTotal ?? '',
-                                sessionNumber: session.sessionID.toString(),
-                                visitDate: DateAndTimeFormater.dateFormat(
-                                  summary?.visitDate,
-                                ),
-                                modalities: List.generate(
-                                  (session.modalitiesPerformed?.length ?? 0),
-                                  (index2) {
-                                    return ModalityEntity(
-                                      title:
-                                          session
-                                              .modalitiesPerformed![index2]
-                                              .modality ??
+          return _sessionShell(
+            isLoading: appBarLoading,
+            body: widget.embedded
+                ? AppPullRefresh(
+                    enabled: !appBarLoading,
+                    onRefresh: () async {
+                      final bloc = context.read<TherapySessionBloc>();
+                      final done = bloc.stream.firstWhere(
+                        (s) =>
+                            s is SessionFromHomeLoaded ||
+                            s is SessionMessageState,
+                      );
+                      bloc.add(TherapySessionEvent(refresh: true));
+                      await done;
+                    },
+                    child: filteredVisits.isNotEmpty
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
+                            children: [
+                              SizedBox(height: 16.h),
+                              ...filteredVisits.expand((items) {
+                                final summary = items.summary!.visitSummary;
+                                final sessions = items.sessions;
+                                final allVisitsIds = allTherapistModel!
+                                    .visitWiseSessions!
+                                    .expand(
+                                      (e) => e.sessions!.map(
+                                        (_) => e.summary!.visitSummary!.visitID,
+                                      ),
+                                    )
+                                    .toList();
+                                bool isDup =
+                                    allVisitsIds
+                                        .where((id) => id == summary!.visitID)
+                                        .toList()
+                                        .length >
+                                    1;
+                                return sessions!.map((session) {
+                                  return SessionReportSessionCard(
+                                    terapistName: session.therapist ?? '',
+                                    patientName:
+                                        currentPatientData!.patient?.name ?? '',
+                                    cnic: currentPatientData!.patient?.cnic ?? '',
+                                    ageGender:
+                                        currentPatientData!.patient?.gender ?? '',
+                                    startedAt: '10:30',
+                                    endedAt: '10:40',
+                                    packageUsed: session.packageUsed ?? '',
+                                    sessionDuration:
+                                        session.sessionDurationTotal ?? '',
+                                    sessionNumber: session.sessionID.toString(),
+                                    visitDate: DateAndTimeFormater.dateFormat(
+                                      summary?.visitDate,
+                                    ),
+                                    modalities: List.generate(
+                                      (session.modalitiesPerformed?.length ?? 0),
+                                      (index2) {
+                                        return ModalityEntity(
+                                          title:
+                                              session
+                                                  .modalitiesPerformed![index2]
+                                                  .modality ??
+                                              '',
+                                          duration:
+                                              session
+                                                  .modalitiesPerformed![index2]
+                                                  .duration ??
+                                              '',
+                                        );
+                                      },
+                                    ),
+                                  );
+                                });
+                              }).toList(),
+                            ],
+                          )
+                        : _therapyEmpty(),
+                  )
+                : SafeArea(
+                    child: AppPullRefresh(
+                      enabled: !appBarLoading,
+                      onRefresh: () async {
+                        final bloc = context.read<TherapySessionBloc>();
+                        final done = bloc.stream.firstWhere(
+                          (s) =>
+                              s is SessionFromHomeLoaded ||
+                              s is SessionMessageState,
+                        );
+                        bloc.add(TherapySessionEvent(refresh: true));
+                        await done;
+                      },
+                      child: filteredVisits.isNotEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding:
+                                  EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
+                              children: [
+                                SizedBox(height: 16.h),
+                                ...filteredVisits.expand((items) {
+                                  final summary = items.summary!.visitSummary;
+                                  final sessions = items.sessions;
+                                  final allVisitsIds = allTherapistModel!
+                                      .visitWiseSessions!
+                                      .expand(
+                                        (e) => e.sessions!.map(
+                                          (_) =>
+                                              e.summary!.visitSummary!.visitID,
+                                        ),
+                                      )
+                                      .toList();
+                                  bool isDup =
+                                      allVisitsIds
+                                          .where((id) => id == summary!.visitID)
+                                          .toList()
+                                          .length >
+                                      1;
+                                  return sessions!.map((session) {
+                                    return SessionReportSessionCard(
+                                      terapistName: session.therapist ?? '',
+                                      patientName:
+                                          currentPatientData!.patient?.name ??
                                           '',
-                                      duration:
-                                          session
-                                              .modalitiesPerformed![index2]
-                                              .duration ??
+                                      cnic:
+                                          currentPatientData!.patient?.cnic ??
                                           '',
+                                      ageGender:
+                                          currentPatientData!.patient?.gender ??
+                                          '',
+                                      startedAt: '10:30',
+                                      endedAt: '10:40',
+                                      packageUsed: session.packageUsed ?? '',
+                                      sessionDuration:
+                                          session.sessionDurationTotal ?? '',
+                                      sessionNumber:
+                                          session.sessionID.toString(),
+                                      visitDate:
+                                          DateAndTimeFormater.dateFormat(
+                                        summary?.visitDate,
+                                      ),
+                                      modalities: List.generate(
+                                        (session.modalitiesPerformed?.length ??
+                                            0),
+                                        (index2) {
+                                          return ModalityEntity(
+                                            title:
+                                                session
+                                                    .modalitiesPerformed![index2]
+                                                    .modality ??
+                                                '',
+                                            duration:
+                                                session
+                                                    .modalitiesPerformed![index2]
+                                                    .duration ??
+                                                '',
+                                          );
+                                        },
+                                      ),
                                     );
-                                  },
-                                ),
-                              );
-                            });
-                          }).toList(),
-                        ],
-                      )
-                    : Center(
-                        child: CustomText(
-                          text: 'No sessions found',
-                          color: AppColors.primaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-              ),
-            ),
-          );
-        }
-        if (state is SessionLoadingState) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else {
-          return Scaffold(
-            body: SizedBox(
-              width: MediaQuery.sizeOf(context).width,
-              child: Column(
-                spacing: 10.h,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomText(
-                    text: message == 'No internet connection!'
-                        ? message!
-                        : 'No sessions found',
-                    color: AppColors.primaryColor,
-                    fontSize: 16,
-                  ),
-                  InkWell(
-                    onTap: () => context.read<TherapySessionBloc>().add(
-                      TherapySessionEvent(id: widget.visitId),
+                                  });
+                                }).toList(),
+                              ],
+                            )
+                          : _therapyEmpty(),
                     ),
-                    child: Icon(Icons.refresh),
                   ),
-                ],
-              ),
-            ),
           );
         }
+
+        if (firstLoad || state is SessionLoadingState) {
+          return _sessionShell(
+            isLoading: true,
+            body: const AppListShimmer(),
+          );
+        }
+
+        return _sessionShell(
+          body: _therapyEmpty(message: message),
+        );
       },
     );
+  }
+
+  Widget _therapyEmpty({String? message}) {
+    return AppEmptyRefreshView(
+      child: AppEmptyState.therapySession(
+        message: message,
+        onRetry: () => context.read<TherapySessionBloc>().add(
+          TherapySessionEvent(id: widget.visitId, refresh: true),
+        ),
+      ),
+    );
+  }
+
+  Widget _sessionShell({required Widget body, bool isLoading = false}) {
+    if (widget.embedded) {
+      return ColoredBox(color: AppColors.bgColor, child: body);
+    }
+    return Scaffold(
+      appBar: AppAppBar(
+        title: 'Sessions',
+        showBack: true,
+        isLoading: isLoading,
+      ),
+      backgroundColor: AppColors.bgColor,
+      body: body,
+    );
+  }
+
+  void _syncAppBarLoading() {
+    if (!widget.embedded || !mounted) return;
+    final loading = isLoading || isRefreshing;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppBarLoadingNotification(loading).dispatch(context);
+    });
   }
 }
 

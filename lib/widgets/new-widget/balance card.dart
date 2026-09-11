@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 
 class BalanceCard extends StatefulWidget {
   final String currentBalance;
@@ -43,9 +45,7 @@ class _BalanceCardState extends State<BalanceCard> {
 
   late bool _hidden;
 
-  @override
-  void initState() {
-    super.initState();
+  void _updatePercent() {
     final total = double.parse(widget.total);
     final paid = double.parse(widget.paid);
     final discount = double.parse(widget.discount);
@@ -53,75 +53,114 @@ class _BalanceCardState extends State<BalanceCard> {
     final totalInsuranceAndDiscount = insurance + discount;
     final totalWithDiscount = paid + totalInsuranceAndDiscount;
     percent = getTotalPaymentProgress(total: total, paid: totalWithDiscount);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updatePercent();
     _hidden = widget.initiallyHidden;
   }
 
   @override
+  void didUpdateWidget(covariant BalanceCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.total != widget.total ||
+        oldWidget.paid != widget.paid ||
+        oldWidget.discount != widget.discount ||
+        oldWidget.insurance != widget.insurance) {
+      _updatePercent();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      color: AppColors.secondaryColor,
-      child: SizedBox(
-        width: double.infinity,
-        //clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: EdgeInsets.all(10.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: AppColors.bgColor,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        side: BorderSide(color: AppColors.borderColor),
+      ),
+      child: Padding(
+        padding: AppSizes.cardInsets,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSizes.gapMd,
+                vertical: AppSizes.spaceLg,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(child: _buildBalance()),
-                  SizedBox(width: 8.w),
-                  _buildProgress(percent.toDouble()),
+                  SizedBox(width: AppSizes.gapMd),
+                  _buildProgress(percent),
                 ],
               ),
-              SizedBox(height: 14.h),
-              Divider(height: 1.h, color: AppColors.borderColor),
-              SizedBox(height: 14.h),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _cell('Total', widget.total),
-                        SizedBox(height: 12.h),
-                        _cell(
-                          'Discount',
-                          widget.discount,
-                          valueColor: AppColors.blueGrayTextColor,
-                        ),
-                      ],
-                    ),
+            ),
+            SizedBox(height: AppSizes.spaceXl),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _cell(
+                    'TOTAL',
+                    widget.total,
+                    accent: AppColors.primaryColor,
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _cell(
-                          'Paid',
-                          widget.paid,
-                          valueColor: AppColors.primaryColor,
-                        ),
-                        SizedBox(height: 12.h),
-                        _cell('Insurance', widget.insurance),
-                      ],
-                    ),
+                ),
+                SizedBox(width: AppSizes.gapSm),
+                Expanded(
+                  child: _cell(
+                    'PAID',
+                    widget.paid,
+                    accent: AppColors.success,
+                    valueColor: AppColors.success,
                   ),
-                  Expanded(
-                    child: _cell(
-                      'Remaining',
-                      widget.remaining,
-                      valueColor: AppColors.dueRedColor,
-                    ),
+                ),
+                SizedBox(width: AppSizes.gapSm),
+                Expanded(
+                  child: _cell(
+                    'REMAINING',
+                    widget.remaining,
+                    accent: AppColors.dueRedColor,
+                    valueColor: AppColors.dueRedColor,
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+            SizedBox(height: AppSizes.spaceMd),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _cell(
+                    'DISCOUNT',
+                    widget.discount,
+                    accent: AppColors.blueGrayTextColor,
+                    valueColor: AppColors.blueGrayTextColor,
+                  ),
+                ),
+                SizedBox(width: AppSizes.gapSm),
+                Expanded(
+                  child: _cell(
+                    'INSURANCE',
+                    widget.insurance,
+                    accent: AppColors.info,
+                    valueColor: AppColors.info,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -131,36 +170,70 @@ class _BalanceCardState extends State<BalanceCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'CURRENT BALANCE',
-          style: TextStyle(
-            fontSize: 11.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.labelTextColor,
-            letterSpacing: 0.5,
-          ),
-        ),
-        SizedBox(height: 6.h),
         Row(
           children: [
-            Text(
-              _hidden ? '******' : widget.currentBalance,
-              style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w800,
-                color: AppColors.firstTextBlackColor,
-                letterSpacing: _hidden ? 2 : 0,
+            Icon(
+              Icons.account_balance_wallet_outlined,
+              size: AppSizes.iconSm,
+              color: AppColors.primaryColor,
+            ),
+            SizedBox(width: AppSizes.gapSm),
+            Flexible(
+              child: CustomText(
+                text: 'CURRENT BALANCE',
+                style: AppTextStyles.label.copyWith(
+                  letterSpacing: 0.4,
+                  color: AppColors.labelTextColor,
+                ),
               ),
             ),
-            SizedBox(width: 8.w),
+          ],
+        ),
+        SizedBox(height: AppSizes.spaceMd),
+        Row(
+          children: [
+            if (_hidden)
+              Row(
+                children: List.generate(6, (index) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      right: index == 5 ? 0 : AppSizes.spaceXs,
+                    ),
+                    child: Container(
+                      width: AppSizes.spaceSm,
+                      height: AppSizes.spaceSm,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  );
+                }),
+              )
+            else
+              Flexible(
+                child: CustomText(
+                  text: widget.currentBalance,
+                  style: AppTextStyles.heading2,
+                  maxLines: 1,
+                ),
+              ),
+            SizedBox(width: AppSizes.gapSm),
             GestureDetector(
               onTap: () => setState(() => _hidden = !_hidden),
-              child: Icon(
-                _hidden
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                size: 20.sp,
-                color: AppColors.primaryColor,
+              child: Container(
+                padding: EdgeInsets.all(AppSizes.spaceXs),
+                decoration: BoxDecoration(
+                  color: AppColors.bgColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _hidden
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: AppSizes.iconSm,
+                  color: AppColors.primaryColor,
+                ),
               ),
             ),
           ],
@@ -170,67 +243,95 @@ class _BalanceCardState extends State<BalanceCard> {
   }
 
   Widget _buildProgress(double percent) {
+    final ringSize = AppSizes.buttonHeight + AppSizes.spaceSm;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 56.w,
-          height: 56.w,
-          padding: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(
-            color: AppColors.softGrayColor,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: AppColors.borderColor),
-          ),
+        SizedBox(
+          width: ringSize,
+          height: ringSize,
           child: CustomPaint(
             painter: _ProgressRingPainter(percent: percent / 100),
             child: Center(
-              child: Text(
-                '${percent.round()}%',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.firstTextBlackColor,
+              child: CustomText(
+                text: '${percent.round()}%',
+                style: AppTextStyles.chipPrimary.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryColor,
                 ),
               ),
             ),
           ),
         ),
-        SizedBox(width: 8.w),
-        Text(
-          'Progress',
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w700,
-            color: AppColors.firstTextBlackColor,
-          ),
+        SizedBox(width: AppSizes.gapMd),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              text: 'Progress',
+              style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+            ),
+            CustomText(
+              text: 'Active Cycle',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.labelTextColor,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _cell(String label, String value, {Color? valueColor}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-            color: AppColors.primaryColor,
+  Widget _cell(
+    String label,
+    String value, {
+    required Color accent,
+    Color? valueColor,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.gapSm,
+        vertical: AppSizes.spaceSm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.softGrayColor,
+        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: AppSizes.spaceXs,
+                height: AppSizes.spaceXs,
+                decoration: BoxDecoration(
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: AppSizes.gapSm),
+              Flexible(
+                child: CustomText(
+                  text: label,
+                  style: AppTextStyles.label,
+                  maxLines: 1,
+                ),
+              ),
+            ],
           ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w800,
-            color: valueColor ?? AppColors.firstTextBlackColor,
+          SizedBox(height: AppSizes.spaceXs),
+          CustomText(
+            text: value,
+            style: AppTextStyles.name.copyWith(
+              color: valueColor ?? AppColors.firstTextBlackColor,
+            ),
+            maxLines: 1,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -243,9 +344,15 @@ class _ProgressRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    const stroke = 4.5;
+    final stroke = AppSizes.spaceXs;
     final radius = (math.min(size.width, size.height) - stroke) / 2;
     final rect = Rect.fromCircle(center: center, radius: radius);
+
+    canvas.drawCircle(
+      center,
+      radius - stroke / 2,
+      Paint()..color = AppColors.bgColor,
+    );
 
     final bg = Paint()
       ..color = AppColors.borderColor

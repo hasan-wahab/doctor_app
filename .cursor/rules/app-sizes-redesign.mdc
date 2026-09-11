@@ -1,0 +1,40 @@
+---
+description: Use AppSizes tokens on every redesigned screen (Ali Therapy Admin scale)
+alwaysApply: true
+---
+
+# Redesign spacing + type — AppSizes and AppTextStyles only
+
+When redesigning any screen in doctor_app, use `lib/core/app_styles/app_sizes.dart` and `lib/core/app_styles/app_text_styles.dart` (copied from Ali Therapy Admin). Do not invent new padding, margin, gap, radius, icon, or font sizes. Do not retrofit screens that have not been redesigned unless asked.
+
+## Type (Admin scale)
+
+- heading1 28 / heading2 22 / heading3 18
+- bodyLarge 16 / body 14 / bodySmall 12
+- label 12 w500 / button 16 w600 / appBarTitle 18 w700 / name 16 w700
+- chips 12
+- Use `style: AppTextStyles.body` on `CustomText` (styles already include `.sp`). Never pass `AppTextStyles.*.fontSize` into `CustomText.fontSize` (that double-scales).
+
+## Tokens
+
+- Page (home, lists): `AppSizes.pageInsets` (16 / 12 / 24)
+- Auth: `AppSizes.authInsets` (24)
+- Cards: `AppSizes.cardInsets`, `AppSizes.radiusMd` (18)
+- Fields / primary buttons: `AppSizes.radiusSm` (12), field padding 14, button height `AppSizes.buttonHeight` (50)
+- Section title → content: `AppSizes.spaceMd` (10); between sections: `AppSizes.spaceXxl` (22)
+- Horizontal gaps: `gapSm` 8 / `gapMd` 12 / `gapLg` 16
+- Icons: `iconSm` 20 / `iconMd` 22 / `iconLg` 24 / `iconXl` 30
+- Tablet: same tokens; constrain with `AppSizes.contentMaxWidth` (720 / 1000). No extra raw tablet padding (no 32/40).
+- ScreenUtil base: phone `390×844`; tablet portrait `834×1194`; tablet landscape `1194×834` (`AppSizes.screenUtilDesignSize`).
+
+```dart
+// BAD
+padding: EdgeInsets.symmetric(horizontal: 20.w);
+SizedBox(height: isTablet ? 28 : 16.h);
+
+// GOOD
+padding: AppSizes.pageInsets;
+SizedBox(height: AppSizes.spaceXxl);
+```
+
+Keep existing logic (bloc, validation, navigation). UI-only unless asked otherwise.

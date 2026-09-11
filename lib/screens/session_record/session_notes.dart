@@ -1,246 +1,221 @@
-import 'package:doctor_app/screens/auth_screen/login_screen/auth_model/login_model_1.dart';
-import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
-import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
+import 'package:doctor_app/screens/assessments/assessment_detail_screen.dart';
+import 'package:doctor_app/screens/history_tracker_screen/history_tracker_screen.dart';
+import 'package:doctor_app/screens/seesion/sessiom_detail_screen.dart';
+import 'package:doctor_app/widgets/app_app_bar.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
-import '../../data/models/current_patient_model.dart';
-import '../../widgets/show_msg.dart';
-import '../history_tracker_screen/bloc/history_tracker_bloc.dart';
-import '../history_tracker_screen/bloc/history_tracker_event.dart';
-import '../profile_screens/bloc/profile_state.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
+import '../../widgets/app_empty_state.dart';
+import '../../widgets/app_pull_refresh.dart';
 
 class SessionNotes extends StatefulWidget {
   final String visitId;
-  bool isConsultation;
-  SessionNotes({super.key, this.visitId = '', this.isConsultation = false});
+  final bool isConsultation;
+
+  const SessionNotes({
+    super.key,
+    this.visitId = '',
+    this.isConsultation = false,
+  });
 
   @override
   State<SessionNotes> createState() => _SessionNotesState();
 }
 
 class _SessionNotesState extends State<SessionNotes> {
-  bool isLoading = false;
-  CurrentPatientModel? currentPatientData;
-  LoginModel1? profileData;
-  bool isVisitDetail = false;
-  String? visitID;
-  List<VisitModel> visits = [];
+  static const _tabs = ['History Tracker', 'Consultant', 'Therapy Session'];
+  static const _tabIcons = [
+    Icons.assignment_outlined,
+    Icons.medical_information_outlined,
+    Icons.spa_outlined,
+  ];
+
+  late int _tabIndex;
+  bool _barLoading = false;
 
   @override
   void initState() {
-    visitID = widget.visitId;
-    print(visitID);
-    context.read<ProfileBloc>().add(MyProfileEvent());
     super.initState();
+    _tabIndex = widget.isConsultation ? 0 : 2;
+  }
+
+  void _setBarLoading(bool value) {
+    if (!mounted || _barLoading == value) return;
+    setState(() => _barLoading = value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileLoadingState) {
-          isLoading = true;
-        } else {
-          isLoading = false;
-        }
-        if (state is ProfileMessageState) {
-          AppMsg.showErrorMsg(context, msg: state.message.toString());
-        }
-        if (state is MyProfileState) {
-          currentPatientData = state.currentPatientModel;
-          profileData = state.profileData;
-        }
+    return NotificationListener<AppBarLoadingNotification>(
+      onNotification: (notification) {
+        _setBarLoading(notification.isLoading);
+        return true;
       },
-      builder: (context, state) {
-        if (isLoading != true) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.bgColor,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios_new),
+      child: Scaffold(
+      backgroundColor: AppColors.screenBgColor,
+      appBar: AppAppBar(
+        title: 'Visit detail',
+        showBack: true,
+        isLoading: _barLoading,
+      ),
+      body: Column(
+        children: [
+          _VisitDetailTabs(
+            labels: _tabs,
+            icons: _tabIcons,
+            selectedIndex: _tabIndex,
+            onSelect: (index) {
+              setState(() {
+                _tabIndex = index;
+                _barLoading = false;
+              });
+            },
+          ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: KeyedSubtree(
+                key: ValueKey(_tabIndex),
+                child: _tabBody(),
               ),
-              centerTitle: true,
-              title: Text('Visit detail'),
-              automaticallyImplyLeading: false,
             ),
-            backgroundColor: AppColors.bgColor,
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: currentPatientData != null
-                  ? currentPatientData!.patient!.visits.isEmpty
-                        ? Center(child: Text('No data'))
-                        : Column(
-                            spacing: 20.h,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              widget.isConsultation != true
-                                  ? Container()
-                                  : InkWell(
-                                      onTap: () {
-                                        context.push(
-                                          AppRoutes.historyTrackerScreen,
-                                          extra: visitID,
-                                        );
-                                      },
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        height: 55.h,
-                                        child: Card(
-                                          margin: EdgeInsets.zero,
-                                          color: AppColors.secondaryColor,
-                                          child: Padding(
-                                            padding: EdgeInsets.all(10.r),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                CustomText(
-                                                  text: 'History Tracker',
-                                                  color: AppColors.primaryColor,
-                                                ),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_forward_ios_outlined,
-                                                  size: 14.r,
-                                                  color: AppColors.primaryColor,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              // widget.isConsultation != true
-                              //     ? Container()
-                              //     : InkWell(
-                              //         onTap: () {
-                              //           Navigator.pushNamed(
-                              //             context,
-                              //             AppRoutes.assistantManagerScreen,
-                              //           );
-                              //         },
-                              //         child: SizedBox(
-                              //           width: double.infinity,
-                              //           height: 55.h,
-                              //           child: Card(
-                              //             margin: EdgeInsets.zero,
-                              //             color: AppColors.secondaryColor,
-                              //             child: Padding(
-                              //               padding: EdgeInsets.all(10.r),
-                              //               child: Row(
-                              //                 mainAxisAlignment:
-                              //                     MainAxisAlignment
-                              //                         .spaceBetween,
-                              //                 children: [
-                              //                   CustomText(
-                              //                     text:
-                              //                         'Assistant Manager Assessment',
-                              //                     color: AppColors.primaryColor,
-                              //                   ),
-                              //                   Icon(
-                              //                     Icons
-                              //                         .arrow_forward_ios_outlined,
-                              //                     size: 14.r,
-                              //                     color: AppColors.primaryColor,
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //         ),
-                              //       ),
-                              widget.isConsultation != true
-                                  ? Container()
-                                  : InkWell(
-                                      onTap: () {
-                                        context.push(
-                                          AppRoutes.assessmentScreen,
-                                          extra: visitID,
-                                        );
-                                      },
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        height: 55.h,
-                                        child: Card(
-                                          margin: EdgeInsets.zero,
-                                          color: AppColors.secondaryColor,
-                                          child: Padding(
-                                            padding: EdgeInsets.all(10.r),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                CustomText(
-                                                  text: 'Consultant Assessment',
-                                                  color: AppColors.primaryColor,
-                                                ),
-                                                Icon(
-                                                  Icons
-                                                      .arrow_forward_ios_outlined,
-                                                  size: 14.r,
-                                                  color: AppColors.primaryColor,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+          ),
+        ],
+      ),
+      ),
+    );
+  }
 
-                              InkWell(
-                                onTap: () {
-                                  context.push(
-                                    AppRoutes.sessionsDetailScreen,
-                                    extra: visitID ?? '',
-                                  );
-                                },
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  height: 55.h,
-                                  child: Card(
-                                    margin: EdgeInsets.zero,
-                                    color: AppColors.secondaryColor,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(10.r),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomText(
-                                            text: 'Therapy Session',
-                                            color: AppColors.primaryColor,
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 14.r,
-                                            color: AppColors.primaryColor,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+  Widget _tabBody() {
+    if (!widget.isConsultation && _tabIndex != 2) {
+      return _tabIndex == 0
+          ? AppEmptyState.historyTracker()
+          : AppEmptyState.consultant();
+    }
+
+    switch (_tabIndex) {
+      case 0:
+        return HistoryTrackerScreen(
+          key: ValueKey('history-${widget.visitId}'),
+          visitId: widget.visitId,
+          embedded: true,
+        );
+      case 1:
+        return AssessmentDetailScreen(
+          key: ValueKey('consultant-${widget.visitId}'),
+          visitId: widget.visitId,
+          embedded: true,
+        );
+      default:
+        return SessionDetailScreen(
+          key: ValueKey('therapy-${widget.visitId}'),
+          visitId: widget.visitId,
+          embedded: true,
+        );
+    }
+  }
+}
+
+class _VisitDetailTabs extends StatelessWidget {
+  const _VisitDetailTabs({
+    required this.labels,
+    required this.icons,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  final List<String> labels;
+  final List<IconData> icons;
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.bgColor,
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderColor),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSizes.pagePaddingH,
+          AppSizes.spaceMd,
+          AppSizes.pagePaddingH,
+          AppSizes.spaceMd,
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.secondaryColor,
+            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(AppSizes.spaceXs),
+            child: Row(
+              spacing: AppSizes.gapSm,
+              children: List.generate(labels.length, (index) {
+                final selected = index == selectedIndex;
+                final radius = BorderRadius.circular(AppSizes.radiusSm);
+                return Expanded(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? AppColors.primaryColor
+                          : Colors.transparent,
+                      borderRadius: radius,
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => onSelect(index),
+                        borderRadius: radius,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppSizes.spaceSm,
+                            horizontal: AppSizes.gapSm,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                icons[index],
+                                size: AppSizes.iconSm,
+                                color: selected
+                                    ? AppColors.textWhiteColor
+                                    : AppColors.mutedTextColor,
+                              ),
+                              SizedBox(height: AppSizes.spaceXs),
+                              CustomText(
+                                text: labels[index],
+                                align: TextAlign.center,
+                                maxLines: 2,
+                                style: AppTextStyles.chipMuted.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: selected
+                                      ? AppColors.textWhiteColor
+                                      : AppColors.mutedTextColor,
                                 ),
                               ),
                             ],
-                          )
-                  : Center(child: CircularProgressIndicator()),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+          ),
+        ),
+      ),
     );
   }
 }

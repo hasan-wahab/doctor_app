@@ -1,29 +1,24 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_bloc.dart';
 import 'package:doctor_app/screens/profile_screens/bloc/profile_event.dart';
-import 'package:doctor_app/screens/profile_screens/widgets/profile_appbar.dart';
+import 'package:doctor_app/screens/profile_screens/bloc/profile_state.dart';
+import 'package:doctor_app/screens/profile_screens/widgets/profile_ui.dart';
+import 'package:doctor_app/widgets/app_app_bar.dart';
+import 'package:doctor_app/widgets/app_empty_state.dart';
+import 'package:doctor_app/widgets/app_pull_refresh.dart';
+import 'package:doctor_app/widgets/app_shimmer.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/date_time_foemat.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/app_routes/routes_name.dart';
 import '../../core/app_styles/app_colors.dart';
-import '../../core/extentions/internect_connectivity.dart';
-import '../../core/functions.dart';
-import '../../data/api_service/api_service.dart';
-import '../../data/local_storage/local_storage.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 import '../../data/models/current_patient_model.dart';
-
-import '../../widgets/show_msg.dart';
 import '../auth_screen/login_screen/auth_model/login_model_1.dart';
-import 'bloc/profile_state.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -33,32 +28,28 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  String? userToken;
-  late Timer _timer;
   LoginModel1? profileData;
   CurrentPatientModel? currentPatientData;
-  bool hasInternet = false;
-  var err;
+  bool isLoading = false;
+  bool isRefreshing = false;
 
   @override
   void initState() {
-    context.read<ProfileBloc>().add(MyProfileEvent());
-    internetController();
     super.initState();
+    context.read<ProfileBloc>().add(MyProfileEvent());
   }
 
-  void internetController() {
-    _timer = Timer.periodic(Duration(milliseconds: 200), (Timer t) async {
-      hasInternet = await InternetUtils.isInternetAvailable();
-      if (!mounted) return; // ✅ IMPORTANT
-      setState(() {});
-    });
+  Future<void> _onRefresh() async {
+    final bloc = context.read<ProfileBloc>();
+    final done = bloc.stream.firstWhere(
+      (s) => s is MyProfileState || s is ProfileMessageState,
+    );
+    bloc.add(MyProfileEvent());
+    await done;
   }
 
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
+  void _openUpdate() {
+    context.push(AppRoutes.updateProfile);
   }
 
   @override
@@ -66,390 +57,130 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
         if (state is ProfileLoadingState) {
-          // isLoading = true;
+          if (profileData == null) {
+            isLoading = true;
+          } else {
+            isRefreshing = true;
+          }
         } else if (state is MyProfileState) {
-          // isLoading = false;
+          isLoading = false;
+          isRefreshing = false;
           profileData = state.profileData;
           currentPatientData = state.currentPatientModel;
         } else if (state is ProfileMessageState) {
+          isLoading = false;
+          isRefreshing = false;
           AppMsg.showSnackBar(context, message: state.message!);
         }
       },
       builder: (context, state) {
+        final firstLoad = isLoading && currentPatientData == null;
+        final appBarLoading = isLoading || isRefreshing;
+        final patient = currentPatientData?.patient;
+
         return Scaffold(
-          backgroundColor: AppColors.bgColor,
-          appBar: ProfileAppbar(title: 'Profile', isLeading: true),
-          body: currentPatientData != null
-              ? profileData != null
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.0.w,
-                          vertical: 20.h,
-                        ),
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                SizedBox(
-                                  height: 110.h,
-                                  width: 110.h,
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        height: 110.h,
-                                        width: 110.h,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: AppColors.primaryColor,
-                                            width: 2.h,
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: currentPatientData != null
-                                            ? hasInternet
-                                                  ? ClipOval(
-                                                      child: Image.network(
-                                                        fit: BoxFit.cover,
-                                                        currentPatientData!
-                                                            .patient!
-                                                            .displayImageUrl,
-
-                                                        headers: {
-                                                          "Authorization":
-                                                              "Bearer ${profileData!.accessToken.toString()}",
-                                                        },
-                                                        errorBuilder:
-                                                            (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              err = error;
-                                                              return Container();
-                                                            },
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      height: 50.h,
-                                                      width: 50.w,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        ),
-                                                      ),
-                                                      child: CustomText(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 20.sp,
-                                                        text:
-                                                            getFirstTwoInitials(
-                                                              currentPatientData!
-                                                                  .patient!
-                                                                  .displayName
-                                                                  .toString(),
-                                                            ),
-                                                      ),
-                                                    )
-                                            : Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: InkWell(
-                                          onTap: () {
-                                            context.push(
-                                              AppRoutes.updateProfile,
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 32.h,
-                                            width: 32.w,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.primaryColor,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: AppColors.whiteIconColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                CustomText(
-                                  text: currentPatientData!.patient!.name
-                                      .toString(),
-                                  fontSize: 20,
-                                ),
-                                CustomText(
-                                  text:
-                                      'Patient ID : ${currentPatientData!.patient!.displayId}',
-                                  color: AppColors.secondaryTextColor,
-                                ),
-                              ],
+          backgroundColor: AppColors.screenBgColor,
+          appBar: AppAppBar(
+            title: 'My Profile',
+            showBack: true,
+            isLoading: appBarLoading,
+            actions: patient == null
+                ? null
+                : [
+                    IconButton(
+                      onPressed: _openUpdate,
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        size: AppSizes.iconMd,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ],
+          ),
+          body: firstLoad
+              ? const AppListShimmer()
+              : patient == null || profileData == null
+              ? AppEmptyRefreshView(
+                  child: AppEmptyState(
+                    title: 'Profile unavailable',
+                    subtitle: 'Pull to refresh or try again.',
+                    onRetry: () =>
+                        context.read<ProfileBloc>().add(MyProfileEvent()),
+                  ),
+                )
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: AppSizes.contentMaxWidth(context),
+                    ),
+                    child: AppPullRefresh(
+                      enabled: !appBarLoading,
+                      onRefresh: _onRefresh,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: AppSizes.pageInsets,
+                        children: [
+                          ProfileHeaderCard(
+                            name: patient.displayName,
+                            patientId: patient.displayId,
+                            imageUrl: patient.displayImageUrl,
+                            token: profileData!.accessToken,
+                            badge: ProfileAvatarBadge(
+                              icon: Icons.edit_outlined,
+                              onTap: _openUpdate,
                             ),
-                            SizedBox(height: 40),
-
-                            Column(
-                              spacing: 20.h,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        Icon(
-                                          Icons.person_2_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: 30,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'Name',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text: currentPatientData!
-                                                  .patient!
-                                                  .name
-                                                  .toString(),
-                                              fontSize: 15,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                          ),
+                          SizedBox(height: AppSizes.spaceXxl),
+                          CustomText(
+                            text: 'Personal details',
+                            style: AppTextStyles.name,
+                          ),
+                          SizedBox(height: AppSizes.spaceMd),
+                          ProfileGroupCard(
+                            children: [
+                              ProfileInfoTile(
+                                icon: Icons.person_outline_rounded,
+                                label: 'Name',
+                                value: patient.displayName,
+                              ),
+                              ProfileInfoTile(
+                                icon: Icons.phone_outlined,
+                                label: 'Phone',
+                                value: patient.displayPhone,
+                              ),
+                              ProfileInfoTile(
+                                icon: patient.gender?.toLowerCase() == 'female'
+                                    ? Icons.female_rounded
+                                    : Icons.male_rounded,
+                                label: 'Gender',
+                                value: patient.gender?.toString() ?? '',
+                              ),
+                              ProfileInfoTile(
+                                icon: Icons.calendar_month_outlined,
+                                label: 'Date of birth',
+                                value: DateAndTimeFormater.dateFormat(
+                                  patient.displayBirthDate,
                                 ),
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        Icon(
-                                          Icons.phone_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: 30,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'Phone',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text: currentPatientData!
-                                                  .patient!
-                                                  .phone
-                                                  .toString(),
-                                              fontSize: 15,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        currentPatientData!.patient!.gender
-                                                    .toString() ==
-                                                'Male'
-                                            ? Icon(
-                                                Icons.male,
-                                                color: AppColors.primaryColor,
-                                                size: 30,
-                                              )
-                                            : Icon(
-                                                Icons.female,
-                                                color: AppColors.primaryColor,
-                                                size: 30,
-                                              ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'Gender',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text: currentPatientData!
-                                                  .patient!
-                                                  .gender
-                                                  .toString(),
-                                              fontSize: 15,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        Icon(
-                                          Icons.calendar_month,
-                                          color: AppColors.primaryColor,
-                                          size: 30,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'DOB',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text:
-                                                  DateAndTimeFormater.dateFormat(
-                                                    currentPatientData!
-                                                        .patient!
-                                                        .displayBirthDate
-                                                        .toString(),
-                                                  ),
-
-                                              fontSize: 15,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        Icon(
-                                          Icons.cake_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: 30,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'Age',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text:
-                                                  DateAndTimeFormater.calculateAge(
-                                                    currentPatientData!
-                                                        .patient!
-                                                        .birthDate
-                                                        .toString(),
-                                                  ).toString(),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Card(
-                                  color: AppColors.secondaryColor,
-                                  margin: EdgeInsets.zero,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Row(
-                                      spacing: 20.w,
-                                      children: [
-                                        Icon(
-                                          Icons.email_outlined,
-                                          color: AppColors.primaryColor,
-                                          size: 30,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            CustomText(
-                                              text: 'Email',
-                                              fontSize: 12,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                            CustomText(
-                                              text: currentPatientData!
-                                                  .patient!
-                                                  .email
-                                                  .toString(),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    : Center(child: CircularProgressIndicator())
-              : Center(child: CircularProgressIndicator()),
+                              ),
+                              ProfileInfoTile(
+                                icon: Icons.cake_outlined,
+                                label: 'Age',
+                                value: DateAndTimeFormater.calculateAge(
+                                  patient.birthDate,
+                                ).toString(),
+                              ),
+                              ProfileInfoTile(
+                                icon: Icons.email_outlined,
+                                label: 'Email',
+                                value: patient.displayEmail,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
         );
       },
     );

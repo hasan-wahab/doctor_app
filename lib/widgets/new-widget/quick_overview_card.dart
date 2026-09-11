@@ -1,7 +1,9 @@
+import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 
 class QuickOverview extends StatelessWidget {
   final VoidCallback onVisitsTap;
@@ -43,22 +45,22 @@ class QuickOverview extends StatelessWidget {
                   onTap: onVisitsTap,
                   label: 'Visits',
                   value: visits,
-                  icon: Icons.visibility_outlined,
+                  icon: Icons.calendar_month_outlined,
                 ),
               ),
-              SizedBox(width: 10.w),
+              SizedBox(width: AppSizes.gapMd),
               Expanded(
                 child: _OverviewTile(
                   onTap: onActivePackagesTap,
-                  label: 'Active packages',
+                  label: 'Active Packages',
                   value: activePackages,
-                  icon: Icons.credit_card_outlined,
+                  icon: Icons.inventory_2_outlined,
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: AppSizes.spaceMd),
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,27 +70,28 @@ class QuickOverview extends StatelessWidget {
                   onTap: onAssessmentsTap,
                   label: 'Assessments',
                   value: assessments,
-                  icon: Icons.warning_amber_rounded,
+                  icon: Icons.assignment_outlined,
                 ),
               ),
-              SizedBox(width: 10.w),
+              SizedBox(width: AppSizes.gapMd),
               Expanded(
                 child: _OverviewTile(
                   onTap: onInvoiceTap,
-                  label: 'Invoice',
+                  label: 'Invoices',
                   value: invoice,
-                  icon: Icons.visibility_outlined,
+                  icon: Icons.description_outlined,
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: AppSizes.spaceMd),
         _OverviewTile(
           onTap: onSessionsTap,
-          label: 'Sessions',
+          label: 'Scheduled Sessions',
           value: sessions,
-          icon: Icons.credit_card_outlined,
+          icon: Icons.event_available_outlined,
+          highlighted: true,
         ),
       ],
     );
@@ -100,53 +103,70 @@ class _OverviewTile extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
+  final bool highlighted;
 
   const _OverviewTile({
     required this.label,
     required this.value,
     required this.icon,
     required this.onTap,
+    this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        color: AppColors.secondaryColor,
-        margin: EdgeInsets.zero,
+    return Material(
+      color: highlighted ? AppColors.secondaryColor : AppColors.bgColor,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        side: BorderSide(
+          color: highlighted ? AppColors.secondaryColor : AppColors.borderColor,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.all(10.r),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSizes.gapMd,
+            vertical: AppSizes.spaceXl,
+          ),
           child: Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                    if (value.isNotEmpty) ...[
-                      SizedBox(height: 6.h),
-                      Text(
-                        value,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.firstTextBlackColor,
-                        ),
-                      ),
-                    ],
-                  ],
+              Container(
+                height: AppSizes.buttonHeightSm,
+                width: AppSizes.buttonHeightSm,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: highlighted
+                      ? AppColors.bgColor
+                      : AppColors.secondaryColor,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                ),
+                child: Icon(
+                  icon,
+                  size: AppSizes.iconMd,
+                  color: AppColors.primaryColor,
                 ),
               ),
-              Icon(icon, size: 22.sp, color: AppColors.blackIconColor),
+              SizedBox(width: AppSizes.gapMd),
+              Expanded(
+                child: CustomText(
+                  text: label,
+                  style: AppTextStyles.label.copyWith(
+                    color: AppColors.labelTextColor,
+                  ),
+                  maxLines: 2,
+                  textOverflow: TextOverflow.visible,
+                ),
+              ),
+              if (value.isNotEmpty) ...[
+                SizedBox(width: AppSizes.gapSm),
+                CustomText(
+                  text: value,
+                  style: AppTextStyles.name,
+                ),
+              ],
             ],
           ),
         ),

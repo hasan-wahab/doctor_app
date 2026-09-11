@@ -8,15 +8,19 @@ import 'package:doctor_app/screens/nave_bar/bloc/nave_bar_event.dart';
 import 'package:doctor_app/screens/nfc_card/nfc_card.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/session_record/session_record.dart';
+import 'package:doctor_app/widgets/app_shimmer.dart';
 import 'package:doctor_app/widgets/custom_text.dart';
 import 'package:doctor_app/widgets/show_msg.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 import '../../core/app_styles/app_colors.dart';
+import '../../core/app_styles/app_sizes.dart';
+import '../../core/app_styles/app_text_styles.dart';
 import '../../core/functions.dart';
-import '../../data/local_storage/local_storage.dart';
 import 'bloc/nave_bar_state.dart';
 
 class NaveBar extends StatefulWidget {
@@ -39,10 +43,10 @@ class _NaveBarState extends State<NaveBar> {
     if (showNfcCard) {
       iconText = ['Home', 'My card', 'Records', 'Account'];
       icons = [
-        Icons.home,
-        Icons.credit_card,
-        Icons.list_alt_rounded,
-        Icons.person_2_outlined,
+        Icons.home_rounded,
+        Icons.credit_card_outlined,
+        Icons.assignment_outlined,
+        Icons.person_outline_rounded,
       ];
       screenList = [
         HomeScreen(),
@@ -60,9 +64,9 @@ class _NaveBarState extends State<NaveBar> {
       // iPhone / iOS: never show the NFC card tab.
       iconText = ['Home', 'Records', 'Account'];
       icons = [
-        Icons.home,
-        Icons.list_alt_rounded,
-        Icons.person_2_outlined,
+        Icons.home_rounded,
+        Icons.assignment_outlined,
+        Icons.person_outline_rounded,
       ];
       screenList = [
         HomeScreen(),
@@ -77,13 +81,56 @@ class _NaveBarState extends State<NaveBar> {
     }
     accountTabIndex = iconText.length - 1;
     context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
+    _checkAndHandleUpdate();
+  }
+
+  Future<void> _checkAndHandleUpdate() async {
+    if (!Platform.isAndroid) return;
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+      final isUpdateAvailable =
+          info.updateAvailability == UpdateAvailability.updateAvailable;
+      if (isUpdateAvailable && info.immediateUpdateAllowed == true) {
+        final result = await InAppUpdate.performImmediateUpdate();
+        if (result != AppUpdateResult.success && mounted) {
+          setState(() {
+            _blockBecauseUpdate = true;
+            _updateMessage =
+                'Update required. Please update from Play Store to continue.';
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('In-app update check failed: $e');
+    }
   }
 
   bool isLoading = false;
   int currentIndex = 0;
   String? token = '';
+  bool _blockBecauseUpdate = false;
+  String _updateMessage = '';
   @override
   Widget build(BuildContext context) {
+    if (_blockBecauseUpdate) {
+      return Scaffold(
+        backgroundColor: AppColors.bgColor,
+        body: Center(
+          child: Padding(
+            padding: AppSizes.pageInsets,
+            child: CustomText(
+              text: _updateMessage,
+              align: TextAlign.center,
+              color: AppColors.firstTextBlackColor,
+            ),
+          ),
+        ),
+      );
+    }
+
     return BlocConsumer<NaveBarBloc, NaveBarState>(
       listener: (context, state) {
         if (state is NaveBarMessageState) {
@@ -101,34 +148,61 @@ class _NaveBarState extends State<NaveBar> {
         }
       },
       builder: (context, state) {
-        return isLoading == false
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) return;
+            if (currentIndex != 0) {
+              context.read<NaveBarBloc>().add(NaveBarIndexEvent(index: 0));
+            } else {
+              SystemNavigator.pop();
+            }
+          },
+          child: isLoading == false
             ? Scaffold(
                 body: token == ''
                     ? screenList.elementAt(currentIndex)
                     : screenList2.elementAt(currentIndex),
                 bottomNavigationBar: Container(
-                  padding: EdgeInsets.only(left: 25.w, right: 25.w, top: 10.h),
-                  height: 100.h,
-                  color: AppColors.secondaryColor,
-                  child: SingleChildScrollView(
-                    child: SafeArea(
+                  decoration: BoxDecoration(
+                    color: AppColors.bgColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.firstTextBlackColor.withValues(
+                          alpha: 0.06,
+                        ),
+                        blurRadius: 12,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSizes.pagePaddingH,
+                        AppSizes.spaceSm,
+                        AppSizes.pagePaddingH,
+                        AppSizes.spaceSm,
+                      ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate((iconText.length), (index) {
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: List.generate(iconText.length, (index) {
+                          final isSelected = currentIndex == index;
                           return InkWell(
                             onTap: () {
                               if (token == '') {
                                 context.read<NaveBarBloc>().add(
                                   NaveBarIndexEvent(
-                                    index: index == 0 ? index : accountTabIndex,
+                                    index: index == 0
+                                        ? index
+                                        : accountTabIndex,
                                   ),
                                 );
                                 if (index != 0 && index != accountTabIndex) {
-                                  AppMsg.showSnackBar(
+                                  AppMsg.warning(
                                     context,
-                                    message:
-                                        'You need to log in to continue. Please log in first.',
+                                    'Please sign in first to open this section.',
                                   );
                                 }
                               } else {
@@ -137,24 +211,35 @@ class _NaveBarState extends State<NaveBar> {
                                 );
                               }
                             },
-
-                            child: Column(
-                              children: [
-                                Icon(
-                                  icons[index],
-                                  color: currentIndex == index
-                                      ? AppColors.primaryColor
-                                      : AppColors.blackIconColor,
-                                ),
-                                CustomText(
-                                  text: iconText[index],
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: currentIndex == index
-                                      ? AppColors.primaryColor
-                                      : AppColors.blackIconColor,
-                                ),
-                              ],
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppSizes.gapSm,
+                                vertical: AppSizes.spaceXs,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    icons[index],
+                                    size: AppSizes.iconLg,
+                                    color: isSelected
+                                        ? AppColors.primaryColor
+                                        : AppColors.mutedTextColor,
+                                  ),
+                                  SizedBox(height: AppSizes.spaceXs),
+                                  CustomText(
+                                    text: iconText[index],
+                                    style: AppTextStyles.label.copyWith(
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      color: isSelected
+                                          ? AppColors.primaryColor
+                                          : AppColors.mutedTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         }),
@@ -163,7 +248,11 @@ class _NaveBarState extends State<NaveBar> {
                   ),
                 ),
               )
-            : Scaffold(body: Center(child: CircularProgressIndicator()));
+            : Scaffold(
+                backgroundColor: AppColors.screenBgColor,
+                body: const AppListShimmer(),
+              ),
+        );
       },
     );
   }

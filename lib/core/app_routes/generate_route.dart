@@ -11,7 +11,6 @@ import 'package:doctor_app/screens/profile_screens/my_profile.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/profile_screens/update_profile.dart';
 import 'package:doctor_app/screens/session_record/session_notes.dart';
-import 'package:doctor_app/screens/splash_scree/splash_screen.dart';
 import 'package:doctor_app/screens/video_palyer/video_player_screen.dart';
 import 'package:doctor_app/screens/visits_detail/visits_detail_screen.dart';
 
@@ -125,7 +124,6 @@ import 'package:doctor_app/screens/profile_screens/my_profile.dart';
 import 'package:doctor_app/screens/profile_screens/profile_screen.dart';
 import 'package:doctor_app/screens/profile_screens/update_profile.dart';
 import 'package:doctor_app/screens/session_record/session_notes.dart';
-import 'package:doctor_app/screens/splash_scree/splash_screen.dart';
 import 'package:doctor_app/screens/video_palyer/video_player_screen.dart';
 import 'package:doctor_app/screens/visits_detail/visits_detail_screen.dart';
 import 'package:doctor_app/screens/invioce/invoice_detail_screen.dart';
@@ -147,12 +145,12 @@ class RouteGenerator {
   }
 
   /// 🔥 MAIN ROUTER
-  static GoRouter get route => GoRouter(
-    initialLocation: AppRoutes.splashScreen,
+  static final GoRouter route = GoRouter(
+    initialLocation: AppRoutes.naveBar,
     routes: [
-      _goRoute(
-        routeName: AppRoutes.splashScreen,
-        screen: (context, state) => SplashScreen(),
+      GoRoute(
+        path: AppRoutes.splashScreen,
+        redirect: (_, __) => AppRoutes.naveBar,
       ),
       _goRoute(
         routeName: AppRoutes.naveBar,
@@ -212,10 +210,25 @@ class RouteGenerator {
         screen: (context, state) =>
             NfcCardPage(fromProfile: state.extra as bool),
       ),
-      _goRoute(
-        routeName: AppRoutes.videoPlayerScreen,
-        screen: (context, state) =>
-            VideoPlayerScreen(videoIndex: state.extra as int),
+      GoRoute(
+        path: AppRoutes.videoPlayerScreen,
+        pageBuilder: (context, state) {
+          final index = state.extra is int ? state.extra as int : 0;
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: VideoPlayerScreen(videoIndex: index),
+            transitionDuration: const Duration(milliseconds: 280),
+            reverseTransitionDuration: const Duration(milliseconds: 220),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              final curved = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic,
+              );
+              return FadeTransition(opacity: curved, child: child);
+            },
+          );
+        },
       ),
       _goRoute(
         routeName: AppRoutes.allPackagesScreen,

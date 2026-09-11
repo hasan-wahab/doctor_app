@@ -86,4 +86,10 @@ class AppColors {
 
   /// Dark card secondary text (STANDARD DURATION)
   static Color darkCardMutedText = const Color(0xFFBDBDBD);
+
+  static const Color success = Color(0xFF2E7D32);
+  static const Color error = Color(0xFFD32F2F);
+  static const Color warning = Color(0xFFF9A825);
+  static const Color info = Color(0xFF1046BC);
+  static const Color secondaryButton = Color(0xFF546E7A);
 }
