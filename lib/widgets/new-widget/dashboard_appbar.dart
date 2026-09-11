@@ -8,7 +8,6 @@ class DashboardAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String? imageUrl;
   final DateTime? date;
   final VoidCallback? onAvatarTap;
-  final VoidCallback? onNotificationTap;
   final bool isLoading;
 
   const DashboardAppbar({
@@ -17,7 +16,6 @@ class DashboardAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.imageUrl,
     this.date,
     this.onAvatarTap,
-    this.onNotificationTap,
     this.isLoading = false,
   });
 
@@ -41,9 +39,6 @@ class DashboardAppbar extends StatelessWidget implements PreferredSizeWidget {
       subtitleColor: AppColors.primaryColor,
       onAvatarTap: onAvatarTap,
       isLoading: isLoading,
-      actions: [
-        AppBarNotificationButton(onTap: onNotificationTap),
-      ],
     );
   }
 }
